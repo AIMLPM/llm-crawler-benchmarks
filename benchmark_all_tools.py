@@ -1216,6 +1216,55 @@ def analyze_output(out_dir: str) -> dict:
     }
 
 
+class _Heartbeat:
+    """Logs periodic progress during tool execution by counting output files."""
+
+    def __init__(self, tool_name: str, site_name: str, out_dir: str,
+                 max_pages: int, interval: float = 30.0):
+        self.tool_name = tool_name
+        self.site_name = site_name
+        self.out_dir = out_dir
+        self.max_pages = max_pages
+        self.interval = interval
+        self._running = False
+        self._thread: Optional[threading.Thread] = None
+        self._last_count = 0
+
+    def start(self):
+        self._running = True
+        self._thread = threading.Thread(target=self._pulse, daemon=True)
+        self._thread.start()
+
+    def stop(self):
+        self._running = False
+        if self._thread:
+            self._thread.join(timeout=2)
+
+    def _pulse(self):
+        while self._running:
+            time.sleep(self.interval)
+            if not self._running:
+                break
+            try:
+                count = sum(1 for f in Path(self.out_dir).glob("*.md") if f.stat().st_size > 0)
+            except OSError:
+                count = self._last_count
+            elapsed = time.time() - self._start_time
+            status = f"{count}/{self.max_pages} pages"
+            if count > self._last_count:
+                delta = count - self._last_count
+                status += f" (+{delta})"
+            elif count == self._last_count and self._last_count > 0:
+                status += " (stalled)"
+            status += f", {elapsed:.0f}s elapsed"
+            logger.info(f"      [{self.tool_name}/{self.site_name}] heartbeat: {status}")
+            self._last_count = count
+
+    def set_start_time(self, t: float):
+        self._start_time = t
+        self._last_count = 0
+
+
 def run_single(
     tool_name: str,
     run_fn: Callable,
@@ -1234,9 +1283,12 @@ def run_single(
     url = site_config["url"]
     max_pages = site_config["max_pages"]
 
+    heartbeat = _Heartbeat(tool_name, site_name, out_dir, max_pages)
     mem = MemoryTracker()
     mem.start()
     start = time.time()
+    heartbeat.set_start_time(start)
+    heartbeat.start()
 
     try:
         pages = run_fn(url, out_dir, max_pages, url_list=url_list, concurrency=concurrency)
@@ -1244,6 +1296,8 @@ def run_single(
     except Exception as exc:
         pages = 0
         error = str(exc)
+    finally:
+        heartbeat.stop()
 
     elapsed = time.time() - start
 
