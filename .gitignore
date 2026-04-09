@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.build/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Secrets
+.env
+.env.*
+
+# Local output
+*.log
+
+# Benchmark data
+runs/
+embed_cache/
+retrieval_checkpoints/
+answer_quality_checkpoints/
+storage/
+.url_cache.json
+.benchmark_checkpoint.json
+results_*
+
+# Compiled binaries
+colly_crawler/colly_crawler/

@@ -1,0 +1,36 @@
+[project]
+name = "llm-crawler-bench"
+version = "0.1.0"
+description = "Head-to-head benchmark suite for web crawlers used in LLM/RAG pipelines"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+
+dependencies = [
+    "markcrawl>=0.1.0",
+    "scrapy",
+    "crawl4ai",
+    "crawlee[playwright]",
+    "firecrawl-py",
+    "python-dotenv",
+    "psutil",
+    "openai",
+    "numpy",
+    "rank_bm25",
+    "sentence-transformers",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
