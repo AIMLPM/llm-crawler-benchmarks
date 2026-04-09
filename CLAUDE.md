@@ -9,8 +9,8 @@ LLM/RAG pipelines. It compares 7 tools across 8 real-world sites on speed,
 extraction quality, retrieval quality, LLM answer quality, and cost at scale.
 Reports live in `reports/`, benchmark scripts at the root.
 
-The crawler under test, [markcrawl](https://github.com/AIMLPM/markcrawl), is
-a pip dependency — not bundled in this repo.
+One of the compared tools, [markcrawl](https://github.com/AIMLPM/markcrawl),
+is a pip dependency — not bundled in this repo.
 
 ## Benchmark report style guide
 
@@ -81,7 +81,7 @@ others can skip it. The summary must serve all three.
 
 ### Tone and credibility
 
-- **Be honest.** If markcrawl loses on a metric, say so. Readers trust reports
+- **Be honest.** If any tool performs poorly on a metric, say so. Readers trust reports
   that acknowledge weaknesses. See `reports/METHODOLOGY.md` for pre-written
   narratives on scenarios where markcrawl loses.
 - **Don't overclaim small differences.** A gap under ~2% on a 5-point scale or

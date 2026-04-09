@@ -11,7 +11,7 @@ All methods are free, deterministic, and require no LLM or API keys.
 
 The two most diagnostic metrics for RAG use cases:
 - **Preamble [1]**: avg words per page before the first heading — nav chrome that pollutes
-  every chunk before the real content starts (crawl4ai: ~200, markcrawl: 0).
+  every chunk before the real content starts.
 - **Repeat rate**: fraction of sentences that appear on >50% of pages — repeated
   nav/footer text that inflates chunk count and degrades retrieval precision.
 """
@@ -509,26 +509,27 @@ def generate_quality_report(
         lines.extend(["", "**[1]** Avg words per page before the first heading (nav chrome).", ""])
 
         # Add takeaway narrative based on the summary data
-        if "markcrawl" in tool_summaries:
-            mc = tool_summaries["markcrawl"]
-            noisy_tools = [t for t, s in tool_summaries.items()
-                           if s["avg_preamble"] > 50 and t != "markcrawl"]
-            if noisy_tools:
-                worst = max(noisy_tools, key=lambda t: tool_summaries[t]["avg_preamble"])
-                worst_p = tool_summaries[worst]["avg_preamble"]
-                lines.extend([
-                    "",
-                    f"**Key takeaway:** markcrawl achieves {mc['signal_ratio']:.0%} content signal "
-                    f"with only {mc['avg_preamble']:.0f} words of preamble per page — compared to "
-                    f"{worst_p:.0f} for {worst}. "
-                    f"Its recall is lower ({mc['avg_recall']:.0%} vs "
-                    f"{tool_summaries[max(tool_summaries, key=lambda t: tool_summaries[t]['avg_recall'])]['avg_recall']:.0%}) "
-                    f"because it strips nav, footer, and sponsor content that other tools include. "
-                    f"For RAG use cases, this trade-off favors markcrawl: every chunk in the vector "
-                    f"index is pure content, with no boilerplate to dilute embeddings or pollute "
-                    f"retrieval results.",
-                    "",
-                ])
+        # Find the tool with lowest preamble (cleanest output)
+        cleanest_tool = min(tool_summaries, key=lambda t: tool_summaries[t]["avg_preamble"])
+        cleanest = tool_summaries[cleanest_tool]
+        noisy_tools = [t for t, s in tool_summaries.items()
+                       if s["avg_preamble"] > 50 and t != cleanest_tool]
+        if noisy_tools:
+            worst = max(noisy_tools, key=lambda t: tool_summaries[t]["avg_preamble"])
+            worst_p = tool_summaries[worst]["avg_preamble"]
+            highest_recall_tool = max(tool_summaries, key=lambda t: tool_summaries[t]["avg_recall"])
+            lines.extend([
+                "",
+                f"**Key takeaway:** {cleanest_tool} achieves {cleanest['signal_ratio']:.0%} content signal "
+                f"with only {cleanest['avg_preamble']:.0f} words of preamble per page — compared to "
+                f"{worst_p:.0f} for {worst}. "
+                f"Its recall is lower ({cleanest['avg_recall']:.0%} vs "
+                f"{tool_summaries[highest_recall_tool]['avg_recall']:.0%}) "
+                f"because it strips nav, footer, and sponsor content that other tools include. "
+                f"For RAG use cases, this trade-off typically favors cleaner output: fewer junk tokens "
+                f"per chunk means better embedding quality and retrieval precision.",
+                "",
+            ])
 
         lines.extend([
             "> **Content signal** = percentage of output that is content (not preamble nav chrome).",
@@ -660,8 +661,8 @@ def generate_quality_report(
                         f"{site_stats[highest_recall]['recall']:.0%}) reflects stricter content "
                         f"filtering — the \"missed\" sentences are predominantly navigation, "
                         f"sponsor links, and footer text that other tools include as content. "
-                        f"For RAG, this is a net positive: fewer junk tokens per chunk means "
-                        f"better embedding quality and retrieval precision."
+                        f"For RAG, this is typically a net positive: fewer junk tokens per chunk "
+                        f"tends to improve embedding quality and retrieval precision."
                     )
 
             if narrative_parts:

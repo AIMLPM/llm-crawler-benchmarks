@@ -100,18 +100,6 @@ git diff
 These are conditions that must ALWAYS be true. The script
 `self_improvement/check_invariants.py` validates them automatically.
 
-### README invariants
-
-| ID | Check | Why |
-|----|-------|-----|
-| R1 | README contains "Common Recipes" section | FR-001: LLM discoverability |
-| R2 | README contains `--no-sitemap --max-pages 1` example | FR-001: single-page recipe |
-| R3 | README contains `--render-js` in a recipe | FR-001: JS-rendered page recipe |
-| R4 | README tagline contains "webpage" | FR-003: signals single-page support |
-| R5 | README contains link to LLM_PROMPT.md before Quickstart | FR-004: LLM agent discovery |
-| R6 | README contains "When NOT to use" section | Honest limitations |
-| R7 | README benchmark summary exists inside `<details>` tag | CLAUDE.md: README sync rule |
-
 ### Report invariants
 
 | ID | Check | Why |

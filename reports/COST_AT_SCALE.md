@@ -41,7 +41,7 @@ Total annual cost by scenario, all 8 tools ranked by total cost ascending. This 
 
 **For the senior engineer checking the model:** these projections assume a fixed K (retrieval depth) per tool, estimated from chunk ratios. The actual relationship between K and quality is non-linear, so treat these as directional estimates, not precise forecasts. The [methodology section](#estimating-k-per-tool) documents the assumptions and their limitations.
 
-**An honest caveat:** crawler choice is not the largest cost lever in a RAG pipeline. Choosing Claude Haiku ($0.80/1M tokens) over Claude Sonnet ($3.00/1M tokens) saves 73% on query costs regardless of crawler. Optimizing chunk size and retrieval strategy often matters more than which tool fetched the HTML. Markcrawl's advantage is that it gives you the cleanest starting material, so your other optimizations compound on a better foundation.
+**An honest caveat:** crawler choice is not the largest cost lever in a RAG pipeline. Choosing Claude Haiku ($0.80/1M tokens) over Claude Sonnet ($3.00/1M tokens) saves 73% on query costs regardless of crawler. Optimizing chunk size and retrieval strategy often matters more than which tool fetched the HTML. The tool that produces the cleanest starting material gives other optimizations a better foundation to compound on.
 
 ---
 
@@ -49,7 +49,7 @@ Total annual cost by scenario, all 8 tools ranked by total cost ascending. This 
 
 Every page gets chunked, embedded, and stored in a vector database. More chunks per page = higher cost. All figures use [OpenAI text-embedding-3-small](https://openai.com/pricing) at $0.02/1M tokens + $0.10/1K vectors/month for DB hosting (see [full formula](#storage-cost-formula)).
 
-Sorted by cost ascending (markcrawl produces the fewest chunks per page):
+Sorted by cost ascending:
 
 | Pages | markcrawl | scrapy+md | firecrawl | crawl4ai | crawl4ai-raw | colly+md | playwright | crawlee |
 |---|---|---|---|---|---|---|---|---|
@@ -65,7 +65,7 @@ At 1M pages, markcrawl saves **$3,015/yr vs scrapy+md** and **$13,193/yr vs craw
 
 ## Query Costs (scale with query volume)
 
-Every query retrieves top-K chunks and sends them to an LLM as context. Markcrawl's cleaner chunks produce the best answers at K=10. Tools with noisier output need a higher K to compensate, which means more tokens (and cost) per query.
+Every query retrieves top-K chunks and sends them to an LLM as context. The tool with the fewest chunks per page produces the best answers at K=10 (see [ANSWER_QUALITY.md](ANSWER_QUALITY.md)). Tools with noisier output need a higher K to compensate, which means more tokens (and cost) per query.
 
 ### Estimated retrieval depth per tool
 
@@ -279,7 +279,7 @@ Three scenarios matching different project sizes. The key insight: for most solo
 | LLM queries | $0 (within subscription) or $10-30/mo (API at 1K queries/day) |
 | **Total** | **$0-25/mo** |
 
-**What this means in practice:** if you're already paying for an AI subscription and building a RAG app over documentation sites, you likely won't pay anything extra. The marginal cost of adding markcrawl to your stack is $0. The only question is whether your corpus fits in a free-tier vector DB -- and with markcrawl's 10.1 chunks/page, you get roughly 2x the capacity of noisier crawlers like crawlee before you need to upgrade. See [ANSWER_QUALITY.md](ANSWER_QUALITY.md) for whether that quality difference matters for your use case.
+**What this means in practice:** if you're already paying for an AI subscription and building a RAG app over documentation sites, you likely won't pay anything extra. The marginal cost of adding markcrawl to your stack is $0. The only question is whether your corpus fits in a free-tier vector DB — tools with fewer chunks/page (e.g., 10.1 vs 21.8) get roughly 2x the capacity before you need to upgrade. See [ANSWER_QUALITY.md](ANSWER_QUALITY.md) for whether that quality difference matters for your use case.
 
 ---
 
@@ -287,7 +287,7 @@ Three scenarios matching different project sizes. The key insight: for most solo
 
 ### Source data
 
-All numbers derive from our benchmark of **92 queries across 8 sites** using 8 crawler tools. Full results in [ANSWER_QUALITY.md](ANSWER_QUALITY.md) and [RETRIEVAL_COMPARISON.md](RETRIEVAL_COMPARISON.md). See [METHODOLOGY.md](METHODOLOGY.md) for the complete test setup.
+All numbers derive from the benchmark of **92 queries across 8 sites** using 8 crawler tools. Full results in [ANSWER_QUALITY.md](ANSWER_QUALITY.md) and [RETRIEVAL_COMPARISON.md](RETRIEVAL_COMPARISON.md). See [METHODOLOGY.md](METHODOLOGY.md) for the complete test setup.
 
 Measured values for all tools (sorted by chunks/page ascending):
 

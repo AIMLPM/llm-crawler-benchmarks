@@ -11,7 +11,7 @@ can be executed independently or as part of a full audit.
 
 Point the AI assistant to a specific spec when you want a focused review:
 
-- "Review spec 01" -- code review of markcrawl core
+- "Review spec 02" -- code review of benchmark scripts
 - "Review spec 04" -- check reports against style guide
 - "Run all specs" -- full audit (start to finish)
 
@@ -26,9 +26,8 @@ Each spec contains:
 
 | # | Spec | Scope | Key Files |
 |---|------|-------|-----------|
-| 01 | [MarkCrawl Code Review](01_markcrawl_code_review.md) | Core crawler package | `markcrawl/` package, `Dockerfile` |
 | 02 | [Benchmark Code Review](02_benchmark_code_review.md) | Python benchmark scripts (no Docker) | `benchmark_*.py`, `quality_scorer.py`, `crawlee_worker.py`, `lint_reports.py` |
-| 03 | [Docker Infrastructure Review](03_docker_infra_review.md) | Firecrawl Docker stack, benchmark Dockerfile | `firecrawl/`, `Dockerfile`, `Dockerfile` |
+| 03 | [Docker Infrastructure Review](03_docker_infra_review.md) | Firecrawl Docker stack, benchmark Dockerfile | `Dockerfile` |
 | 04 | [Report Style Compliance](04_report_style_compliance.md) | Markdown reports vs CLAUDE.md style guide | All `reports/*.md` reports |
 | 05 | [Cross-Report Data Consistency](05_cross_report_consistency.md) | Numbers agree across reports | SPEED, RETRIEVAL, ANSWER_QUALITY, COST reports + source data |
 | 06 | [Resilience & Restart](06_resilience_restart.md) | Checkpointing, crash recovery, data integrity | All benchmark scripts, checkpoint dirs |
@@ -36,8 +35,8 @@ Each spec contains:
 | 08 | [Persona Reviews](08_persona_reviews.md) | Persona definitions, assignments, review guides | README, all reports, all specs |
 | 09 | [Safeguards](09_safeguards.md) | Pre-commit validation, feedback preservation, invariant checks | All changes |
 | -- | [Feedback Registry](feedback_registry.md) | Protected content from user/reviewer feedback | All files |
-| -- | [check_invariants.py](check_invariants.py) | Automated invariant checker (run before committing) | README, reports, code |
-| -- | [check_cross_report_consistency.py](check_cross_report_consistency.py) | Cross-report data consistency checker (run before committing) | README, SPEED, COST, ANSWER_QUALITY reports |
+| -- | [check_invariants.py](check_invariants.py) | Automated invariant checker (run before committing) | reports, code |
+| -- | [check_cross_report_consistency.py](check_cross_report_consistency.py) | Cross-report data consistency checker (run before committing) | COST, ANSWER_QUALITY reports |
 
 ---
 
@@ -106,7 +105,6 @@ for full persona definitions and per-spec checklists.
 
 | Spec | LLM Agent | Junior Dev | Principal Eng | Product Manager |
 |------|-----------|------------|---------------|-----------------|
-| 01 MarkCrawl Code | | x | x | |
 | 02 Benchmark Code | | x | x | |
 | 03 Docker Infra | | | x | |
 | 04 Report Style | x | x | | x |

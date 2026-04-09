@@ -1,4 +1,4 @@
-# Head-to-Head Benchmark Plan: MarkCrawl vs Other Crawlers
+# Benchmark Methodology
 
 <!-- style: v2, 2026-04-07 -->
 
@@ -6,22 +6,14 @@
 
 Compare MarkCrawl against Crawl4AI, FireCrawl (self-hosted), and Scrapy on the same sites with equivalent settings, measuring what matters for the "crawl a documentation site for RAG" use case.
 
-If another tool is faster, we say so. The comparison is factual, not promotional.
+If one tool is faster than another, the reports say so. The comparison is factual, not promotional.
 
-## Decision: what happens when MarkCrawl loses
+## Reporting approach
 
-We expect MarkCrawl to lose on some metrics. Here's the pre-written narrative for each scenario:
+When one tool outperforms another, the reports state the result directly.
+There is no default "winner" — each metric is reported factually.
 
-| Scenario | Likely? | Our response |
-|---|---|---|
-| Scrapy has 2-3x higher throughput | Very likely | Position on simplicity: "Scrapy is faster but requires building spiders, pipelines, and Markdown conversion. MarkCrawl trades peak throughput for one-command simplicity." |
-| Scrapy has 5x+ higher throughput | Possible | Investigate async (`httpx`/`aiohttp`) as a roadmap item. Document the gap honestly. |
-| Crawl4AI wins on JS-rendered sites | Almost certain | Expected — Crawl4AI is built around Playwright. Note that MarkCrawl's `--render-js` is optional, keeping the core lightweight. |
-| Crawl4AI has better extraction quality | Possible | If true, investigate their cleaning approach and consider adopting readability-based extraction. |
-| FireCrawl has better Markdown quality | Possible | Analyze their conversion pipeline. They may use a different HTML-to-Markdown library or post-processing. |
-| MarkCrawl has the most junk in output | Would be bad | Fix the extraction pipeline before publishing results. This is a quality bug, not a positioning question. |
-
-## What we compare
+## What is compared
 
 **Measured:** Fetch HTML → extract clean Markdown → write to disk (the common denominator).
 
@@ -48,9 +40,9 @@ We expect MarkCrawl to lose on some metrics. Here's the pre-written narrative fo
 | Tool order | Randomized per site per run | Eliminate CDN/DNS cache bias from fixed ordering |
 | Scheduling | Resource-aware parallel (see below) | Avoid browser-browser contention on one laptop |
 
-### Why we keep the warmup run
+### Why the warmup run is kept
 
-We validated that the warmup run meaningfully improves benchmark stability.
+Validation showed that the warmup run meaningfully improves benchmark stability.
 The experiment (`warmup_validation/test_warmup_impact.py`) runs
 each tool twice on the same site — once cold and once with a throwaway warmup
 — and compares medians, standard deviations, and first-iteration outliers.
@@ -78,7 +70,7 @@ each tool twice on the same site — once cold and once with a throwaway warmup
    because HTTP keep-alive and connection pooling benefit subsequent
    requests to the same host.
 
-4. **With only 2 timed iterations** (our default), a cold first-run
+4. **With only 2 timed iterations** (the default), a cold first-run
    outlier has outsized impact on the median. Warmup eliminates this bias.
 
 **Decision:** warmup is enabled by default. The cost is 1 extra run per
@@ -142,16 +134,16 @@ To force fully sequential execution: `--sequential`
 
 Firecrawl is architecturally a SaaS product. Even the open-source self-hosted
 version requires 4+ Docker services (API server, worker, Redis, Playwright) with
-no library or single-process mode. Our benchmarks use the self-hosted setup,
+no library or single-process mode. The benchmarks use the self-hosted setup,
 which crashed on 3 of 8 sites (react-dev, stripe-docs, blog-engineering) and
 fetched fewer pages on others. Firecrawl's paid API likely performs better since
-it scales these services independently. We include firecrawl as the best
+it scales these services independently. Firecrawl is included as the best
 free-tier comparison available, but results may not reflect paid-tier
 performance.
 
 #### crawl4ai vs crawl4ai-raw
 
-We run Crawl4AI in two configurations to show the impact of custom optimization:
+Crawl4AI is run in two configurations to show the impact of custom optimization:
 
 - **crawl4ai** uses `arun_many()` which dispatches all URLs in a single batch call,
   letting crawl4ai manage browser tab concurrency internally. This is a performance
@@ -264,7 +256,7 @@ For each test site, select 5 pages with known structural elements. Score each to
 
 ### Junk detection (automated)
 
-Same junk patterns as our existing benchmarks, applied to all tools equally:
+Same junk patterns as the existing benchmarks, applied to all tools equally:
 - `<script>`, `<style>`, `<nav>`, `<footer>`, `<header>` tags in output
 - Cookie banner/consent text
 - "All rights reserved" boilerplate
@@ -276,7 +268,7 @@ Count per tool across all pages. Lower is better.
 
 The automated quality scorer (`quality_scorer.py`) applies several normalizations to
 compare tool outputs fairly. These are **scoring-layer customizations**, not crawler
-customizations — they don't change what any tool produces, only how we measure it.
+customizations — they don't change what any tool produces, only how it is measured.
 
 | Normalization | What it does | Why it's needed |
 |---|---|---|
@@ -299,7 +291,7 @@ A tool that includes nav boilerplate in every page might still score well on pre
 (the boilerplate is "shared" across tools) but produce poor embeddings because the same
 navigation text dilutes the semantic signal in every chunk.
 
-We measure this by running the same retrieval pipeline across all tools, using **four
+This is measured by running the same retrieval pipeline across all tools, using **four
 retrieval modes** to test under realistic production conditions:
 
 1. **Chunk** each tool's output using markdown-aware chunking (default: 400 word max, 50 word overlap)
@@ -467,13 +459,13 @@ This script:
 5. Generates `reports/SPEED_COMPARISON.md` with all tables and statistics
 6. Saves raw Markdown output from each tool for manual quality review
 
-Anyone can re-run it and verify our numbers. If our results are biased, the community can check.
+Anyone can re-run it and verify the numbers. If the results are biased, the community can check.
 
 ## Benchmark 2: MarkCrawl full pipeline (end-to-end)
 
 This is a **separate, MarkCrawl-only benchmark** that times the complete RAG pipeline that no other single tool offers. It answers: "If I crawl 50 pages, extract structured fields, and upload to Supabase, how long does the whole thing take?"
 
-### What we time (per stage)
+### What is timed (per stage)
 
 ```
 Stage 1: Crawl           → pages.jsonl + .md files       (no API keys needed)
@@ -575,17 +567,11 @@ for query, expected_url in test_queries:
 
 ### A note on fairness
 
-The retrieval quality check is the most important part of the pipeline benchmark — and it's designed to be critical of our own tool, not to give us an unfair advantage.
+The retrieval quality check validates the entire pipeline end-to-end: if a crawl missed content, chunks split badly, or embeddings are poor, the test catches it. It is the metric that matters most for RAG.
 
-The retrieval check validates the entire pipeline end-to-end: if the crawl missed content, the chunks split badly, or the embeddings are poor, the test catches it. It's the metric that actually matters for RAG, and it's self-contained (no Supabase required).
+This benchmark runs the retrieval check against all tools that support the full crawl-to-retrieval pipeline. Currently only markcrawl offers this as a built-in feature. If other tools add similar pipelines, the same retrieval queries will be run against their output for a direct comparison.
 
-We publish this test against MarkCrawl's own output because no other tool in the comparison offers the full crawl-to-retrieval pipeline. This isn't a competitive claim — it's a self-assessment. If our retrieval accuracy is 3/5 or worse, that's a signal our chunking or extraction needs work, and we'll say so. The purpose is to hold ourselves accountable to the end-to-end quality bar, not to declare victory in a category where we're the only entrant.
-
-If other tools add similar end-to-end pipelines in the future, we'd welcome running the same retrieval queries against their output for a direct comparison.
-
-### Why this matters for positioning
-
-No other single tool in the comparison offers this pipeline. The message isn't "we're faster at crawling" — it's "we're the only tool where `pip install markcrawl` gets you from URL to searchable vector database in 3 commands." The pipeline benchmark quantifies that value with real numbers.
+If retrieval accuracy for any tool falls to 3/5 or worse, that signals chunking or extraction needs improvement, and the reports will say so.
 
 ## Where results are published
 

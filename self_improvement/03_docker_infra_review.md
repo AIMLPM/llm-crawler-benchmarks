@@ -12,14 +12,15 @@ updates, or when investigating OOM/crash issues.
 
 | File | Purpose |
 |------|---------|
-| `Dockerfile` (project root) | Main markcrawl Docker image |
-| `Dockerfile` | Benchmark environment with all tools |
-| `firecrawl/firecrawl-src/docker-compose.yaml` | Firecrawl services (gitignored) |
-| `firecrawl/firecrawl-src/.env` | Firecrawl environment vars (gitignored) |
+| `Dockerfile` | Benchmark environment Docker image |
 
 ---
 
 ## What to check
+
+> **Note:** The `firecrawl/` directory is not included in this repo. Sections
+> 1-3 below only apply if you are running a self-hosted Firecrawl instance.
+> Skip to section 4 if you are using the hosted Firecrawl API.
 
 ### 1. Firecrawl Docker stack stability
 

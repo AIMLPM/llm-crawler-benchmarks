@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Head-to-head benchmark: MarkCrawl vs Crawl4AI vs Scrapy+markdownify.
+"""Head-to-head benchmark: runs all available crawlers against the same sites.
 
-Runs all available tools against the same sites with equivalent settings,
-measuring performance, extraction quality, and output characteristics.
+Compares 7+ tools with equivalent settings, measuring performance,
+extraction quality, and output characteristics.
 
 FireCrawl runs if FIRECRAWL_API_KEY or FIRECRAWL_API_URL is set. The script
 auto-loads .env from the project root, so no manual `source .env` is needed.
@@ -368,14 +368,14 @@ def _validate_urls(urls: List[str], concurrency: int = 20) -> tuple[List[str], L
     def _check(url: str) -> None:
         try:
             req = urllib.request.Request(url, method="HEAD")
-            req.add_header("User-Agent", "markcrawl-benchmark/1.0")
+            req.add_header("User-Agent", "llm-crawler-bench/1.0")
             resp = urllib.request.urlopen(req, timeout=10)
             code = resp.getcode()
         except (urllib.error.URLError, urllib.error.HTTPError, OSError):
             # HEAD rejected — try GET
             try:
                 req = urllib.request.Request(url)
-                req.add_header("User-Agent", "markcrawl-benchmark/1.0")
+                req.add_header("User-Agent", "llm-crawler-bench/1.0")
                 resp = urllib.request.urlopen(req, timeout=10)
                 code = resp.getcode()
             except (urllib.error.URLError, urllib.error.HTTPError, OSError):
