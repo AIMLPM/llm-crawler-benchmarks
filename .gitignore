@@ -38,4 +38,7 @@ storage/
 results_*
 
 # Compiled binaries
-tools/colly_crawler/colly_crawler/
+tools/colly_crawler/colly_crawler
+
+# Cloned tool sources
+tools/firecrawl/firecrawl-src/
