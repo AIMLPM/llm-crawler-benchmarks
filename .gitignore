@@ -42,3 +42,6 @@ tools/colly_crawler/colly_crawler
 
 # Cloned tool sources
 tools/firecrawl/firecrawl-src/
+
+# Private docs (competitive research, internal notes)
+private/

@@ -99,6 +99,24 @@ docker run --rm \
   llm-crawler-benchmarks
 ```
 
+## Related Work
+
+Other projects benchmark parts of the web scraping pipeline:
+
+- **[Firecrawl scrape-evals](https://www.firecrawl.dev/blog/introducing-scrape-evals)** —
+  1,000-URL extraction quality benchmark (precision/recall). Single-page quality
+  only; no speed, retrieval, or LLM answer evaluation.
+- **[WCXB](https://webcontentextraction.org/)** — 2,008-page content extraction
+  leaderboard with word-level F1. Covers traditional tools (trafilatura,
+  readability) but not LLM-era crawlers.
+- **[Spider.cloud benchmark](https://spider.cloud/blog/firecrawl-vs-crawl4ai-vs-spider-honest-benchmark)** —
+  3-tool comparison (Firecrawl, Crawl4AI, Spider) on throughput, cost, and RAG
+  retrieval accuracy.
+
+This project differs by evaluating the **full RAG pipeline** — from crawl through
+chunk, embed, retrieve, and LLM answer — across 7 tools, 8 sites, and 5
+dimensions including downstream answer quality and cost at scale.
+
 ## Self-Improvement Framework
 
 The `self_improvement/` directory contains a 9-spec review framework for
