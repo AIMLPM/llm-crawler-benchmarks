@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -53,6 +54,7 @@ func main() {
 	c.Limit(&colly.LimitRule{
 		DomainGlob:  "*",
 		Parallelism: 5,
+		Delay:       100 * time.Millisecond,
 	})
 
 	// Respect robots.txt
@@ -61,7 +63,26 @@ func main() {
 	parsedBase, _ := url.Parse(*baseURL)
 	baseDomain := parsedBase.Hostname()
 
+	// Track per-URL retry counts for 429 backoff
+	var retryCounts sync.Map
+	const maxRetries = 3
+
 	c.OnError(func(r *colly.Response, err error) {
+		if r.StatusCode == 429 {
+			key := r.Request.URL.String()
+			countVal, _ := retryCounts.LoadOrStore(key, 0)
+			count := countVal.(int)
+			if count < maxRetries {
+				retryCounts.Store(key, count+1)
+				delay := time.Duration(count+1) * 500 * time.Millisecond
+				fmt.Fprintf(os.Stderr, "[colly] 429 on %s, retry %d/%d after %v\n", key, count+1, maxRetries, delay)
+				time.Sleep(delay)
+				r.Request.Retry()
+				return
+			}
+			fmt.Fprintf(os.Stderr, "[colly] 429 on %s, giving up after %d retries\n", key, maxRetries)
+			return
+		}
 		fmt.Fprintf(os.Stderr, "[colly] error %s: %v\n", r.Request.URL, err)
 	})
 

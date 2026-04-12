@@ -267,6 +267,7 @@ def run_checks() -> tuple[dict[str, bool], bool]:
     # actually runs on this platform (not just that the file exists).
     colly_candidates = [
         Path("/usr/local/bin/colly_crawler"),
+        BENCH_DIR / "tools" / "colly_crawler" / "colly_crawler",
         BENCH_DIR / "colly_crawler" / "colly_crawler",
     ]
     colly_bin = None

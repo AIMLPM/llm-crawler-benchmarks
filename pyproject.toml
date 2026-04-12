@@ -9,7 +9,7 @@ requires-python = ">=3.10"
 dependencies = [
     "markcrawl>=0.1.0",
     "scrapy",
-    "crawl4ai",
+    "crawl4ai==0.8.6",
     "crawlee[playwright]",
     "firecrawl-py",
     "python-dotenv",
