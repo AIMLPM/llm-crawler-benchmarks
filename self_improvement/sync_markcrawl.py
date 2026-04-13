@@ -71,6 +71,15 @@ def parse_speed(text: str) -> dict[str, float]:
     return result
 
 
+def _get_col(row: dict, prefix: str, default: str = "—") -> str:
+    """Get a column value by prefix match (handles 'Preamble [1]', 'Preamble [2]', etc.)."""
+    prefix_lower = prefix.lower()
+    for key, val in row.items():
+        if key.lower().startswith(prefix_lower):
+            return val
+    return default
+
+
 def parse_quality(text: str) -> dict[str, dict]:
     """Parse QUALITY_COMPARISON.md → {tool: {preamble, recall, precision}}."""
     result = {}
@@ -78,9 +87,9 @@ def parse_quality(text: str) -> dict[str, dict]:
         tool = row.get("Tool", "").strip("*").strip()
         if not tool:
             continue
-        preamble_str = row.get("Preamble [1]", "—").replace("⚠", "").strip()
-        recall_str = row.get("Recall", "—").replace("%", "").strip()
-        precision_str = row.get("Precision", "—").replace("%", "").strip()
+        preamble_str = _get_col(row, "Preamble").replace("⚠", "").strip()
+        recall_str = _get_col(row, "Recall").replace("%", "").strip()
+        precision_str = _get_col(row, "Precision").replace("%", "").strip()
         try:
             result[tool] = {
                 "preamble": int(preamble_str) if preamble_str != "—" else None,
