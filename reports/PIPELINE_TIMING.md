@@ -1,11 +1,7 @@
 # End-to-End RAG Pipeline Timing Benchmark
 <!-- style: v2, 2026-04-12 -->
 
-markcrawl is the fastest and cheapest end-to-end: 476.5s total pipeline time
-and $0.22 in API costs across 8 sites, vs 515.3s/$0.24 for the runner-up
-scrapy+md. Browser-based tools cost 5-6x more due to higher chunk counts.
-
-This benchmark measures how long each crawler takes across the full RAG pipeline:
+Measures how long each crawler takes across the full RAG pipeline:
 scraping, chunking, embedding, and querying.
 
 **Run:** `run_20260412_195003` | **Sites:** blog-engineering, books-toscrape, fastapi-docs, python-docs, quotes-toscrape, react-dev, stripe-docs, wikipedia-python | **Embedding model:** text-embedding-3-small | **Answer model:** gpt-4o-mini
@@ -21,6 +17,8 @@ scraping, chunking, embedding, and querying.
 | crawl4ai | 716.4 | 1.1 | 8.4 | 373.5 | **1099.5** | 1456 | 32735 | $0.366 |
 | crawlee | 806.2 | 4.4 | 13.0 | 342.5 | **1166.1** | 1456 | 47560 | $1.41 |
 | crawl4ai-raw | 1027.5 | 1.8 | 8.1 | 332.6 | **1370.0** | 1456 | 32735 | $0.366 |
+
+> **Column definitions:** **Scrape/Chunk/Embed/Query (s)** = wall-clock seconds for each pipeline phase (summed across all sites). **Total (s)** = sum of all phases. **Pages** = total pages fetched. **Chunks** = total text chunks produced. **Cost** = total API cost (embedding + LLM query).
 
 *(Cost uses OpenAI `text-embedding-3-small` at $0.02/1M tokens, `gpt-4o-mini` at $0.15/$0.6 per 1M input/output tokens)*
 
@@ -39,6 +37,8 @@ time and cost per page for a fairer comparison.
 | crawlee | 1456 | 1166.1 | 0.80 | $0.0010 | 32.7 |
 | crawl4ai-raw | 1456 | 1370.0 | 0.94 | $0.0003 | 22.5 |
 
+> **Column definitions:** **s/page** = Total (s) ÷ Pages. **Cost/page** = total API cost ÷ Pages. **Chunks/page** = Chunks ÷ Pages. All values are per-page averages.
+
 ## Phase Breakdown (% of Total Pipeline Time)
 
 | Tool | Scrape % | Chunk % | Embed % | Query % |
@@ -50,6 +50,8 @@ time and cost per page for a fairer comparison.
 | crawl4ai | 65.2% | 0.1% | 0.8% | 34.0% |
 | crawlee | 69.1% | 0.4% | 1.1% | 29.4% |
 | crawl4ai-raw | 75.0% | 0.1% | 0.6% | 24.3% |
+
+> Each percentage = phase time ÷ total pipeline time. Shows which phase dominates.
 
 ## API Cost Breakdown
 
@@ -65,7 +67,11 @@ time and cost per page for a fairer comparison.
 | crawlee | 66,893,569 | $1.34 | 441,799 | 14,750 | $0.075 | **$1.41** |
 | crawl4ai-raw | 14,109,525 | $0.282 | 502,761 | 13,769 | $0.084 | **$0.366** |
 
+> **Embed tokens** = tokens sent to the embedding API (all chunks). **Query in/out tokens** = tokens sent to and received from the answer LLM. **Total cost** = Embed cost + Query cost.
+
 ## Per-Site Breakdown
+
+Per-site tables use the same columns as the summary table above. See [summary legend](#summary-total-pipeline-time-by-tool) for column definitions.
 
 ### blog-engineering
 
@@ -182,11 +188,3 @@ time and cost per page for a fairer comparison.
 - **Cost tracking** counts actual tokens from API responses (embed tokens estimated via tiktoken, query tokens from response.usage)
 - **Embedding cache** — chunks are cached by content hash; re-runs with unchanged pages.jsonl skip API calls entirely
 - See [METHODOLOGY.md](METHODOLOGY.md) for full test setup
-
-## Related Reports
-
-- [SPEED_COMPARISON.md](SPEED_COMPARISON.md) — scrape-only speed comparison (no embedding/query overhead)
-- [QUALITY_COMPARISON.md](QUALITY_COMPARISON.md) — extraction cleanliness drives chunk count differences
-- [ANSWER_QUALITY.md](ANSWER_QUALITY.md) — does faster/cheaper pipeline sacrifice answer quality?
-- [COST_AT_SCALE.md](COST_AT_SCALE.md) — projecting these per-page costs to production scale
-- [METHODOLOGY.md](METHODOLOGY.md) — full test setup and fairness decisions

@@ -369,8 +369,11 @@ def run_site_benchmark(name: str, config: dict, output_base: str) -> SiteResult:
 
 def generate_report(results: List[SiteResult], output_path: str) -> str:
     """Generate a Markdown benchmark report."""
+    import datetime
+    today = datetime.date.today().isoformat()
     lines = [
         "# MarkCrawl Self-Benchmark (MarkCrawl only — no competitors)",
+        f"<!-- style: v2, {today} -->",
         "",
         "> **Looking for the head-to-head comparison vs Crawl4AI and Scrapy?** See [SPEED_COMPARISON.md](SPEED_COMPARISON.md).",
         "",
@@ -437,7 +440,7 @@ def generate_report(results: List[SiteResult], output_path: str) -> str:
         lines.extend([
             f"### {tier_labels.get(tier, tier)} — {tier_pages} pages in {tier_time:.1f}s ({tier_pps:.1f} p/s), {tier_kb:.0f} KB output",
             "",
-            "| Site | Description | Pages | Time (s) | Pages/sec | Avg words | Output KB | Peak MB |",
+            "| Site | Description | Pages (a) | Time (b) | Pages/sec (a÷b) | Avg words [1] | Output KB [2] | Peak MB [3] |",
             "|---|---|---|---|---|---|---|---|",
         ])
 
@@ -502,9 +505,18 @@ def generate_report(results: List[SiteResult], output_path: str) -> str:
         "",
         "## What these metrics mean",
         "",
-        "- **Pages/sec**: Crawl throughput (higher is better). Affected by network, server response time, and `--delay`.",
-        "- **Avg words/page**: Average extracted content size. Very low values may indicate extraction issues.",
-        "- **Junk detected**: Count of navigation, footer, script, or cookie text found in extracted Markdown. Should be 0.",
+        "### Performance table",
+        "",
+        "- **Pages (a)**: Total pages crawled for the site.",
+        "- **Time (b)**: Wall-clock seconds for the full crawl (all 6 pipeline steps).",
+        "- **Pages/sec (a÷b)**: Crawl throughput. Affected by network, server response time, and `--delay`.",
+        "- **[1] Avg words**: Mean words per page (total words ÷ page count).",
+        "- **[2] Output KB**: Total Markdown output size across all pages.",
+        "- **[3] Peak MB**: Peak resident memory (RSS) during crawl.",
+        "",
+        "### Extraction quality table",
+        "",
+        "- **Junk detected**: Total count of navigation, footer, script, or cookie text found across all pages. Should be 0.",
         "- **Title rate**: Percentage of pages where a `<title>` was successfully extracted.",
         "- **Citation rate**: Percentage of JSONL rows with a complete citation string.",
         "- **JSONL complete**: Percentage of JSONL rows with all required fields (url, title, path, crawled_at, citation, tool, text).",
@@ -538,6 +550,86 @@ def generate_report(results: List[SiteResult], output_path: str) -> str:
 # Main
 # ---------------------------------------------------------------------------
 
+def _regenerate_from_run(run_name: str, output_path: str):
+    """Regenerate MARKCRAWL_RESULTS.md from saved run data (no re-crawl)."""
+    runs_dir = Path(__file__).resolve().parent / "runs"
+    run_dir = runs_dir / run_name
+    meta_path = run_dir / "run_metadata.json"
+
+    if not run_dir.is_dir():
+        logger.error(f"Run directory not found: {run_dir}")
+        sys.exit(1)
+
+    # Load timing metadata
+    timings = {}
+    if meta_path.is_file():
+        with open(meta_path) as f:
+            metadata = json.load(f)
+        bench = metadata.get("phases", {}).get("benchmarking", {}).get("results", {})
+        mc = bench.get("markcrawl", {})
+        for site_name, site_data in mc.items():
+            timings[site_name] = {
+                "time": site_data.get("time_median_s", 0),
+                "pages": site_data.get("pages_median", 0),
+            }
+
+    # Build SiteResult from each markcrawl/<site>/pages.jsonl
+    mc_dir = run_dir / "markcrawl"
+    if not mc_dir.is_dir():
+        logger.error(f"No markcrawl data in run: {mc_dir}")
+        sys.exit(1)
+
+    results = []
+    for site_name, config in BENCHMARK_SITES.items():
+        jsonl_path = mc_dir / site_name / "pages.jsonl"
+        if not jsonl_path.is_file():
+            continue
+
+        analysis = analyze_jsonl(str(jsonl_path))
+        pages = analysis["pages"]
+        n_pages = len(pages)
+        if n_pages == 0:
+            continue
+
+        # Get timing from metadata, or estimate from page count
+        site_timing = timings.get(site_name, {})
+        crawl_time = site_timing.get("time", 0)
+        pps = n_pages / crawl_time if crawl_time > 0 else 0
+
+        # Calculate total output size from JSONL content
+        total_bytes = sum(len(p.get("text", "").encode("utf-8")) for p in pages)
+        total_kb = total_bytes / 1024
+
+        results.append(SiteResult(
+            name=site_name,
+            url=config["url"],
+            description=config["description"],
+            tier=config.get("tier", "small"),
+            pages_saved=n_pages,
+            expected_min_pages=config["expected_min_pages"],
+            crawl_time_seconds=crawl_time,
+            pages_per_second=pps,
+            avg_content_words=analysis["avg_content_words"],
+            avg_html_to_content_ratio=0,
+            total_output_kb=total_kb,
+            peak_memory_mb=0,  # not available from saved data
+            junk_detections=analysis["total_junk"],
+            junk_details=analysis["junk_details"],
+            title_extraction_rate=analysis["title_rate"],
+            citation_present_rate=analysis["citation_rate"],
+            jsonl_complete_rate=analysis["complete_rate"],
+        ))
+
+    if not results:
+        logger.error("No markcrawl site data found in run")
+        sys.exit(1)
+
+    logger.info(f"Regenerating report from {run_name} ({len(results)} sites)")
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+    generate_report(results, output_path)
+    logger.info(f"Report saved to: {output_path}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Run MarkCrawl benchmarks")
     parser.add_argument(
@@ -550,7 +642,17 @@ def main():
         default="reports/MARKCRAWL_RESULTS.md",
         help="Output report path (default: reports/MARKCRAWL_RESULTS.md)",
     )
+    parser.add_argument(
+        "--run",
+        default=None,
+        help="Regenerate report from a saved run (e.g. run_20260412_195003) — no re-crawl",
+    )
     args = parser.parse_args()
+
+    # --run: regenerate from saved data
+    if args.run:
+        _regenerate_from_run(args.run, args.output)
+        return
 
     # Select sites
     if args.sites:

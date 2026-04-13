@@ -31,6 +31,8 @@ Total annual cost by scenario, all 8 tools ranked by total cost ascending. This 
 | playwright | $517 | $7,320 | $73,202 | +62.5% |
 | crawlee | $518 | $7,467 | $74,673 | +65.7% |
 
+> **Column definitions:** Each cell is **annual cost** (Storage/yr + Queries/yr). Column headers show (pages, queries/day) for each scenario. **vs markcrawl (mid)** = percentage difference at the 100K/1K scenario. All costs use OpenAI text-embedding-3-small + Claude Sonnet pricing — see [Methodology](#methodology) for formulas.
+
 > Firecrawl's K is estimated at 13, based on its chunk ratio (12.97 chunks/page, 1.28x markcrawl). Firecrawl scored 4.04/5 on answer quality (70 queries on 6 sites) vs markcrawl's 3.91/5 (93 queries on 8 sites) -- these scores are not directly comparable due to different query sets. Firecrawl is architecturally a SaaS product -- even self-hosted, it requires 4+ services (API, worker, Redis, Playwright) with no library mode. The self-hosted setup failed on 2 of 8 benchmark sites (react-dev, stripe-docs). See [SPEED_COMPARISON.md](SPEED_COMPARISON.md) and [ANSWER_QUALITY.md](ANSWER_QUALITY.md) for details.
 
 ## What this means
@@ -59,6 +61,8 @@ Sorted by cost ascending:
 | 100,000 | $1,220 | $1,522 | $1,564 | $2,032 | $2,033 | $2,285 | $2,393 | $2,540 |
 | 1,000,000 | $12,205 | $15,220 | $15,642 | $20,321 | $20,333 | $22,854 | $23,927 | $25,398 |
 
+> **Column definitions:** Each tool column shows **annual storage cost** at the given page count. Cost = embedding cost (one-time, amortized) + vector DB hosting (monthly x 12). See [storage formula](#storage-cost-formula).
+
 At 1M pages, markcrawl saves **$3,015/yr vs scrapy+md** and **$13,193/yr vs crawlee** on storage alone.
 
 ---
@@ -82,6 +86,8 @@ All figures use [Claude Sonnet](https://www.anthropic.com/pricing) at $3.00/1M i
 | crawlee | 3.80 (-2.8%) | ~15 | 4,500 |
 | playwright | 3.74 (-4.3%) | ~15 | 4,500 |
 
+> **Column definitions:** **Quality at K=10** = answer quality score (1-5) when retrieving 10 chunks. **Estimated K to match** = retrieval depth needed to match markcrawl's quality (estimated from chunk ratio). **Tokens/query** = K x 300 tokens/chunk — input tokens sent to the LLM per query.
+
 ### Annual LLM query cost
 
 | Queries/day | markcrawl | scrapy+md | firecrawl | crawl4ai | crawl4ai-raw | colly+md | playwright | crawlee |
@@ -91,6 +97,8 @@ All figures use [Claude Sonnet](https://www.anthropic.com/pricing) at $3.00/1M i
 | 10,000 | $32,850 | $39,420 | $42,705 | $49,275 | $49,275 | $49,275 | $49,275 | $49,275 |
 | 100,000 | $328,500 | $394,200 | $427,050 | $492,750 | $492,750 | $492,750 | $492,750 | $492,750 |
 
+> **Column definitions:** Each tool column shows **annual LLM query cost** at the given query volume. Cost = K x tokens/chunk x queries/day x 365 x price/token. See [query formula](#query-cost-formula).
+
 Query costs dwarf storage costs at every scale. At 1K queries/day, the LLM bill is 2-3x the storage bill. This is why the K estimate matters -- even a small increase in retrieval depth compounds across millions of queries.
 
 ---
@@ -98,6 +106,8 @@ Query costs dwarf storage costs at every scale. At 1K queries/day, the LLM bill 
 ## Named Scenarios
 
 Three scenarios so you can find your own situation. Each breaks out storage and query costs separately, because they scale with different things and you may be able to reduce one independently.
+
+> **Column definitions for all scenario tables:** **Storage/yr** = annual embedding + vector DB cost (scales with pages). **Queries/yr** = annual LLM input token cost (scales with queries/day). **Total/yr** = Storage + Queries. **vs markcrawl** = absolute and percentage difference from markcrawl's total.
 
 ### Scenario A: Small app (1K pages, 100 queries/day)
 
@@ -162,6 +172,8 @@ All figures use the same pricing assumptions as above (see [storage formula](#st
 | 100,000 | 1,012,000 | 1,262,000 | $1,220 | $1,522 | $302 |
 | 1,000,000 | 10,120,000 | 12,620,000 | $12,205 | $15,220 | $3,015 |
 
+> **MC** = markcrawl. **Chunks** = Pages x chunks/page. **Savings** = Scrapy storage/yr - MC storage/yr.
+
 ### Query comparison
 
 | Queries/day | MC queries/yr | Scrapy queries/yr | Savings |
@@ -188,6 +200,8 @@ The [API-priced scenarios above](#named-scenarios) model enterprise workloads. T
 | LLM answer scoring | ~$0.15-0.25/run | **$0** | Route through Claude Code / ChatGPT |
 | LLM queries at runtime | $3.00/1M input tokens | **$0** | Within subscription limits |
 | Vector database | $0-25/mo | **$0-25/mo** | Free tiers cover most solo projects |
+
+> **Column definitions:** **API pricing** = pay-per-token cost. **With subscription** = cost when using a flat-rate AI plan. **How** = what enables the $0 cost.
 
 The only hard cost is vector database hosting -- and free tiers cover a surprising number of pages.
 
@@ -216,6 +230,8 @@ Using markcrawl (10.1 chunks/page, the most efficient). Sorted by max pages desc
 | **Neon** | DB + vectors | 500 MB | ~32,000 | **~3,200** | No pause, 100 compute-hrs/mo |
 | **Railway** | DB + vectors | $5/mo credits | ~2,000+ | **~2,000** | Typical actual cost ~$0.55/mo |
 
+> **Column definitions:** **Type** = vector-only (embedding search only) or DB + vectors (full SQL database with vector extension). **Free storage** = available storage on the free tier. **Max chunks/pages** = estimated capacity using markcrawl (10.1 chunks/page, 16 KB/chunk with indexes — see formula above).
+
 Crawler choice matters here: a noisier tool like crawlee (21.1 chunks/page) roughly halves these numbers -- ~1,520 pages on Supabase Free instead of ~3,200. This is the same chunk efficiency gap from the [main comparison](#summary), but now it translates directly into free-tier capacity.
 
 For context, 3,200 pages covers most documentation sites entirely (FastAPI docs: 275 pages, Python stdlib: 500 pages, Stripe docs: 500 pages). A solo dev building a RAG app over 1-3 documentation sites fits comfortably in a free tier.
@@ -232,6 +248,8 @@ These services provide a SQL database, auth, storage, AND vector search -- every
 | **[CockroachDB](https://www.cockroachlabs.com/pricing/)** | $15/mo in credits | Usage-based | Yes (request units) | Multi-region, distributed SQL |
 | **[Supabase](https://supabase.com/pricing)** | 500 MB, pauses after 7d | $25/mo (8 GB, ~52K pages) | No | Full-stack apps (auth, storage, realtime, edge functions) |
 
+> **Column definitions:** **Free tier** = what's available at $0/mo. **Cheapest paid** = lowest paid tier cost. **Per-query cost?** = whether queries incur additional per-request charges beyond the tier price. **Best for** = primary use case.
+
 ### Vector-only services (embedding storage + search)
 
 These only store and query embeddings -- no SQL, no auth, no file storage. Use these when you already have a separate database and just need fast vector search. Sorted by cheapest paid tier ascending:
@@ -244,6 +262,8 @@ These only store and query embeddings -- no SQL, no auth, no file storage. Use t
 | **[Qdrant](https://qdrant.tech/pricing/)** | 0.5 vCPU, 4 GB disk | ~$150/mo | No | Self-host friendly, no per-query fees |
 | **[Chroma](https://www.trychroma.com/pricing)** | $5 in credits | $250/mo | Yes ($0.0075/TiB queried) | Python-native, local-first development |
 | **[Zilliz](https://zilliz.com/pricing)** | 5 GB | Serverless ($4/M compute units) | Yes | Most free storage, Milvus ecosystem |
+
+> **Column definitions:** Same as [DB + vector table above](#database--vector-storage-full-stack). These services store and query embeddings only — no SQL, auth, or file storage.
 
 ### Solo dev named scenarios
 
@@ -301,6 +321,8 @@ Measured values for all tools (sorted by chunks/page ascending):
 | colly+md | 3,884 | 205 | 18.95 | 3.83 |
 | playwright | 4,167 | 210 | 19.84 | 3.74 |
 | crawlee | 4,422 | 210 | 21.06 | 3.80 |
+
+> **Column definitions:** **Total chunks** = sum of chunks across all pages for this tool. **Pages** = total pages crawled. **Chunks/page** = Total chunks ÷ Pages. **Answer quality** = mean LLM answer score (1-5) from [ANSWER_QUALITY.md](ANSWER_QUALITY.md).
 
 All tools crawled the same ~210 pages across 8 sites. Firecrawl crawled 6 of 8 sites (1,079 pages) -- it has higher total chunks due to more pages, but a comparable chunks/page ratio. Firecrawl's answer quality (4.04/5) is based on 70 queries across 6 sites, while other tools were scored on 93 queries across 8 sites -- see [ANSWER_QUALITY.md](ANSWER_QUALITY.md) for why these scores are not directly comparable. Chunks were created with the same chunker (300-word max, 50-word overlap). Quality was scored by a GPT-4o-mini judge on correctness, relevance, completeness, and usefulness (1-5 each), averaged to an overall score.
 

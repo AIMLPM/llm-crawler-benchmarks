@@ -35,6 +35,7 @@ REPORT_FILES = [
     "ANSWER_QUALITY.md",
     "COST_AT_SCALE.md",
     "MARKCRAWL_RESULTS.md",
+    "PIPELINE_TIMING.md",
     "METHODOLOGY.md",
     "RETRIEVAL_FASTAPI_200.md",
     "RETRIEVAL_COMPARISON_CONTEXT.md",
@@ -218,6 +219,33 @@ def lint_file(filepath: Path) -> list[str]:
                 f"{name}: inconsistent query counts within report: "
                 f"{sorted(counts)} — bolded query counts should be consistent"
             )
+
+    # --- 11. Column definitions for data tables ---
+    # Reports with data tables should include at least one "Column definitions"
+    # or "What these metrics mean" block. METHODOLOGY.md is exempt (reference only).
+    if name != "METHODOLOGY.md":
+        # Count data tables: groups of |rows that follow a header+separator
+        has_data_tables = False
+        for i, line in enumerate(lines):
+            if _is_table_header_or_separator(line) and line.startswith("|"):
+                # Check if there are non-header rows after this
+                for j in range(i + 1, min(i + 3, len(lines))):
+                    if lines[j].startswith("|") and not _is_table_header_or_separator(lines[j]):
+                        has_data_tables = True
+                        break
+            if has_data_tables:
+                break
+
+        if has_data_tables:
+            has_legend = (
+                "column definitions" in text.lower()
+                or "what these metrics mean" in text.lower()
+            )
+            if not has_legend:
+                warnings.append(
+                    f"{name}: has data tables but no column definitions legend — "
+                    f"add a '> **Column definitions:**' block after each table group"
+                )
 
     return warnings
 

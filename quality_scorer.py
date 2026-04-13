@@ -10,7 +10,7 @@ Four scoring methods:
 All methods are free, deterministic, and require no LLM or API keys.
 
 The two most diagnostic metrics for RAG use cases:
-- **Preamble [1]**: avg words per page before the first heading — nav chrome that pollutes
+- **Preamble [2]**: avg words per page before the first heading — nav chrome that pollutes
   every chunk before the real content starts.
 - **Repeat rate**: fraction of sentences that appear on >50% of pages — repeated
   nav/footer text that inflates chunk count and degrades retrieval precision.
@@ -418,7 +418,7 @@ def generate_quality_report(
         "Four automated quality metrics — no LLM or human review needed:",
         "",
         "1. **Junk phrases** — known boilerplate strings (nav, footer, breadcrumbs) found in output",
-        "2. **Preamble [1]** — average words per page appearing *before* the first heading.",
+        "2. **Preamble [2]** — average words per page appearing *before* the first heading.",
         "   Nav chrome (version selectors, language pickers, prev/next links) lives here.",
         "   A tool with a high preamble count is injecting site chrome into every chunk.",
         "3. **Cross-page repeat rate** — fraction of sentences that appear on >50% of pages.",
@@ -492,7 +492,7 @@ def generate_quality_report(
             "A tool that includes 1,000 words of nav chrome per page pollutes every",
             "chunk in the vector index, degrading retrieval for every query.",
             "",
-            "| Tool | Content signal | Preamble [1] | Repeat rate | Junk/page | Precision | Recall |",
+            "| Tool | Content signal [1] | Preamble [2] | Repeat rate [3] | Junk/page [4] | Precision [5] | Recall [5] |",
             "|---|---|---|---|---|---|---|",
         ])
 
@@ -513,7 +513,16 @@ def generate_quality_report(
             )
 
         # Footnote below the summary table
-        lines.extend(["", "**[1]** Avg words per page before the first heading (nav chrome).", ""])
+        lines.extend([
+            "",
+            "> **Column definitions:**",
+            "> **[1] Content signal** = (total words - preamble words) ÷ total words, per page average. Higher = cleaner output.",
+            "> **[2] Preamble** = avg words per page appearing *before* the first heading (nav chrome, breadcrumbs). Lower is better.",
+            "> **[3] Repeat rate** = fraction of sentences appearing on >50% of pages (boilerplate). Lower is better.",
+            "> **[4] Junk/page** = known boilerplate phrases (nav, footer, cookie banners) detected per page. Lower is better.",
+            "> **[5] Precision/Recall** = cross-tool consensus: precision measures how much output is agreed-upon content; recall measures how much agreed content was captured.",
+            "",
+        ])
 
         # Add takeaway narrative based on the summary data
         # Find the tool with lowest preamble (cleanest output)
@@ -538,13 +547,7 @@ def generate_quality_report(
                 "",
             ])
 
-        lines.extend([
-            "> **Content signal** = percentage of output that is content (not preamble nav chrome).",
-            "> Higher is better. A tool with 100% content signal has zero nav/header pollution.",
-            "> **Repeat rate** = fraction of phrases appearing on >50% of pages (boilerplate).",
-            "> **Junk/page** = known boilerplate phrases detected per page.",
-            "",
-        ])
+        lines.append("")
 
     for site_name, site_data in results.items():
         lines.extend([f"## {site_name}", ""])
@@ -557,7 +560,7 @@ def generate_quality_report(
 
         # Summary table — includes the two new columns
         lines.extend([
-            "| Tool | Avg words | Preamble [1] | Repeat rate | Junk found | Headings | Code blocks | Precision | Recall |",
+            "| Tool | Avg words [6] | Preamble [2] | Repeat rate [3] | Junk found [4] | Headings [7] | Code blocks [8] | Precision [5] | Recall [5] |",
             "|---|---|---|---|---|---|---|---|---|",
         ])
 
@@ -594,7 +597,14 @@ def generate_quality_report(
         # Footnote below the per-site table
         lines.extend([
             "",
-            "**[1]** Avg words per page before the first heading (nav chrome). "
+            "> **Column definitions:**",
+            "> **[6] Avg words** = mean words per page. "
+            "**[2] Preamble** = avg words per page before the first heading (nav chrome). "
+            "**[3] Repeat rate** = fraction of sentences on >50% of pages.",
+            "> **[4] Junk found** = total known boilerplate phrases detected across all pages. "
+            "**[7] Headings** = avg headings per page. "
+            "**[8] Code blocks** = avg fenced code blocks per page.",
+            "> **[5] Precision/Recall** = cross-tool consensus (pages with <2 sentences excluded). "
             "**⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).",
             "",
         ])
@@ -726,9 +736,9 @@ def generate_quality_report(
         # Per-page detail table
         lines.extend([
             "<details>",
-            "<summary>Per-page word counts and preamble [1]</summary>",
+            "<summary>Per-page word counts and preamble [6]/[2]</summary>",
             "",
-            "| URL | " + " | ".join(f"{t} words / preamble [1]" for t in tool_names) + " |",
+            "| URL | " + " | ".join(f"{t} words [6] / preamble [2]" for t in tool_names) + " |",
             "|---" + "|---" * len(tool_names) + "|",
         ])
 

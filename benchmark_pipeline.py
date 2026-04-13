@@ -405,11 +405,20 @@ def generate_report(result: PipelineResult) -> str:
             f"{_fmt_cost(agg['total_cost'])} |"
         )
 
-    lines.append("")
-    lines.append(f"*(Cost uses OpenAI `{EMBEDDING_MODEL}` at ${EMBED_PRICE_PER_1M}/1M tokens, "
-                 f"`{ANSWER_MODEL}` at ${QUERY_INPUT_PRICE_PER_1M}/${QUERY_OUTPUT_PRICE_PER_1M} "
-                 f"per 1M input/output tokens)*")
-    lines.append("")
+    lines.extend([
+        "",
+        "> **Column definitions:** "
+        "**Scrape/Chunk/Embed/Query (s)** = wall-clock seconds for each pipeline phase (summed across all sites). "
+        "**Total (s)** = sum of all phases. "
+        "**Pages** = total pages fetched. "
+        "**Chunks** = total text chunks produced. "
+        "**Cost** = total API cost (embedding + LLM query).",
+        "",
+        f"*(Cost uses OpenAI `{EMBEDDING_MODEL}` at ${EMBED_PRICE_PER_1M}/1M tokens, "
+        f"`{ANSWER_MODEL}` at ${QUERY_INPUT_PRICE_PER_1M}/${QUERY_OUTPUT_PRICE_PER_1M} "
+        f"per 1M input/output tokens)*",
+        "",
+    ])
 
     # --- Per-page normalized ---
     lines.append("## Per-Page Pipeline Cost (normalized)")
@@ -428,7 +437,14 @@ def generate_report(result: PipelineResult) -> str:
             f"{agg['total']/pages:.2f} | {_fmt_cost(agg['total_cost']/pages)} | "
             f"{agg['chunks']/pages:.1f} |"
         )
-    lines.append("")
+    lines.extend([
+        "",
+        "> **Column definitions:** "
+        "**s/page** = Total (s) ÷ Pages. "
+        "**Cost/page** = total API cost ÷ Pages. "
+        "**Chunks/page** = Chunks ÷ Pages. All values are per-page averages.",
+        "",
+    ])
 
     # --- Phase breakdown as % of total ---
     lines.append("## Phase Breakdown (% of Total Pipeline Time)")
@@ -441,7 +457,11 @@ def generate_report(result: PipelineResult) -> str:
             f"| {tool} | {agg['scrape']/total*100:.1f}% | {agg['chunk']/total*100:.1f}% | "
             f"{agg['embed']/total*100:.1f}% | {agg['query']/total*100:.1f}% |"
         )
-    lines.append("")
+    lines.extend([
+        "",
+        "> Each percentage = phase time ÷ total pipeline time. Shows which phase dominates.",
+        "",
+    ])
 
     # --- Cost breakdown ---
     lines.append("## API Cost Breakdown")
@@ -459,7 +479,13 @@ def generate_report(result: PipelineResult) -> str:
             f"{agg['query_input_tokens']:,} | {agg['query_output_tokens']:,} | "
             f"{_fmt_cost(agg['query_cost'])} | **{_fmt_cost(agg['total_cost'])}** |"
         )
-    lines.append("")
+    lines.extend([
+        "",
+        "> **Embed tokens** = tokens sent to the embedding API (all chunks). "
+        "**Query in/out tokens** = tokens sent to and received from the answer LLM. "
+        "**Total cost** = Embed cost + Query cost.",
+        "",
+    ])
 
     # --- Per-site detail ---
     lines.append("## Per-Site Breakdown")
@@ -544,6 +570,8 @@ def main():
     parser.add_argument("--output", default="reports/PIPELINE_TIMING.md")
     parser.add_argument("--fresh", action="store_true",
                         help="Clear checkpoints and re-run everything")
+    parser.add_argument("--report-only", action="store_true",
+                        help="Regenerate report from checkpoints only — no API calls")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -595,109 +623,128 @@ def main():
     # Load scrape timings
     scrape_timings = load_scrape_timings(run_dir, tools, sites)
 
-    # Get OpenAI client (optional - embed/query phases require it)
-    api_key = os.environ.get("OPENAI_API_KEY")
-    client = None
-    if api_key:
-        client = _get_openai_client()
+    # --report-only: load all results from checkpoints, skip API calls
+    if args.report_only:
+        result = PipelineResult(run_id=run_id, sites=sites, tools=tools)
+        missing = []
+        for site in sites:
+            for tool in tools:
+                cached = _load_checkpoint(run_id, tool, site)
+                if cached is not None:
+                    result.timings.append(cached)
+                elif (run_dir / tool / site / "pages.jsonl").exists():
+                    missing.append(f"{tool}/{site}")
+
+        if missing:
+            logger.error("Missing checkpoints for --report-only: %s", ", ".join(missing))
+            logger.error("Run without --report-only first to generate checkpoints.")
+            sys.exit(1)
+
+        logger.info(f"Loaded {len(result.timings)} tool/site combos from checkpoints")
     else:
-        logger.warning("OPENAI_API_KEY not set — skipping embed and query phases.")
-        logger.warning("Set it in .env or environment to enable full pipeline timing.")
+        # Get OpenAI client (optional - embed/query phases require it)
+        api_key = os.environ.get("OPENAI_API_KEY")
+        client = None
+        if api_key:
+            client = _get_openai_client()
+        else:
+            logger.warning("OPENAI_API_KEY not set — skipping embed and query phases.")
+            logger.warning("Set it in .env or environment to enable full pipeline timing.")
 
-    result = PipelineResult(run_id=run_id, sites=sites, tools=tools)
-    pipeline_start = time.time()
-    resumed = 0
+        result = PipelineResult(run_id=run_id, sites=sites, tools=tools)
+        pipeline_start = time.time()
+        resumed = 0
 
-    for site in sites:
-        logger.info(f"\n--- {site} ---")
-        queries = TEST_QUERIES.get(site, [])
+        for site in sites:
+            logger.info(f"\n--- {site} ---")
+            queries = TEST_QUERIES.get(site, [])
 
-        # Batch-embed queries once per site (instead of per-tool per-query)
-        query_vectors = None
-        if queries and client:
-            needs_work = any(
-                _load_checkpoint(run_id, t, site) is None
-                and (run_dir / t / site / "pages.jsonl").exists()
-                for t in tools
-            )
-            if needs_work:
-                query_texts = [q["query"] for q in queries]
-                logger.info(f"  Embedding {len(query_texts)} queries for {site}...")
-                query_vectors = embed_texts(client, query_texts)
-
-        for tool in tools:
-            # Check checkpoint first
-            cached = _load_checkpoint(run_id, tool, site)
-            if cached is not None:
-                result.timings.append(cached)
-                resumed += 1
-                logger.info(f"  {tool}: RESUMED (total={cached.total_seconds:.1f}s, "
-                            f"cost=${cached.total_cost_usd:.4f})")
-                continue
-
-            # Load pages
-            jsonl_path = run_dir / tool / site / "pages.jsonl"
-            if not jsonl_path.exists():
-                logger.info(f"  {tool}: no pages.jsonl for {site}, skipping")
-                continue
-            pages = load_pages(str(jsonl_path))
-            if not pages:
-                logger.info(f"  {tool}: no pages, skipping")
-                continue
-
-            timing = PhaseTimings(tool=tool, site=site)
-
-            # Phase 1: Scrape timing (from metadata)
-            scrape_data = scrape_timings.get(tool, {}).get(site, {})
-            timing.scrape_seconds = scrape_data.get("seconds", 0)
-            timing.pages_scraped = scrape_data.get("pages", len(pages))
-
-            # Phase 2: Chunk
-            logger.info(f"  {tool}: chunking {len(pages)} pages...")
-            chunks, chunk_time = chunk_tool_site(pages)
-            timing.chunk_seconds = chunk_time
-            timing.chunks_created = len(chunks)
-
-            # Phase 3: Embed (requires OpenAI API key)
-            vectors = []
-            if client:
-                logger.info(f"  {tool}: embedding {len(chunks)} chunks...")
-                vectors, embed_time, embed_tokens = embed_chunks(client, chunks)
-                timing.embed_seconds = embed_time
-                timing.embed_tokens = embed_tokens
-                timing.embed_cost_usd = embed_tokens / 1_000_000 * EMBED_PRICE_PER_1M
-
-            # Phase 4: Query (only for sites with test queries, requires API key)
-            if queries and client and vectors:
-                logger.info(f"  {tool}: running {len(queries)} queries...")
-                qcost = query_pipeline(client, chunks, vectors, queries,
-                                       query_vectors=query_vectors)
-                timing.query_seconds = qcost.elapsed_seconds
-                timing.queries_run = qcost.queries_run
-                timing.query_input_tokens = qcost.input_tokens
-                timing.query_output_tokens = qcost.output_tokens
-                timing.query_cost_usd = (
-                    qcost.input_tokens / 1_000_000 * QUERY_INPUT_PRICE_PER_1M +
-                    qcost.output_tokens / 1_000_000 * QUERY_OUTPUT_PRICE_PER_1M
+            # Batch-embed queries once per site (instead of per-tool per-query)
+            query_vectors = None
+            if queries and client:
+                needs_work = any(
+                    _load_checkpoint(run_id, t, site) is None
+                    and (run_dir / t / site / "pages.jsonl").exists()
+                    for t in tools
                 )
+                if needs_work:
+                    query_texts = [q["query"] for q in queries]
+                    logger.info(f"  Embedding {len(query_texts)} queries for {site}...")
+                    query_vectors = embed_texts(client, query_texts)
 
-            timing.total_seconds = (timing.scrape_seconds + timing.chunk_seconds +
-                                    timing.embed_seconds + timing.query_seconds)
-            timing.total_cost_usd = timing.embed_cost_usd + timing.query_cost_usd
+            for tool in tools:
+                # Check checkpoint first
+                cached = _load_checkpoint(run_id, tool, site)
+                if cached is not None:
+                    result.timings.append(cached)
+                    resumed += 1
+                    logger.info(f"  {tool}: RESUMED (total={cached.total_seconds:.1f}s, "
+                                f"cost=${cached.total_cost_usd:.4f})")
+                    continue
 
-            logger.info(f"  {tool}: total={timing.total_seconds:.1f}s "
-                        f"(scrape={timing.scrape_seconds:.1f} chunk={timing.chunk_seconds:.1f} "
-                        f"embed={timing.embed_seconds:.1f} query={timing.query_seconds:.1f}) "
-                        f"cost=${timing.total_cost_usd:.4f}")
+                # Load pages
+                jsonl_path = run_dir / tool / site / "pages.jsonl"
+                if not jsonl_path.exists():
+                    logger.info(f"  {tool}: no pages.jsonl for {site}, skipping")
+                    continue
+                pages = load_pages(str(jsonl_path))
+                if not pages:
+                    logger.info(f"  {tool}: no pages, skipping")
+                    continue
 
-            result.timings.append(timing)
-            _save_checkpoint(run_id, timing)
+                timing = PhaseTimings(tool=tool, site=site)
 
-    if resumed:
-        logger.info(f"\nResumed {resumed} tool/site combos from checkpoint")
+                # Phase 1: Scrape timing (from metadata)
+                scrape_data = scrape_timings.get(tool, {}).get(site, {})
+                timing.scrape_seconds = scrape_data.get("seconds", 0)
+                timing.pages_scraped = scrape_data.get("pages", len(pages))
 
-    pipeline_elapsed = time.time() - pipeline_start
-    logger.info(f"\nPipeline benchmark completed in {pipeline_elapsed:.1f}s")
+                # Phase 2: Chunk
+                logger.info(f"  {tool}: chunking {len(pages)} pages...")
+                chunks, chunk_time = chunk_tool_site(pages)
+                timing.chunk_seconds = chunk_time
+                timing.chunks_created = len(chunks)
+
+                # Phase 3: Embed (requires OpenAI API key)
+                vectors = []
+                if client:
+                    logger.info(f"  {tool}: embedding {len(chunks)} chunks...")
+                    vectors, embed_time, embed_tokens = embed_chunks(client, chunks)
+                    timing.embed_seconds = embed_time
+                    timing.embed_tokens = embed_tokens
+                    timing.embed_cost_usd = embed_tokens / 1_000_000 * EMBED_PRICE_PER_1M
+
+                # Phase 4: Query (only for sites with test queries, requires API key)
+                if queries and client and vectors:
+                    logger.info(f"  {tool}: running {len(queries)} queries...")
+                    qcost = query_pipeline(client, chunks, vectors, queries,
+                                           query_vectors=query_vectors)
+                    timing.query_seconds = qcost.elapsed_seconds
+                    timing.queries_run = qcost.queries_run
+                    timing.query_input_tokens = qcost.input_tokens
+                    timing.query_output_tokens = qcost.output_tokens
+                    timing.query_cost_usd = (
+                        qcost.input_tokens / 1_000_000 * QUERY_INPUT_PRICE_PER_1M +
+                        qcost.output_tokens / 1_000_000 * QUERY_OUTPUT_PRICE_PER_1M
+                    )
+
+                timing.total_seconds = (timing.scrape_seconds + timing.chunk_seconds +
+                                        timing.embed_seconds + timing.query_seconds)
+                timing.total_cost_usd = timing.embed_cost_usd + timing.query_cost_usd
+
+                logger.info(f"  {tool}: total={timing.total_seconds:.1f}s "
+                            f"(scrape={timing.scrape_seconds:.1f} chunk={timing.chunk_seconds:.1f} "
+                            f"embed={timing.embed_seconds:.1f} query={timing.query_seconds:.1f}) "
+                            f"cost=${timing.total_cost_usd:.4f}")
+
+                result.timings.append(timing)
+                _save_checkpoint(run_id, timing)
+
+        if resumed:
+            logger.info(f"\nResumed {resumed} tool/site combos from checkpoint")
+
+        pipeline_elapsed = time.time() - pipeline_start
+        logger.info(f"\nPipeline benchmark completed in {pipeline_elapsed:.1f}s")
 
     # Generate report
     report = generate_report(result)
@@ -715,7 +762,9 @@ def main():
         for w in lint_warnings:
             logger.warning("  - %s", w)
 
-    # Also save raw timings as JSON
+    # Save raw timings as JSON (skip in report-only mode)
+    if args.report_only:
+        return
     json_path = run_dir / "pipeline_timings.json"
     raw_data = {
         "run_id": run_id,

@@ -1,5 +1,5 @@
 # Retrieval Quality Comparison
-<!-- style: v2, 2026-04-12 -->
+<!-- style: v2, 2026-04-13 -->
 
 Crawler choice barely matters for retrieval — retrieval mode matters more.
 
@@ -48,6 +48,7 @@ Hit rate = correct source page in top-K results. Higher is better.
 | playwright | hybrid | 65% (71/109) ±9% | 82% (89/109) ±7% | 85% (93/109) ±7% | 94% (102/109) ±5% | 94% (102/109) ±5% | 0.737 |
 | playwright | reranked | 61% (67/109) ±9% | 84% (92/109) ±7% | 89% (97/109) ±6% | 93% (101/109) ±5% | 94% (102/109) ±5% | 0.735 |
 
+> **Column definitions:** **Hit@K** = percentage of queries where the correct source page appeared in the top K results (shown as % with raw counts). **MRR** (Mean Reciprocal Rank) = average of 1/rank for correct results (1.0 = always rank 1, 0.5 = always rank 2). **Mode** = retrieval strategy used (see definitions above).
 
 ## Summary: embedding-only (hit rate at multiple K values)
 
@@ -61,6 +62,7 @@ Hit rate = correct source page in top-K results. Higher is better.
 | colly+md | 69% (75/109) ±9% | 80% (87/109) ±7% | 86% (94/109) ±6% | 91% (99/109) ±6% | 92% (100/109) ±5% | 0.759 | 42934 | 210 |
 | playwright | 73% (80/109) ±8% | 83% (91/109) ±7% | 90% (98/109) ±6% | 94% (102/109) ±5% | 94% (102/109) ±5% | 0.799 | 46439 | 212 |
 
+> **Column definitions:** **Hit@K** = correct source page in top K results. **MRR** = Mean Reciprocal Rank (1/rank of correct result, averaged). **Chunks** = total chunks produced by this tool (across all pages in common sites). **Avg words** = mean words per chunk.
 
 ## Per-category breakdown (embedding mode)
 
@@ -125,6 +127,7 @@ Query categories reveal where crawlers actually differ. Categories like `js-rend
 | structured-data | colly+md | 75% (6/8) | 0.750 | 8 |
 | structured-data | playwright | 75% (6/8) | 0.750 | 8 |
 
+> **Column definitions:** **Category** = query type (see [METHODOLOGY.md](METHODOLOGY.md) for definitions). **Hit@10** = correct page in top 10 results. **MRR** = Mean Reciprocal Rank (1/rank of correct result, averaged). **Queries** = number of queries in this category.
 
 ### Best tool per category
 
@@ -153,6 +156,8 @@ _Spread = difference between best and worst tool. High spread categories are whe
 | crawlee | 100% (8/8) | 100% (8/8) | 100% (8/8) | 100% (8/8) | 100% (8/8) | 1.000 | 28 | 15 |
 | colly+md | 100% (8/8) | 100% (8/8) | 100% (8/8) | 100% (8/8) | 100% (8/8) | 1.000 | 28 | 15 |
 | playwright | 100% (8/8) | 100% (8/8) | 100% (8/8) | 100% (8/8) | 100% (8/8) | 1.000 | 28 | 15 |
+
+> **Chunks** = total chunks from this tool for this site. **Pages** = pages crawled. Hit rates shown as % (hits/total queries).
 
 <details>
 <summary>Query-by-query results for quotes-toscrape</summary>
@@ -282,6 +287,8 @@ _Spread = difference between best and worst tool. High spread categories are whe
 | crawlee | 80% (8/10) | 80% (8/10) | 80% (8/10) | 80% (8/10) | 80% (8/10) | 0.800 | 134 | 60 |
 | colly+md | 80% (8/10) | 80% (8/10) | 80% (8/10) | 80% (8/10) | 80% (8/10) | 0.800 | 134 | 60 |
 | playwright | 80% (8/10) | 80% (8/10) | 80% (8/10) | 80% (8/10) | 80% (8/10) | 0.800 | 134 | 60 |
+
+> **Chunks** = total chunks from this tool for this site. **Pages** = pages crawled. Hit rates shown as % (hits/total queries).
 
 <details>
 <summary>Query-by-query results for books-toscrape</summary>
@@ -439,6 +446,8 @@ _Spread = difference between best and worst tool. High spread categories are whe
 | crawlee | 75% (15/20) | 100% (20/20) | 100% (20/20) | 100% (20/20) | 100% (20/20) | 0.858 | 3856 | 153 |
 | colly+md | 65% (13/20) | 90% (18/20) | 95% (19/20) | 100% (20/20) | 100% (20/20) | 0.777 | 3871 | 153 |
 | playwright | 75% (15/20) | 100% (20/20) | 100% (20/20) | 100% (20/20) | 100% (20/20) | 0.858 | 3857 | 153 |
+
+> **Chunks** = total chunks from this tool for this site. **Pages** = pages crawled. Hit rates shown as % (hits/total queries).
 
 <details>
 <summary>Query-by-query results for fastapi-docs</summary>
@@ -737,6 +746,8 @@ _Spread = difference between best and worst tool. High spread categories are whe
 | colly+md | 63% (12/19) | 79% (15/19) | 95% (18/19) | 100% (19/19) | 100% (19/19) | 0.745 | 13221 | 500 |
 | playwright | 63% (12/19) | 79% (15/19) | 95% (18/19) | 100% (19/19) | 100% (19/19) | 0.745 | 13304 | 500 |
 
+> **Chunks** = total chunks from this tool for this site. **Pages** = pages crawled. Hit rates shown as % (hits/total queries).
+
 <details>
 <summary>Query-by-query results for python-docs</summary>
 
@@ -1020,6 +1031,8 @@ _Spread = difference between best and worst tool. High spread categories are whe
 | colly+md | 69% (11/16) | 81% (13/16) | 94% (15/16) | 100% (16/16) | 100% (16/16) | 0.785 | 6355 | 221 |
 | playwright | 69% (11/16) | 81% (13/16) | 94% (15/16) | 100% (16/16) | 100% (16/16) | 0.785 | 6355 | 221 |
 
+> **Chunks** = total chunks from this tool for this site. **Pages** = pages crawled. Hit rates shown as % (hits/total queries).
+
 <details>
 <summary>Query-by-query results for react-dev</summary>
 
@@ -1261,6 +1274,8 @@ _Spread = difference between best and worst tool. High spread categories are whe
 | colly+md | 70% (7/10) | 70% (7/10) | 70% (7/10) | 70% (7/10) | 70% (7/10) | 0.700 | 1378 | 50 |
 | playwright | 60% (6/10) | 60% (6/10) | 60% (6/10) | 60% (6/10) | 60% (6/10) | 0.600 | 1112 | 42 |
 
+> **Chunks** = total chunks from this tool for this site. **Pages** = pages crawled. Hit rates shown as % (hits/total queries).
+
 <details>
 <summary>Query-by-query results for wikipedia-python</summary>
 
@@ -1417,6 +1432,8 @@ _Spread = difference between best and worst tool. High spread categories are whe
 | crawlee | 67% (12/18) | 72% (13/18) | 83% (15/18) | 94% (17/18) | 94% (17/18) | 0.732 | 15683 | 257 |
 | colly+md | 67% (12/18) | 78% (14/18) | 83% (15/18) | 94% (17/18) | 94% (17/18) | 0.743 | 14661 | 254 |
 | playwright | 67% (12/18) | 72% (13/18) | 83% (15/18) | 94% (17/18) | 94% (17/18) | 0.735 | 15680 | 257 |
+
+> **Chunks** = total chunks from this tool for this site. **Pages** = pages crawled. Hit rates shown as % (hits/total queries).
 
 <details>
 <summary>Query-by-query results for stripe-docs</summary>
@@ -1686,6 +1703,8 @@ _Spread = difference between best and worst tool. High spread categories are whe
 | crawlee | 62% (5/8) | 62% (5/8) | 62% (5/8) | 62% (5/8) | 75% (6/8) | 0.635 | 5963 | 200 |
 | colly+md | 50% (4/8) | 50% (4/8) | 50% (4/8) | 50% (4/8) | 62% (5/8) | 0.512 | 3286 | 123 |
 | playwright | 100% (8/8) | 100% (8/8) | 100% (8/8) | 100% (8/8) | 100% (8/8) | 1.000 | 5969 | 200 |
+
+> **Chunks** = total chunks from this tool for this site. **Pages** = pages crawled. Hit rates shown as % (hits/total queries).
 
 <details>
 <summary>Query-by-query results for blog-engineering</summary>

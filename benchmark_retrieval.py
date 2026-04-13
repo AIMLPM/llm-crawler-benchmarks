@@ -1672,7 +1672,14 @@ def generate_retrieval_report(
                 f" | {mrr:.3f} |"
             )
 
-    lines.extend(["", ""])
+    lines.extend([
+        "",
+        "> **Column definitions:** "
+        "**Hit@K** = percentage of queries where the correct source page appeared in the top K results (shown as % with raw counts). "
+        "**MRR** (Mean Reciprocal Rank) = average of 1/rank for correct results (1.0 = always rank 1, 0.5 = always rank 2). "
+        "**Mode** = retrieval strategy used (see definitions above).",
+        "",
+    ])
 
     # ============================================================
     # Section 2: Embedding-only summary (backward compatible)
@@ -1723,7 +1730,15 @@ def generate_retrieval_report(
             f" | {mrr:.3f} | {total_chunks} | {avg_words:.0f} |"
         )
 
-    lines.extend(["", ""])
+    lines.extend([
+        "",
+        "> **Column definitions:** "
+        "**Hit@K** = correct source page in top K results. "
+        "**MRR** = Mean Reciprocal Rank (1/rank of correct result, averaged). "
+        "**Chunks** = total chunks produced by this tool (across all pages in common sites). "
+        "**Avg words** = mean words per chunk.",
+        "",
+    ])
 
     # ============================================================
     # Section 3: Per-category breakdown
@@ -1904,7 +1919,13 @@ def generate_retrieval_report(
                 f" | {r.mrr:.3f} | {r.total_chunks} | {r.total_pages} |"
             )
 
-        lines.append("")
+        lines.extend([
+            "",
+            "> **Chunks** = total chunks from this tool for this site. "
+            "**Pages** = pages crawled. "
+            "Hit rates shown as % (hits/total queries).",
+            "",
+        ])
 
         # Per-query detail (show top-3 only for readability)
         detail_k = 3
@@ -2235,6 +2256,8 @@ def main():
                         help="Prepend page title, section heading, and URL path to each chunk")
     parser.add_argument("--fresh", action="store_true",
                         help="Clear checkpoints and embedding cache — start from scratch")
+    parser.add_argument("--report-only", action="store_true",
+                        help="Regenerate report from checkpoints only — no API calls")
     args = parser.parse_args()
 
     # If --no-rerank, remove reranked from modes
@@ -2294,43 +2317,69 @@ def main():
     logger.info(f"Sites: {', '.join(sites)}")
     logger.info(f"Retrieval modes: {', '.join(RETRIEVAL_MODES)}")
 
-    # Initialize OpenAI client
-    client = _get_openai_client()
+    # --report-only: load all results from checkpoints, skip API calls
+    if args.report_only:
+        run_name = run_dir.name
+        max_words, overlap_words, config_label = DEFAULT_CHUNK_CONFIG
+        all_results: Dict[str, Dict[str, ToolSiteRetrievalResult]] = {}
+        missing = []
+        for site in sites:
+            if site not in TEST_QUERIES:
+                continue
+            site_results: Dict[str, ToolSiteRetrievalResult] = {}
+            for tool in available_tools:
+                cached = _load_checkpoint(run_name, tool, site, config_label)
+                if cached is not None:
+                    site_results[tool] = cached
+                else:
+                    missing.append(f"{tool}/{site}")
+            all_results[site] = site_results
 
-    # Verify API works with a tiny test
-    logger.info("Verifying OpenAI API key...")
-    try:
-        embed_texts(client, ["test"])
-        logger.info("  OK")
-    except Exception as exc:
-        logger.error(f"  FAILED: {exc}")
-        sys.exit(1)
+        if missing:
+            logger.error("Missing checkpoints for --report-only: %s", ", ".join(missing))
+            logger.error("Run without --report-only first to generate checkpoints.")
+            sys.exit(1)
 
-    # Run primary benchmark (default chunk config)
-    max_words, overlap_words, config_label = DEFAULT_CHUNK_CONFIG
-    all_results = _run_benchmark_for_config(
-        client, run_dir, sites, available_tools,
-        max_words, overlap_words, config_label,
-        add_context_headers=args.context_headers,
-    )
+        logger.info(f"Loaded all results from checkpoints ({sum(len(v) for v in all_results.values())} tool/site combos)")
+        chunk_sensitivity_results = None
+    else:
+        # Initialize OpenAI client
+        client = _get_openai_client()
 
-    # Run chunk sensitivity analysis if requested
-    chunk_sensitivity_results: Optional[Dict[str, Dict[str, Dict[str, ToolSiteRetrievalResult]]]] = None
-    if args.chunk_sensitivity:
-        chunk_sensitivity_results = {}
-        for mw, ow, label in CHUNK_CONFIGS:
-            if (mw, ow, label) == DEFAULT_CHUNK_CONFIG:
-                # Reuse primary results
-                chunk_sensitivity_results[label] = all_results
-            else:
-                logger.info(f"\n\n{'#'*60}")
-                logger.info(f"# Chunk sensitivity: {label} (max_words={mw}, overlap={ow})")
-                logger.info(f"{'#'*60}")
-                chunk_sensitivity_results[label] = _run_benchmark_for_config(
-                    client, run_dir, sites, available_tools,
-                    mw, ow, label, verbose=True,
-                    add_context_headers=args.context_headers,
-                )
+        # Verify API works with a tiny test
+        logger.info("Verifying OpenAI API key...")
+        try:
+            embed_texts(client, ["test"])
+            logger.info("  OK")
+        except Exception as exc:
+            logger.error(f"  FAILED: {exc}")
+            sys.exit(1)
+
+        # Run primary benchmark (default chunk config)
+        max_words, overlap_words, config_label = DEFAULT_CHUNK_CONFIG
+        all_results = _run_benchmark_for_config(
+            client, run_dir, sites, available_tools,
+            max_words, overlap_words, config_label,
+            add_context_headers=args.context_headers,
+        )
+
+        # Run chunk sensitivity analysis if requested
+        chunk_sensitivity_results: Optional[Dict[str, Dict[str, Dict[str, ToolSiteRetrievalResult]]]] = None
+        if args.chunk_sensitivity:
+            chunk_sensitivity_results = {}
+            for mw, ow, label in CHUNK_CONFIGS:
+                if (mw, ow, label) == DEFAULT_CHUNK_CONFIG:
+                    # Reuse primary results
+                    chunk_sensitivity_results[label] = all_results
+                else:
+                    logger.info(f"\n\n{'#'*60}")
+                    logger.info(f"# Chunk sensitivity: {label} (max_words={mw}, overlap={ow})")
+                    logger.info(f"{'#'*60}")
+                    chunk_sensitivity_results[label] = _run_benchmark_for_config(
+                        client, run_dir, sites, available_tools,
+                        mw, ow, label, verbose=True,
+                        add_context_headers=args.context_headers,
+                    )
 
     # Generate report
     report = generate_retrieval_report(all_results, available_tools, chunk_sensitivity_results)

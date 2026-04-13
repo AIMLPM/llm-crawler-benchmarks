@@ -344,18 +344,33 @@ def run_answer_quality_test(
     return results
 
 
+def _ordinal_suffix(n: int) -> str:
+    """Return ordinal suffix for a number (1->st, 2->nd, 3->rd, etc.)."""
+    if 11 <= (n % 100) <= 13:
+        return "th"
+    return {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+
+
 def generate_report(
     all_results: Dict[str, Dict[str, List[AnswerResult]]],
     tool_names: List[str],
 ) -> str:
     """Generate ANSWER_QUALITY.md report."""
+    import datetime
+    today = datetime.date.today().isoformat()
     lines = [
         "# End-to-End RAG Answer Quality",
+        f"<!-- style: v2, {today} -->",
         "",
-        "Does cleaner crawler output produce better LLM answers?",
+        "",  # placeholder — one-line answer inserted after aggregation
+        "",
         f"Each tool's crawled content is chunked, embedded, retrieved (top-{TOP_K_FOR_ANSWER}),",
         f"and sent to `{ANSWER_MODEL}` to generate an answer. Answers are scored by",
         f"`{JUDGE_MODEL}` on correctness, relevance, completeness, and usefulness (1-5 each).",
+        "",
+        "**Scoring scale:** 1 = wrong/irrelevant, 2 = partially relevant, "
+        "3 = acceptable, 4 = good, 5 = excellent/complete. Scores are averaged across "
+        "all queries per tool. An overall score above 4.0 indicates consistently good answers.",
         "",
     ]
 
@@ -384,6 +399,26 @@ def generate_report(
             results=all_tool_results,
         )
 
+    # Generate dynamic one-line answer
+    if tool_summaries:
+        sorted_tools = sorted(tool_summaries.values(), key=lambda s: s.avg_overall, reverse=True)
+        best = sorted_tools[0]
+        worst = sorted_tools[-1]
+        mc = tool_summaries.get("markcrawl")
+        mc_rank = next((i + 1 for i, s in enumerate(sorted_tools) if s.tool == "markcrawl"), None)
+        gap_pct = ((best.avg_overall - worst.avg_overall) / best.avg_overall * 100) if best.avg_overall else 0
+        one_line = (
+            f"All crawlers produce similar LLM answer quality "
+            f"({worst.avg_overall:.2f}-{best.avg_overall:.2f} out of 5). "
+            f"{best.tool} leads slightly at {best.avg_overall:.2f}"
+        )
+        if mc and mc.tool != best.tool:
+            mc_gap = (best.avg_overall - mc.avg_overall) / best.avg_overall * 100
+            one_line += f"; markcrawl ranks {mc_rank}{_ordinal_suffix(mc_rank)} at {mc.avg_overall:.2f}"
+            one_line += f" \u2014 a {mc_gap:.1f}% gap from the best"
+        one_line += ". The gaps are small but consistent."
+        lines[3] = one_line  # replace placeholder
+
     # Summary table
     total_q = max((s.total_queries for s in tool_summaries.values()), default=0)
     lines.extend([
@@ -398,8 +433,9 @@ def generate_report(
         if not s:
             continue
         avg_tokens = int(s.avg_chunk_words * 1.33)
+        tool_label = f"**{tool}**" if tool == "markcrawl" else tool
         lines.append(
-            f"| {tool} "
+            f"| {tool_label} "
             f"| {s.avg_correctness:.2f} "
             f"| {s.avg_relevance:.2f} "
             f"| {s.avg_completeness:.2f} "
@@ -408,7 +444,18 @@ def generate_report(
             f"| {avg_tokens:,} |"
         )
 
-    lines.extend(["", ""])
+    lines.extend([
+        "",
+        "> **Column definitions:** "
+        "All scores are 1-5 averages across queries, judged by `" + JUDGE_MODEL + "`. "
+        "**Correctness** = factual accuracy. "
+        "**Relevance** = answers the question asked. "
+        "**Completeness** = covers all aspects. "
+        "**Usefulness** = practical value to the user. "
+        "**Overall** = mean of the four dimensions. "
+        "**Avg tokens/query** = estimated input tokens per query (chunk words x 1.33).",
+        "",
+    ])
 
     # Per-site breakdown
     for site, site_results in all_results.items():
@@ -425,8 +472,9 @@ def generate_report(
             if not results:
                 continue
             n = len(results)
+            tool_label = f"**{tool}**" if tool == "markcrawl" else tool
             lines.append(
-                f"| {tool} "
+                f"| {tool_label} "
                 f"| {sum(r.correctness for r in results)/n:.2f} "
                 f"| {sum(r.relevance for r in results)/n:.2f} "
                 f"| {sum(r.completeness for r in results)/n:.2f} "
@@ -434,7 +482,11 @@ def generate_report(
                 f"| {sum(r.overall for r in results)/n:.2f} |"
             )
 
-        lines.append("")
+        lines.extend([
+            "",
+            "> Scores are 1-5 averages. See summary table legend for dimension definitions.",
+            "",
+        ])
 
         # Per-query detail
         lines.append("<details>")
@@ -468,6 +520,12 @@ def generate_report(
         f"- **Embedding:** `{EMBEDDING_MODEL}`",
         "- **Same pipeline for all tools** — only crawler output quality varies",
         "",
+        "## See also",
+        "",
+        "- [RETRIEVAL_COMPARISON.md](RETRIEVAL_COMPARISON.md) — retrieval doesn't differ much, but answers do",
+        "- [COST_AT_SCALE.md](COST_AT_SCALE.md) — what the quality gap costs at scale",
+        "- [METHODOLOGY.md](METHODOLOGY.md) — full test setup and fairness decisions",
+        "",
     ])
 
     return "\n".join(lines) + "\n"
@@ -480,10 +538,12 @@ def generate_report(
 def main():
     parser = argparse.ArgumentParser(description="End-to-end RAG answer quality benchmark")
     parser.add_argument("--run", default=None, help="Specific run directory name")
-    parser.add_argument("--output", default=str(BENCH_DIR / "ANSWER_QUALITY.md"))
+    parser.add_argument("--output", default=str(BENCH_DIR / "reports" / "ANSWER_QUALITY.md"))
     parser.add_argument("--sites", default=None, help="Comma-separated sites")
     parser.add_argument("--tools", default=None, help="Comma-separated tools")
     parser.add_argument("--fresh", action="store_true", help="Clear checkpoints")
+    parser.add_argument("--report-only", action="store_true",
+                        help="Regenerate report from checkpoints only — no API calls")
     args = parser.parse_args()
 
     runs_dir = BENCH_DIR / "runs"
@@ -518,80 +578,105 @@ def main():
     logger.info(f"Tools: {', '.join(available_tools)}")
     logger.info(f"Sites: {', '.join(sites)}")
 
-    client = _get_openai_client()
-
-    # Verify API
-    logger.info("Verifying OpenAI API...")
-    try:
-        embed_texts(client, ["test"])
-        logger.info("  OK")
-    except Exception as exc:
-        logger.error(f"  FAILED: {exc}")
-        sys.exit(1)
-
-    # Count total work
-    total_combos = sum(
-        1 for site in sites for tool in available_tools
-        if (run_dir / tool / site / "pages.jsonl").is_file()
-    )
-    total_queries = sum(len(TEST_QUERIES.get(s, [])) for s in sites)
-    logger.info(f"\n{total_combos} tool*site combos, {total_queries} queries per tool")
-    logger.info(f"Estimated API cost: ~${total_queries * len(available_tools) * 0.002:.2f}")
-
-    all_results: Dict[str, Dict[str, List[AnswerResult]]] = {}
     run_name = run_dir.name
 
-    for site in sites:
-        queries = TEST_QUERIES.get(site)
-        if not queries:
-            continue
+    # --report-only: load all results from checkpoints, skip API calls
+    if args.report_only:
+        all_results: Dict[str, Dict[str, List[AnswerResult]]] = {}
+        missing = []
+        for site in sites:
+            if site not in TEST_QUERIES:
+                continue
+            site_results: Dict[str, List[AnswerResult]] = {}
+            for tool in available_tools:
+                cached = _load_checkpoint(run_name, tool, site)
+                if cached is not None:
+                    site_results[tool] = cached
+                else:
+                    if (run_dir / tool / site / "pages.jsonl").is_file():
+                        missing.append(f"{tool}/{site}")
+            all_results[site] = site_results
 
-        logger.info(f"\n{'='*60}")
-        logger.info(f"Site: {site} ({len(queries)} queries)")
-        logger.info(f"{'='*60}")
+        if missing:
+            logger.error("Missing checkpoints for --report-only: %s", ", ".join(missing))
+            logger.error("Run without --report-only first to generate checkpoints.")
+            sys.exit(1)
 
-        site_results: Dict[str, List[AnswerResult]] = {}
+        logger.info(f"Loaded all results from checkpoints ({sum(len(v) for v in all_results.values())} tool/site combos)")
+    else:
+        client = _get_openai_client()
 
-        # Pre-embed queries once per site
-        query_vectors: Optional[List[List[float]]] = None
-        needs_work = any(
-            _load_checkpoint(run_name, t, site) is None
-            and (run_dir / t / site / "pages.jsonl").is_file()
-            for t in available_tools
+        # Verify API
+        logger.info("Verifying OpenAI API...")
+        try:
+            embed_texts(client, ["test"])
+            logger.info("  OK")
+        except Exception as exc:
+            logger.error(f"  FAILED: {exc}")
+            sys.exit(1)
+
+        # Count total work
+        total_combos = sum(
+            1 for site in sites for tool in available_tools
+            if (run_dir / tool / site / "pages.jsonl").is_file()
         )
-        if needs_work:
-            query_texts = [q["query"] for q in queries]
-            logger.info(f"  Embedding {len(query_texts)} queries...")
-            query_vectors = _embed_with_retry(client, query_texts)
+        total_queries = sum(len(TEST_QUERIES.get(s, [])) for s in sites)
+        logger.info(f"\n{total_combos} tool*site combos, {total_queries} queries per tool")
+        logger.info(f"Estimated API cost: ~${total_queries * len(available_tools) * 0.002:.2f}")
 
-        for tool in available_tools:
-            # Check checkpoint
-            cached = _load_checkpoint(run_name, tool, site)
-            if cached is not None:
-                site_results[tool] = cached
-                avg = sum(r.overall for r in cached) / len(cached)
-                logger.info(f"\n  {tool}: RESUMED -- avg score {avg:.2f}/5")
+        all_results: Dict[str, Dict[str, List[AnswerResult]]] = {}
+
+        for site in sites:
+            queries = TEST_QUERIES.get(site)
+            if not queries:
                 continue
 
-            jsonl_path = run_dir / tool / site / "pages.jsonl"
-            if not jsonl_path.is_file() or jsonl_path.stat().st_size == 0:
-                continue
+            logger.info(f"\n{'='*60}")
+            logger.info(f"Site: {site} ({len(queries)} queries)")
+            logger.info(f"{'='*60}")
 
-            logger.info(f"\n  {tool}:")
-            pages = load_pages(str(jsonl_path))
-            logger.info(f"    {len(pages)} pages")
+            site_results: Dict[str, List[AnswerResult]] = {}
 
-            results = run_answer_quality_test(
-                client, pages, queries, tool, site, query_vectors,
+            # Pre-embed queries once per site
+            query_vectors: Optional[List[List[float]]] = None
+            needs_work = any(
+                _load_checkpoint(run_name, t, site) is None
+                and (run_dir / t / site / "pages.jsonl").is_file()
+                for t in available_tools
             )
+            if needs_work:
+                query_texts = [q["query"] for q in queries]
+                logger.info(f"  Embedding {len(query_texts)} queries...")
+                query_vectors = _embed_with_retry(client, query_texts)
 
-            if results:
-                site_results[tool] = results
-                _save_checkpoint(run_name, tool, site, results)
-                avg = sum(r.overall for r in results) / len(results)
-                logger.info(f"    Average: {avg:.2f}/5")
+            for tool in available_tools:
+                # Check checkpoint
+                cached = _load_checkpoint(run_name, tool, site)
+                if cached is not None:
+                    site_results[tool] = cached
+                    avg = sum(r.overall for r in cached) / len(cached)
+                    logger.info(f"\n  {tool}: RESUMED -- avg score {avg:.2f}/5")
+                    continue
 
-        all_results[site] = site_results
+                jsonl_path = run_dir / tool / site / "pages.jsonl"
+                if not jsonl_path.is_file() or jsonl_path.stat().st_size == 0:
+                    continue
+
+                logger.info(f"\n  {tool}:")
+                pages = load_pages(str(jsonl_path))
+                logger.info(f"    {len(pages)} pages")
+
+                results = run_answer_quality_test(
+                    client, pages, queries, tool, site, query_vectors,
+                )
+
+                if results:
+                    site_results[tool] = results
+                    _save_checkpoint(run_name, tool, site, results)
+                    avg = sum(r.overall for r in results) / len(results)
+                    logger.info(f"    Average: {avg:.2f}/5")
+
+            all_results[site] = site_results
 
     # Generate report
     report = generate_report(all_results, available_tools)

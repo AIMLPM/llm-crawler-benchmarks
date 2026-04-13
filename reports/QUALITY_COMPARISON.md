@@ -8,7 +8,7 @@
 Four automated quality metrics — no LLM or human review needed:
 
 1. **Junk phrases** — known boilerplate strings (nav, footer, breadcrumbs) found in output
-2. **Preamble [1]** — average words per page appearing *before* the first heading.
+2. **Preamble [2]** — average words per page appearing *before* the first heading.
    Nav chrome (version selectors, language pickers, prev/next links) lives here.
    A tool with a high preamble count is injecting site chrome into every chunk.
 3. **Cross-page repeat rate** — fraction of sentences that appear on >50% of pages.
@@ -28,7 +28,7 @@ For RAG pipelines, **clean output matters more than comprehensive output.**
 A tool that includes 1,000 words of nav chrome per page pollutes every
 chunk in the vector index, degrading retrieval for every query.
 
-| Tool | Content signal | Preamble [1] | Repeat rate | Junk/page | Precision | Recall |
+| Tool | Content signal [1] | Preamble [2] | Repeat rate [3] | Junk/page [4] | Precision [5] | Recall [5] |
 |---|---|---|---|---|---|---|
 | **markcrawl** | 99% | 15 | 0% | 0.5 | 99% | 64% |
 | crawl4ai | 89% | 311 ⚠ | 1% | 3.2 | 100% | 66% |
@@ -39,19 +39,20 @@ chunk in the vector index, degrading retrieval for every query.
 | playwright | 68% | 2037 ⚠ | 1% | 3.6 | 100% | 97% |
 | firecrawl | — | — | — | — | — | — |
 
-**[1]** Avg words per page before the first heading (nav chrome).
+> **Column definitions:**
+> **[1] Content signal** = (total words - preamble words) ÷ total words, per page average. Higher = cleaner output.
+> **[2] Preamble** = avg words per page appearing *before* the first heading (nav chrome, breadcrumbs). Lower is better.
+> **[3] Repeat rate** = fraction of sentences appearing on >50% of pages (boilerplate). Lower is better.
+> **[4] Junk/page** = known boilerplate phrases (nav, footer, cookie banners) detected per page. Lower is better.
+> **[5] Precision/Recall** = cross-tool consensus: precision measures how much output is agreed-upon content; recall measures how much agreed content was captured.
 
 
 **Key takeaway:** markcrawl achieves 99% content signal with only 15 words of preamble per page — compared to 2207 for crawlee. Its recall is lower (64% vs 97%) because it strips nav, footer, and sponsor content that other tools include. For RAG use cases, this trade-off typically favors cleaner output: fewer junk tokens per chunk means better embedding quality and retrieval precision.
 
-> **Content signal** = percentage of output that is content (not preamble nav chrome).
-> Higher is better. A tool with 100% content signal has zero nav/header pollution.
-> **Repeat rate** = fraction of phrases appearing on >50% of pages (boilerplate).
-> **Junk/page** = known boilerplate phrases detected per page.
 
 ## quotes-toscrape
 
-| Tool | Avg words | Preamble [1] | Repeat rate | Junk found | Headings | Code blocks | Precision | Recall |
+| Tool | Avg words [6] | Preamble [2] | Repeat rate [3] | Junk found [4] | Headings [7] | Code blocks [8] | Precision [5] | Recall [5] |
 |---|---|---|---|---|---|---|---|---|
 | **markcrawl** | 214 | 15 | 0% | 0 | 0.9 | 0.0 | 100% | 100% |
 | crawl4ai | 242 | 0 | 2% | 1 | 2.7 | 0.0 | 100% | 100% |
@@ -62,33 +63,91 @@ chunk in the vector index, degrading retrieval for every query.
 | playwright | 245 | 3 | 2% | 1 | 2.7 | 0.0 | 100% | 100% |
 | firecrawl | — | — | — | — | — | — | — | — |
 
-**[1]** Avg words per page before the first heading (nav chrome). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
+> **Column definitions:**
+> **[6] Avg words** = mean words per page. **[2] Preamble** = avg words per page before the first heading (nav chrome). **[3] Repeat rate** = fraction of sentences on >50% of pages.
+> **[4] Junk found** = total known boilerplate phrases detected across all pages. **[7] Headings** = avg headings per page. **[8] Code blocks** = avg fenced code blocks per page.
+> **[5] Precision/Recall** = cross-tool consensus (pages with <2 sentences excluded). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
 
 <details>
-<summary>Sample output — first 40 lines of <code>quotes.toscrape.com/author/Steve-Martin</code></summary>
+<summary>Sample output — first 40 lines of <code>quotes.toscrape.com/tag/books/page/1</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
 ```
-### Steve Martin
+### Viewing tag: [books](/tag/books/page/1/)
 
-**Born:** August 14, 1945 in Waco, Texas, The United States
+“The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.”
+by Jane Austen
+[(about)](/author/Jane-Austen)
 
-**Description:**
+“Good friends, good books, and a sleepy conscience: this is the ideal life.”
+by Mark Twain
+[(about)](/author/Mark-Twain)
 
-Stephen Glenn "Steve" Martin is an American actor, comedian, writer, playwright, producer, musician, and composer. He was raised in Southern California in a Baptist family, where his early influences were working at Disneyland and Knott's Berry Farm and working magic and comedy acts at these and other smaller venues in the area. His ascent to fame picked up when he became a writer for the Smothers Brothers Comedy Hour, and later became a frequent guest on the Tonight Show.In the 1970s, Martin performed his offbeat, absurdist comedy routines before packed houses on national tours. In the 1980s, having branched away from stand-up comedy, he became a successful actor, playwright, and juggler, and eventually earned Emmy, Grammy, and American Comedy awards.
+“I have always imagined that Paradise will be a kind of library.”
+by Jorge Luis Borges
+[(about)](/author/Jorge-Luis-Borges)
+
+“You can never get a cup of tea large enough or a book long enough to suit me.”
+by C.S. Lewis
+[(about)](/author/C-S-Lewis)
+
+“If you only read the books that everyone else is reading, you can only think what everyone else is thinking.”
+by Haruki Murakami
+[(about)](/author/Haruki-Murakami)
+
+“There is no friend as loyal as a book.”
+by Ernest Hemingway
+[(about)](/author/Ernest-Hemingway)
+
+“What really knocks me out is a book that, when you're all done reading it, you wish the author that wrote it was a terrific friend of yours and you could call him up on the phone whenever you felt like it. That doesn't happen much, though.”
+by J.D. Salinger
+[(about)](/author/J-D-Salinger)
+
+“′Classic′ - a book which people praise and don't read.”
+by Mark Twain
+[(about)](/author/Mark-Twain)
+
+“I declare after all there is no enjoyment like reading! How much sooner one tires of any thing than of a book! -- When I have a house of my own, I shall be miserable if I have not an excellent library.”
+by Jane Austen
+[(about)](/author/Jane-Austen)
+
+“You have to write the book that wants to be written. And if the book will be too difficult for grown-ups, then you write it for children.”
+by Madeleine L'Engle
 ```
 
 **crawl4ai**
 ```
 #  [Quotes to Scrape](https://quotes.toscrape.com/)
 [Login](https://quotes.toscrape.com/login)
-### Steve Martin
-**Born:** August 14, 1945 in Waco, Texas, The United States
-**Description:**
-Stephen Glenn "Steve" Martin is an American actor, comedian, writer, playwright, producer, musician, and composer. He was raised in Southern California in a Baptist family, where his early influences were working at Disneyland and Knott's Berry Farm and working magic and comedy acts at these and other smaller venues in the area. His ascent to fame picked up when he became a writer for the Smothers Brothers Comedy Hour, and later became a frequent guest on the Tonight Show.In the 1970s, Martin performed his offbeat, absurdist comedy routines before packed houses on national tours. In the 1980s, having branched away from stand-up comedy, he became a successful actor, playwright, and juggler, and eventually earned Emmy, Grammy, and American Comedy awards. 
+### Viewing tag: [books](https://quotes.toscrape.com/tag/books/page/1/)
+“The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.” by Jane Austen [(about)](https://quotes.toscrape.com/author/Jane-Austen)
+Tags: [aliteracy](https://quotes.toscrape.com/tag/aliteracy/page/1/) [books](https://quotes.toscrape.com/tag/books/page/1/) [classic](https://quotes.toscrape.com/tag/classic/page/1/) [humor](https://quotes.toscrape.com/tag/humor/page/1/)
+“Good friends, good books, and a sleepy conscience: this is the ideal life.” by Mark Twain [(about)](https://quotes.toscrape.com/author/Mark-Twain)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [contentment](https://quotes.toscrape.com/tag/contentment/page/1/) [friends](https://quotes.toscrape.com/tag/friends/page/1/) [friendship](https://quotes.toscrape.com/tag/friendship/page/1/) [life](https://quotes.toscrape.com/tag/life/page/1/)
+“I have always imagined that Paradise will be a kind of library.” by Jorge Luis Borges [(about)](https://quotes.toscrape.com/author/Jorge-Luis-Borges)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [library](https://quotes.toscrape.com/tag/library/page/1/)
+“You can never get a cup of tea large enough or a book long enough to suit me.” by C.S. Lewis [(about)](https://quotes.toscrape.com/author/C-S-Lewis)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [inspirational](https://quotes.toscrape.com/tag/inspirational/page/1/) [reading](https://quotes.toscrape.com/tag/reading/page/1/) [tea](https://quotes.toscrape.com/tag/tea/page/1/)
+“If you only read the books that everyone else is reading, you can only think what everyone else is thinking.” by Haruki Murakami [(about)](https://quotes.toscrape.com/author/Haruki-Murakami)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [thought](https://quotes.toscrape.com/tag/thought/page/1/)
+“There is no friend as loyal as a book.” by Ernest Hemingway [(about)](https://quotes.toscrape.com/author/Ernest-Hemingway)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [friends](https://quotes.toscrape.com/tag/friends/page/1/) [novelist-quotes](https://quotes.toscrape.com/tag/novelist-quotes/page/1/)
+“What really knocks me out is a book that, when you're all done reading it, you wish the author that wrote it was a terrific friend of yours and you could call him up on the phone whenever you felt like it. That doesn't happen much, though.” by J.D. Salinger [(about)](https://quotes.toscrape.com/author/J-D-Salinger)
+Tags: [authors](https://quotes.toscrape.com/tag/authors/page/1/) [books](https://quotes.toscrape.com/tag/books/page/1/) [literature](https://quotes.toscrape.com/tag/literature/page/1/) [reading](https://quotes.toscrape.com/tag/reading/page/1/) [writing](https://quotes.toscrape.com/tag/writing/page/1/)
+“′Classic′ - a book which people praise and don't read.” by Mark Twain [(about)](https://quotes.toscrape.com/author/Mark-Twain)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [classic](https://quotes.toscrape.com/tag/classic/page/1/) [reading](https://quotes.toscrape.com/tag/reading/page/1/)
+“I declare after all there is no enjoyment like reading! How much sooner one tires of any thing than of a book! -- When I have a house of my own, I shall be miserable if I have not an excellent library.” by Jane Austen [(about)](https://quotes.toscrape.com/author/Jane-Austen)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [library](https://quotes.toscrape.com/tag/library/page/1/) [reading](https://quotes.toscrape.com/tag/reading/page/1/)
+“You have to write the book that wants to be written. And if the book will be too difficult for grown-ups, then you write it for children.” by Madeleine L'Engle [(about)](https://quotes.toscrape.com/author/Madeleine-LEngle)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [children](https://quotes.toscrape.com/tag/children/page/1/) [difficult](https://quotes.toscrape.com/tag/difficult/page/1/) [grown-ups](https://quotes.toscrape.com/tag/grown-ups/page/1/) [write](https://quotes.toscrape.com/tag/write/page/1/) [writers](https://quotes.toscrape.com/tag/writers/page/1/) [writing](https://quotes.toscrape.com/tag/writing/page/1/)
+  * [Next →](https://quotes.toscrape.com/tag/books/page/2/)
+
+
+## Top Ten tags
+[love](https://quotes.toscrape.com/tag/love/) [inspirational](https://quotes.toscrape.com/tag/inspirational/) [life](https://quotes.toscrape.com/tag/life/) [humor](https://quotes.toscrape.com/tag/humor/) [books](https://quotes.toscrape.com/tag/books/) [reading](https://quotes.toscrape.com/tag/reading/) [friendship](https://quotes.toscrape.com/tag/friendship/) [friends](https://quotes.toscrape.com/tag/friends/) [truth](https://quotes.toscrape.com/tag/truth/) [simile](https://quotes.toscrape.com/tag/simile/)
 Quotes by: [GoodReads.com](https://www.goodreads.com/quotes)
 Made with ❤ by [Zyte](https://www.zyte.com)
 ```
@@ -97,10 +156,32 @@ Made with ❤ by [Zyte](https://www.zyte.com)
 ```
 #  [Quotes to Scrape](https://quotes.toscrape.com/)
 [Login](https://quotes.toscrape.com/login)
-### Steve Martin
-**Born:** August 14, 1945 in Waco, Texas, The United States
-**Description:**
-Stephen Glenn "Steve" Martin is an American actor, comedian, writer, playwright, producer, musician, and composer. He was raised in Southern California in a Baptist family, where his early influences were working at Disneyland and Knott's Berry Farm and working magic and comedy acts at these and other smaller venues in the area. His ascent to fame picked up when he became a writer for the Smothers Brothers Comedy Hour, and later became a frequent guest on the Tonight Show.In the 1970s, Martin performed his offbeat, absurdist comedy routines before packed houses on national tours. In the 1980s, having branched away from stand-up comedy, he became a successful actor, playwright, and juggler, and eventually earned Emmy, Grammy, and American Comedy awards. 
+### Viewing tag: [books](https://quotes.toscrape.com/tag/books/page/1/)
+“The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.” by Jane Austen [(about)](https://quotes.toscrape.com/author/Jane-Austen)
+Tags: [aliteracy](https://quotes.toscrape.com/tag/aliteracy/page/1/) [books](https://quotes.toscrape.com/tag/books/page/1/) [classic](https://quotes.toscrape.com/tag/classic/page/1/) [humor](https://quotes.toscrape.com/tag/humor/page/1/)
+“Good friends, good books, and a sleepy conscience: this is the ideal life.” by Mark Twain [(about)](https://quotes.toscrape.com/author/Mark-Twain)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [contentment](https://quotes.toscrape.com/tag/contentment/page/1/) [friends](https://quotes.toscrape.com/tag/friends/page/1/) [friendship](https://quotes.toscrape.com/tag/friendship/page/1/) [life](https://quotes.toscrape.com/tag/life/page/1/)
+“I have always imagined that Paradise will be a kind of library.” by Jorge Luis Borges [(about)](https://quotes.toscrape.com/author/Jorge-Luis-Borges)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [library](https://quotes.toscrape.com/tag/library/page/1/)
+“You can never get a cup of tea large enough or a book long enough to suit me.” by C.S. Lewis [(about)](https://quotes.toscrape.com/author/C-S-Lewis)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [inspirational](https://quotes.toscrape.com/tag/inspirational/page/1/) [reading](https://quotes.toscrape.com/tag/reading/page/1/) [tea](https://quotes.toscrape.com/tag/tea/page/1/)
+“If you only read the books that everyone else is reading, you can only think what everyone else is thinking.” by Haruki Murakami [(about)](https://quotes.toscrape.com/author/Haruki-Murakami)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [thought](https://quotes.toscrape.com/tag/thought/page/1/)
+“There is no friend as loyal as a book.” by Ernest Hemingway [(about)](https://quotes.toscrape.com/author/Ernest-Hemingway)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [friends](https://quotes.toscrape.com/tag/friends/page/1/) [novelist-quotes](https://quotes.toscrape.com/tag/novelist-quotes/page/1/)
+“What really knocks me out is a book that, when you're all done reading it, you wish the author that wrote it was a terrific friend of yours and you could call him up on the phone whenever you felt like it. That doesn't happen much, though.” by J.D. Salinger [(about)](https://quotes.toscrape.com/author/J-D-Salinger)
+Tags: [authors](https://quotes.toscrape.com/tag/authors/page/1/) [books](https://quotes.toscrape.com/tag/books/page/1/) [literature](https://quotes.toscrape.com/tag/literature/page/1/) [reading](https://quotes.toscrape.com/tag/reading/page/1/) [writing](https://quotes.toscrape.com/tag/writing/page/1/)
+“′Classic′ - a book which people praise and don't read.” by Mark Twain [(about)](https://quotes.toscrape.com/author/Mark-Twain)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [classic](https://quotes.toscrape.com/tag/classic/page/1/) [reading](https://quotes.toscrape.com/tag/reading/page/1/)
+“I declare after all there is no enjoyment like reading! How much sooner one tires of any thing than of a book! -- When I have a house of my own, I shall be miserable if I have not an excellent library.” by Jane Austen [(about)](https://quotes.toscrape.com/author/Jane-Austen)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [library](https://quotes.toscrape.com/tag/library/page/1/) [reading](https://quotes.toscrape.com/tag/reading/page/1/)
+“You have to write the book that wants to be written. And if the book will be too difficult for grown-ups, then you write it for children.” by Madeleine L'Engle [(about)](https://quotes.toscrape.com/author/Madeleine-LEngle)
+Tags: [books](https://quotes.toscrape.com/tag/books/page/1/) [children](https://quotes.toscrape.com/tag/children/page/1/) [difficult](https://quotes.toscrape.com/tag/difficult/page/1/) [grown-ups](https://quotes.toscrape.com/tag/grown-ups/page/1/) [write](https://quotes.toscrape.com/tag/write/page/1/) [writers](https://quotes.toscrape.com/tag/writers/page/1/) [writing](https://quotes.toscrape.com/tag/writing/page/1/)
+  * [Next →](https://quotes.toscrape.com/tag/books/page/2/)
+
+
+## Top Ten tags
+[love](https://quotes.toscrape.com/tag/love/) [inspirational](https://quotes.toscrape.com/tag/inspirational/) [life](https://quotes.toscrape.com/tag/life/) [humor](https://quotes.toscrape.com/tag/humor/) [books](https://quotes.toscrape.com/tag/books/) [reading](https://quotes.toscrape.com/tag/reading/) [friendship](https://quotes.toscrape.com/tag/friendship/) [friends](https://quotes.toscrape.com/tag/friends/) [truth](https://quotes.toscrape.com/tag/truth/) [simile](https://quotes.toscrape.com/tag/simile/)
 Quotes by: [GoodReads.com](https://www.goodreads.com/quotes)
 Made with ❤ by [Zyte](https://www.zyte.com)
 ```
@@ -111,17 +192,42 @@ Made with ❤ by [Zyte](https://www.zyte.com)
 
 [Login](/login)
 
-### Steve Martin
+### Viewing tag: [books](/tag/books/page/1/)
 
-**Born:** August 14, 1945 in Waco, Texas, The United States
+“The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.”
+by Jane Austen
+[(about)](/author/Jane-Austen)
 
-**Description:**
+Tags:
+[aliteracy](/tag/aliteracy/page/1/)
+[books](/tag/books/page/1/)
+[classic](/tag/classic/page/1/)
+[humor](/tag/humor/page/1/)
 
-Stephen Glenn "Steve" Martin is an American actor, comedian, writer, playwright, producer, musician, and composer. He was raised in Southern California in a Baptist family, where his early influences were working at Disneyland and Knott's Berry Farm and working magic and comedy acts at these and other smaller venues in the area. His ascent to fame picked up when he became a writer for the Smothers Brothers Comedy Hour, and later became a frequent guest on the Tonight Show.In the 1970s, Martin performed his offbeat, absurdist comedy routines before packed houses on national tours. In the 1980s, having branched away from stand-up comedy, he became a successful actor, playwright, and juggler, and eventually earned Emmy, Grammy, and American Comedy awards.
+“Good friends, good books, and a sleepy conscience: this is the ideal life.”
+by Mark Twain
+[(about)](/author/Mark-Twain)
 
-Quotes by: [GoodReads.com](https://www.goodreads.com/quotes)
+Tags:
+[books](/tag/books/page/1/)
+[contentment](/tag/contentment/page/1/)
+[friends](/tag/friends/page/1/)
+[friendship](/tag/friendship/page/1/)
+[life](/tag/life/page/1/)
 
-Made with ❤ by [Zyte](https://www.zyte.com)
+“I have always imagined that Paradise will be a kind of library.”
+by Jorge Luis Borges
+[(about)](/author/Jorge-Luis-Borges)
+
+Tags:
+[books](/tag/books/page/1/)
+[library](/tag/library/page/1/)
+
+“You can never get a cup of tea large enough or a book long enough to suit me.”
+by C.S. Lewis
+[(about)](/author/C-S-Lewis)
+
+Tags:
 ```
 
 **crawlee**
@@ -134,17 +240,38 @@ Quotes to Scrape
 
 [Login](/login)
 
-### Steve Martin
+### Viewing tag: [books](/tag/books/page/1/)
 
-**Born:** August 14, 1945 in Waco, Texas, The United States
+“The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.”
+by Jane Austen
+[(about)](/author/Jane-Austen)
 
-**Description:**
+Tags:
+[aliteracy](/tag/aliteracy/page/1/)
+[books](/tag/books/page/1/)
+[classic](/tag/classic/page/1/)
+[humor](/tag/humor/page/1/)
 
-Stephen Glenn "Steve" Martin is an American actor, comedian, writer, playwright, producer, musician, and composer. He was raised in Southern California in a Baptist family, where his early influences were working at Disneyland and Knott's Berry Farm and working magic and comedy acts at these and other smaller venues in the area. His ascent to fame picked up when he became a writer for the Smothers Brothers Comedy Hour, and later became a frequent guest on the Tonight Show.In the 1970s, Martin performed his offbeat, absurdist comedy routines before packed houses on national tours. In the 1980s, having branched away from stand-up comedy, he became a successful actor, playwright, and juggler, and eventually earned Emmy, Grammy, and American Comedy awards.
+“Good friends, good books, and a sleepy conscience: this is the ideal life.”
+by Mark Twain
+[(about)](/author/Mark-Twain)
 
-Quotes by: [GoodReads.com](https://www.goodreads.com/quotes)
+Tags:
+[books](/tag/books/page/1/)
+[contentment](/tag/contentment/page/1/)
+[friends](/tag/friends/page/1/)
+[friendship](/tag/friendship/page/1/)
+[life](/tag/life/page/1/)
 
-Made with ❤ by [Zyte](https://www.zyte.com)
+“I have always imagined that Paradise will be a kind of library.”
+by Jorge Luis Borges
+[(about)](/author/Jorge-Luis-Borges)
+
+Tags:
+[books](/tag/books/page/1/)
+[library](/tag/library/page/1/)
+
+“You can never get a cup of tea large enough or a book long enough to suit me.”
 ```
 
 **colly+md**
@@ -157,17 +284,38 @@ Quotes to Scrape
 
 [Login](/login)
 
-### Steve Martin
+### Viewing tag: [books](/tag/books/page/1/)
 
-**Born:** August 14, 1945 in Waco, Texas, The United States
+“The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.”
+by Jane Austen
+[(about)](/author/Jane-Austen)
 
-**Description:**
+Tags:
+[aliteracy](/tag/aliteracy/page/1/)
+[books](/tag/books/page/1/)
+[classic](/tag/classic/page/1/)
+[humor](/tag/humor/page/1/)
 
-Stephen Glenn "Steve" Martin is an American actor, comedian, writer, playwright, producer, musician, and composer. He was raised in Southern California in a Baptist family, where his early influences were working at Disneyland and Knott's Berry Farm and working magic and comedy acts at these and other smaller venues in the area. His ascent to fame picked up when he became a writer for the Smothers Brothers Comedy Hour, and later became a frequent guest on the Tonight Show.In the 1970s, Martin performed his offbeat, absurdist comedy routines before packed houses on national tours. In the 1980s, having branched away from stand-up comedy, he became a successful actor, playwright, and juggler, and eventually earned Emmy, Grammy, and American Comedy awards.
+“Good friends, good books, and a sleepy conscience: this is the ideal life.”
+by Mark Twain
+[(about)](/author/Mark-Twain)
 
-Quotes by: [GoodReads.com](https://www.goodreads.com/quotes)
+Tags:
+[books](/tag/books/page/1/)
+[contentment](/tag/contentment/page/1/)
+[friends](/tag/friends/page/1/)
+[friendship](/tag/friendship/page/1/)
+[life](/tag/life/page/1/)
 
-Made with ❤ by [Zyte](https://www.zyte.com)
+“I have always imagined that Paradise will be a kind of library.”
+by Jorge Luis Borges
+[(about)](/author/Jorge-Luis-Borges)
+
+Tags:
+[books](/tag/books/page/1/)
+[library](/tag/library/page/1/)
+
+“You can never get a cup of tea large enough or a book long enough to suit me.”
 ```
 
 **playwright**
@@ -180,17 +328,38 @@ Quotes to Scrape
 
 [Login](/login)
 
-### Steve Martin
+### Viewing tag: [books](/tag/books/page/1/)
 
-**Born:** August 14, 1945 in Waco, Texas, The United States
+“The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.”
+by Jane Austen
+[(about)](/author/Jane-Austen)
 
-**Description:**
+Tags:
+[aliteracy](/tag/aliteracy/page/1/)
+[books](/tag/books/page/1/)
+[classic](/tag/classic/page/1/)
+[humor](/tag/humor/page/1/)
 
-Stephen Glenn "Steve" Martin is an American actor, comedian, writer, playwright, producer, musician, and composer. He was raised in Southern California in a Baptist family, where his early influences were working at Disneyland and Knott's Berry Farm and working magic and comedy acts at these and other smaller venues in the area. His ascent to fame picked up when he became a writer for the Smothers Brothers Comedy Hour, and later became a frequent guest on the Tonight Show.In the 1970s, Martin performed his offbeat, absurdist comedy routines before packed houses on national tours. In the 1980s, having branched away from stand-up comedy, he became a successful actor, playwright, and juggler, and eventually earned Emmy, Grammy, and American Comedy awards.
+“Good friends, good books, and a sleepy conscience: this is the ideal life.”
+by Mark Twain
+[(about)](/author/Mark-Twain)
 
-Quotes by: [GoodReads.com](https://www.goodreads.com/quotes)
+Tags:
+[books](/tag/books/page/1/)
+[contentment](/tag/contentment/page/1/)
+[friends](/tag/friends/page/1/)
+[friendship](/tag/friendship/page/1/)
+[life](/tag/life/page/1/)
 
-Made with ❤ by [Zyte](https://www.zyte.com)
+“I have always imagined that Paradise will be a kind of library.”
+by Jorge Luis Borges
+[(about)](/author/Jorge-Luis-Borges)
+
+Tags:
+[books](/tag/books/page/1/)
+[library](/tag/library/page/1/)
+
+“You can never get a cup of tea large enough or a book long enough to suit me.”
 ```
 
 **firecrawl** — no output for this URL
@@ -198,9 +367,9 @@ Made with ❤ by [Zyte](https://www.zyte.com)
 </details>
 
 <details>
-<summary>Per-page word counts and preamble [1]</summary>
+<summary>Per-page word counts and preamble [2]</summary>
 
-| URL | markcrawl words / preamble [1] | crawl4ai words / preamble [1] | crawl4ai-raw words / preamble [1] | scrapy+md words / preamble [1] | crawlee words / preamble [1] | colly+md words / preamble [1] | playwright words / preamble [1] | firecrawl words / preamble [1] |
+| URL | markcrawl words [6] / preamble [2] | crawl4ai words [6] / preamble [2] | crawl4ai-raw words [6] / preamble [2] | scrapy+md words [6] / preamble [2] | crawlee words [6] / preamble [2] | colly+md words [6] / preamble [2] | playwright words [6] / preamble [2] | firecrawl words [6] / preamble [2] |
 |---|---|---|---|---|---|---|---|---|
 | quotes.toscrape.com | 212 / 212 | 282 / 0 | 282 / 0 | 282 / 0 | 285 / 3 | 285 / 3 | 285 / 3 | — |
 | quotes.toscrape.com/author/Albert-Einstein | 616 / 0 | 629 / 0 | 629 / 0 | 629 / 0 | 632 / 3 | 632 / 3 | 632 / 3 | — |
@@ -222,7 +391,7 @@ Made with ❤ by [Zyte](https://www.zyte.com)
 
 ## books-toscrape
 
-| Tool | Avg words | Preamble [1] | Repeat rate | Junk found | Headings | Code blocks | Precision | Recall |
+| Tool | Avg words [6] | Preamble [2] | Repeat rate [3] | Junk found [4] | Headings [7] | Code blocks [8] | Precision [5] | Recall [5] |
 |---|---|---|---|---|---|---|---|---|
 | **markcrawl** | 339 | 66 ⚠ | 0% | 0 | 1.8 | 0.0 | 100% | 99% |
 | crawl4ai | 493 | 178 ⚠ | 2% | 0 | 10.7 | 0.0 | 100% | 99% |
@@ -233,33 +402,62 @@ Made with ❤ by [Zyte](https://www.zyte.com)
 | playwright | 395 | 110 ⚠ | 1% | 0 | 1.8 | 0.0 | 100% | 100% |
 | firecrawl | — | — | — | — | — | — | — | — |
 
-**[1]** Avg words per page before the first heading (nav chrome). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
+> **Column definitions:**
+> **[6] Avg words** = mean words per page. **[2] Preamble** = avg words per page before the first heading (nav chrome). **[3] Repeat rate** = fraction of sentences on >50% of pages.
+> **[4] Junk found** = total known boilerplate phrases detected across all pages. **[7] Headings** = avg headings per page. **[8] Code blocks** = avg fenced code blocks per page.
+> **[5] Precision/Recall** = cross-tool consensus (pages with <2 sentences excluded). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
 
 **Reading the numbers:**
 The word count gap (339 vs 493 avg words) is largely explained by preamble: 178 words of nav chrome account for ~36% of crawl4ai's output on this site.
 
 <details>
-<summary>Sample output — first 40 lines of <code>books.toscrape.com/catalogue/category/books/short-stories_45/index.html</code></summary>
+<summary>Sample output — first 40 lines of <code>books.toscrape.com/catalogue/category/books/autobiography_27/index.html</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
 ```
-# Short Stories
+# Autobiography
 
 
-**1** result.
+**9** results.
 
 **Warning!** This is a demo website for web scraping purposes. Prices and ratings here were randomly assigned and have no real meaning.
 
-1. ### [The Grownup](../../../the-grownup_546/index.html "The Grownup")
+1. ### [The Argonauts](../../../the-argonauts_837/index.html "The Argonauts")
 
-   £35.88
+   £10.93
 
    In stock
 
    Add to basket
+2. ### [M Train](../../../m-train_598/index.html "M Train")
+
+   £27.18
+
+   In stock
+
+   Add to basket
+3. ### [Lab Girl](../../../lab-girl_595/index.html "Lab Girl")
+
+   £40.85
+
+   In stock
+
+   Add to basket
+4. ### [Approval Junkie: Adventures in ...](../../../approval-junkie-adventures-in-caring-too-much_363/index.html "Approval Junkie: Adventures in Caring Too Much")
+
+   £58.81
+
+   In stock
+
+   Add to basket
+5. ### [Running with Scissors](../../../running-with-scissors_215/index.html "Running with Scissors")
+
+   £12.91
+
+   In stock
 ```
 
 **crawl4ai**
@@ -267,7 +465,7 @@ Nav boilerplate appears here before the real content starts.
 [Books to Scrape](https://books.toscrape.com/index.html) We love being scraped!
   * [Home](https://books.toscrape.com/index.html)
   * [Books](https://books.toscrape.com/catalogue/category/books_1/index.html)
-  * Short Stories
+  * Autobiography
 
 
   * [ Books ](https://books.toscrape.com/catalogue/category/books_1/index.html)
@@ -296,7 +494,7 @@ Nav boilerplate appears here before the real content starts.
     * [ Paranormal ](https://books.toscrape.com/catalogue/category/books/paranormal_24/index.html)
     * [ Art ](https://books.toscrape.com/catalogue/category/books/art_25/index.html)
     * [ Psychology ](https://books.toscrape.com/catalogue/category/books/psychology_26/index.html)
-    * [ Autobiography ](https://books.toscrape.com/catalogue/category/books/autobiography_27/index.html)
+    * [ **Autobiography** ](https://books.toscrape.com/catalogue/category/books/autobiography_27/index.html)
     * [ Parenting ](https://books.toscrape.com/catalogue/category/books/parenting_28/index.html)
     * [ Adult Fiction ](https://books.toscrape.com/catalogue/category/books/adult-fiction_29/index.html)
     * [ Humor ](https://books.toscrape.com/catalogue/category/books/humor_30/index.html)
@@ -311,7 +509,7 @@ Nav boilerplate appears here before the real content starts.
 [Books to Scrape](https://books.toscrape.com/index.html) We love being scraped!
   * [Home](https://books.toscrape.com/index.html)
   * [Books](https://books.toscrape.com/catalogue/category/books_1/index.html)
-  * Short Stories
+  * Autobiography
 
 
   * [ Books ](https://books.toscrape.com/catalogue/category/books_1/index.html)
@@ -340,7 +538,7 @@ Nav boilerplate appears here before the real content starts.
     * [ Paranormal ](https://books.toscrape.com/catalogue/category/books/paranormal_24/index.html)
     * [ Art ](https://books.toscrape.com/catalogue/category/books/art_25/index.html)
     * [ Psychology ](https://books.toscrape.com/catalogue/category/books/psychology_26/index.html)
-    * [ Autobiography ](https://books.toscrape.com/catalogue/category/books/autobiography_27/index.html)
+    * [ **Autobiography** ](https://books.toscrape.com/catalogue/category/books/autobiography_27/index.html)
     * [ Parenting ](https://books.toscrape.com/catalogue/category/books/parenting_28/index.html)
     * [ Adult Fiction ](https://books.toscrape.com/catalogue/category/books/adult-fiction_29/index.html)
     * [ Humor ](https://books.toscrape.com/catalogue/category/books/humor_30/index.html)
@@ -356,7 +554,7 @@ Nav boilerplate appears here before the real content starts.
 
 * [Home](../../../../index.html)
 * [Books](../../books_1/index.html)
-* Short Stories
+* Autobiography
 
 * [Books](../../books_1/index.html)
   + [Travel](../travel_2/index.html)
@@ -384,7 +582,7 @@ Nav boilerplate appears here before the real content starts.
   + [Paranormal](../paranormal_24/index.html)
   + [Art](../art_25/index.html)
   + [Psychology](../psychology_26/index.html)
-  + [Autobiography](../autobiography_27/index.html)
+  + [**Autobiography**](index.html)
   + [Parenting](../parenting_28/index.html)
   + [Adult Fiction](../adult-fiction_29/index.html)
   + [Humor](../humor_30/index.html)
@@ -396,7 +594,7 @@ Nav boilerplate appears here before the real content starts.
 
 **crawlee**
 ```
-Short Stories |
+Autobiography |
 Books to Scrape - Sandbox
 
 
@@ -406,7 +604,7 @@ Books to Scrape - Sandbox
 
 * [Home](../../../../index.html)
 * [Books](../../books_1/index.html)
-* Short Stories
+* Autobiography
 
 * [Books](../../books_1/index.html)
   + [Travel](../travel_2/index.html)
@@ -434,7 +632,7 @@ Books to Scrape - Sandbox
   + [Paranormal](../paranormal_24/index.html)
   + [Art](../art_25/index.html)
   + [Psychology](../psychology_26/index.html)
-  + [Autobiography](../autobiography_27/index.html)
+  + [**Autobiography**](index.html)
   + [Parenting](../parenting_28/index.html)
 ```
 
@@ -443,7 +641,7 @@ Books to Scrape - Sandbox
   
 
 
-Short Stories |
+Autobiography |
 Books to Scrape - Sandbox
 
 
@@ -453,7 +651,7 @@ Books to Scrape - Sandbox
 
 * [Home](../../../../index.html)
 * [Books](../../books_1/index.html)
-* Short Stories
+* Autobiography
 
 * [Books](../../books_1/index.html)
   + [Travel](../travel_2/index.html)
@@ -484,7 +682,7 @@ Books to Scrape - Sandbox
 
 **playwright**
 ```
-Short Stories |
+Autobiography |
 Books to Scrape - Sandbox
 
 
@@ -494,7 +692,7 @@ Books to Scrape - Sandbox
 
 * [Home](../../../../index.html)
 * [Books](../../books_1/index.html)
-* Short Stories
+* Autobiography
 
 * [Books](../../books_1/index.html)
   + [Travel](../travel_2/index.html)
@@ -522,7 +720,7 @@ Books to Scrape - Sandbox
   + [Paranormal](../paranormal_24/index.html)
   + [Art](../art_25/index.html)
   + [Psychology](../psychology_26/index.html)
-  + [Autobiography](../autobiography_27/index.html)
+  + [**Autobiography**](index.html)
   + [Parenting](../parenting_28/index.html)
 ```
 
@@ -531,9 +729,9 @@ Books to Scrape - Sandbox
 </details>
 
 <details>
-<summary>Per-page word counts and preamble [1]</summary>
+<summary>Per-page word counts and preamble [2]</summary>
 
-| URL | markcrawl words / preamble [1] | crawl4ai words / preamble [1] | crawl4ai-raw words / preamble [1] | scrapy+md words / preamble [1] | crawlee words / preamble [1] | colly+md words / preamble [1] | playwright words / preamble [1] | firecrawl words / preamble [1] |
+| URL | markcrawl words [6] / preamble [2] | crawl4ai words [6] / preamble [2] | crawl4ai-raw words [6] / preamble [2] | scrapy+md words [6] / preamble [2] | crawlee words [6] / preamble [2] | colly+md words [6] / preamble [2] | playwright words [6] / preamble [2] | firecrawl words [6] / preamble [2] |
 |---|---|---|---|---|---|---|---|---|
 | books.toscrape.com | 397 / 5 | 702 / 232 | 702 / 232 | 531 / 130 | 539 / 138 | 539 / 138 | 539 / 138 | — |
 | books.toscrape.com/catalogue/category/books/academic_40 | 32 / 6 | 282 / 233 | 282 / 233 | 185 / 131 | 192 / 138 | 192 / 138 | 192 / 138 | — |
@@ -600,7 +798,7 @@ Books to Scrape - Sandbox
 
 ## fastapi-docs
 
-| Tool | Avg words | Preamble [1] | Repeat rate | Junk found | Headings | Code blocks | Precision | Recall |
+| Tool | Avg words [6] | Preamble [2] | Repeat rate [3] | Junk found [4] | Headings [7] | Code blocks [8] | Precision [5] | Recall [5] |
 |---|---|---|---|---|---|---|---|---|
 | **markcrawl** | 2084 | 13 | 0% | 186 | 20.2 | 14.3 | 93% | 68% |
 | crawl4ai | 3519 | 1420 ⚠ | 1% | 183 | 20.1 | 14.2 | 100% | 92% |
@@ -611,13 +809,16 @@ Books to Scrape - Sandbox
 | playwright | 3160 | 999 ⚠ | 1% | 632 | 20.1 | 14.3 | 100% | 97% |
 | firecrawl | — | — | — | — | — | — | — | — |
 
-**[1]** Avg words per page before the first heading (nav chrome). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
+> **Column definitions:**
+> **[6] Avg words** = mean words per page. **[2] Preamble** = avg words per page before the first heading (nav chrome). **[3] Repeat rate** = fraction of sentences on >50% of pages.
+> **[4] Junk found** = total known boilerplate phrases detected across all pages. **[7] Headings** = avg headings per page. **[8] Code blocks** = avg fenced code blocks per page.
+> **[5] Precision/Recall** = cross-tool consensus (pages with <2 sentences excluded). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
 
 **Reading the numbers:**
 **markcrawl** produces the cleanest output with 13 words of preamble per page, while **crawl4ai-raw** injects 1420 words of nav chrome before content begins. The word count gap (2084 vs 3521 avg words) is largely explained by preamble: 1420 words of nav chrome account for ~40% of crawl4ai-raw's output on this site. markcrawl's lower recall (68% vs 97%) reflects stricter content filtering — the "missed" sentences are predominantly navigation, sponsor links, and footer text that other tools include as content. For RAG, this is typically a net positive: fewer junk tokens per chunk tends to improve embedding quality and retrieval precision.
 
 <details>
-<summary>Sample output — first 40 lines of <code>fastapi.tiangolo.com/reference/encoders</code></summary>
+<summary>Sample output — first 40 lines of <code>fastapi.tiangolo.com/reference/status</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
@@ -627,48 +828,47 @@ Nav boilerplate appears here before the real content starts.
 *FastAPI framework, high performance, easy to learn, fast to code, ready for production*
 
 
-# Encoders - `jsonable_encoder`[¶](#encoders-jsonable_encoder "Permanent link")
+# Status Codes[¶](#status-codes "Permanent link")
 
-## fastapi.encoders.jsonable_encoder [¶](#fastapi.encoders.jsonable_encoder "Permanent link")
+You can import the `status` module from `fastapi`:
 
 ```
-jsonable_encoder(
-    obj,
-    include=None,
-    exclude=None,
-    by_alias=True,
-    exclude_unset=False,
-    exclude_defaults=False,
-    exclude_none=False,
-    custom_encoder=None,
-    sqlalchemy_safe=True,
-)
+from fastapi import status
 ```
 
-Convert any object to something that can be encoded in JSON.
+`status` is provided directly by Starlette.
 
-This is used internally by FastAPI to make sure anything you return can be
-encoded as JSON before it is sent to the client.
+It contains a group of named constants (variables) with integer status codes.
 
-You can also use it yourself, for example to convert objects before saving them
-in a database that supports only JSON.
+For example:
 
-Read more about it in the
-[FastAPI docs for JSON Compatible Encoder](https://fastapi.tiangolo.com/tutorial/encoder/).
+* 200: `status.HTTP_200_OK`
+* 403: `status.HTTP_403_FORBIDDEN`
+* etc.
 
-| PARAMETER | DESCRIPTION |
-| --- | --- |
-| `obj` | The input object to convert to JSON.  **TYPE:** `Any` |
-| `include` | Pydantic's `include` parameter, passed to Pydantic models to set the fields to include.  **TYPE:** `IncEx | None`  **DEFAULT:** `None` |
-| `exclude` | Pydantic's `exclude` parameter, passed to Pydantic models to set the fields to exclude.  **TYPE:** `IncEx | None`  **DEFAULT:** `None` |
-| `by_alias` | Pydantic's `by_alias` parameter, passed to Pydantic models to define if the output should use the alias names (when provided) or the Python attribute names. In an API, if you set an alias, it's probably because you want to use it in the result, so you probably want to leave this set to `True`.  **TYPE:** `bool`  **DEFAULT:** `True` |
-| `exclude_unset` | Pydantic's `exclude_unset` parameter, passed to Pydantic models to define if it should exclude from the output the fields that were not explicitly set (and that only had their default values).  **TYPE:** `bool`  **DEFAULT:** `False` |
-| `exclude_defaults` | Pydantic's `exclude_defaults` parameter, passed to Pydantic models to define if it should exclude from the output the fields that had the same default value, even when they were explicitly set.  **TYPE:** `bool`  **DEFAULT:** `False` |
+It can be convenient to quickly access HTTP (and WebSocket) status codes in your app, using autocompletion for the name without having to remember the integer status codes by memory.
+
+Read more about it in the [FastAPI docs about Response Status Code](https://fastapi.tiangolo.com/tutorial/response-status-code/).
+
+## Example[¶](#example "Permanent link")
+
+```
+from fastapi import FastAPI, status
+
+app = FastAPI()
+
+
+@app.get("/items/", status_code=status.HTTP_418_IM_A_TEAPOT)
+def read_items():
+    return [{"name": "Plumbus"}, {"name": "Portal Gun"}]
+```
+
+## fastapi.status [¶](#fastapi.status "Permanent link")
 ```
 
 **crawl4ai**
 ```
-[ Skip to content ](https://fastapi.tiangolo.com/reference/encoders/#encoders-jsonable_encoder)
+[ Skip to content ](https://fastapi.tiangolo.com/reference/status/#status-codes)
 [ **FastAPI Cloud** waiting list 🚀 ](https://fastapicloud.com)
 [ Follow **@fastapi** on **X (Twitter)** to stay updated ](https://x.com/fastapi)
 [ Follow **FastAPI** on **LinkedIn** to stay updated ](https://www.linkedin.com/company/fastapi)
@@ -686,7 +886,7 @@ Read more about it in the
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/greptile-banner.png) ](https://www.greptile.com/?utm_source=fastapi&utm_medium=sponsorship&utm_campaign=fastapi_sponsor_page "Greptile: The AI Code Reviewer")
 [ ![logo](https://fastapi.tiangolo.com/img/icon-white.svg) ](https://fastapi.tiangolo.com/ "FastAPI")
 FastAPI 
-Encoders - jsonable_encoder 
+Status Codes 
   * [ en - English ](https://fastapi.tiangolo.com/)
   * [ de - Deutsch ](https://fastapi.tiangolo.com/de/)
   * [ es - español ](https://fastapi.tiangolo.com/es/)
@@ -701,7 +901,7 @@ Encoders - jsonable_encoder
   * [ zh-hant - 繁體中文 ](https://fastapi.tiangolo.com/zh-hant/)
 
 
-[ ](https://fastapi.tiangolo.com/reference/encoders/?q= "Share")
+[ ](https://fastapi.tiangolo.com/reference/status/?q= "Share")
 Initializing search 
 [ fastapi/fastapi 
   * 0.135.3
@@ -711,7 +911,7 @@ Initializing search
 
 **crawl4ai-raw**
 ```
-[ Skip to content ](https://fastapi.tiangolo.com/reference/encoders/#encoders-jsonable_encoder)
+[ Skip to content ](https://fastapi.tiangolo.com/reference/status/#status-codes)
 [ **FastAPI Cloud** waiting list 🚀 ](https://fastapicloud.com)
 [ Follow **@fastapi** on **X (Twitter)** to stay updated ](https://x.com/fastapi)
 [ Follow **FastAPI** on **LinkedIn** to stay updated ](https://www.linkedin.com/company/fastapi)
@@ -729,7 +929,7 @@ Initializing search
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/greptile-banner.png) ](https://www.greptile.com/?utm_source=fastapi&utm_medium=sponsorship&utm_campaign=fastapi_sponsor_page "Greptile: The AI Code Reviewer")
 [ ![logo](https://fastapi.tiangolo.com/img/icon-white.svg) ](https://fastapi.tiangolo.com/ "FastAPI")
 FastAPI 
-Encoders - jsonable_encoder 
+Status Codes 
   * [ en - English ](https://fastapi.tiangolo.com/)
   * [ de - Deutsch ](https://fastapi.tiangolo.com/de/)
   * [ es - español ](https://fastapi.tiangolo.com/es/)
@@ -744,7 +944,7 @@ Encoders - jsonable_encoder
   * [ zh-hant - 繁體中文 ](https://fastapi.tiangolo.com/zh-hant/)
 
 
-[ ](https://fastapi.tiangolo.com/reference/encoders/?q= "Share")
+[ ](https://fastapi.tiangolo.com/reference/status/?q= "Share")
 Type to start searching
 [ fastapi/fastapi 
   * 0.135.3
@@ -798,7 +998,7 @@ FastAPI
 
 **crawlee**
 ```
-Encoders - jsonable\_encoder - FastAPI
+Status Codes - FastAPI
 
 
 
@@ -829,7 +1029,7 @@ visibility: hidden;
 
 
 
-[Skip to content](https://fastapi.tiangolo.com/reference/encoders/#encoders-jsonable_encoder)
+[Skip to content](https://fastapi.tiangolo.com/reference/status/#status-codes)
 
 [Join the **FastAPI Cloud** waiting list 🚀](https://fastapicloud.com)
 
@@ -842,7 +1042,7 @@ visibility: hidden;
 
 **colly+md**
 ```
-Encoders - jsonable\_encoder - FastAPI
+Status Codes - FastAPI
 
 
 
@@ -858,7 +1058,7 @@ Encoders - jsonable\_encoder - FastAPI
 
 
 
-[Skip to content](#encoders-jsonable_encoder)
+[Skip to content](#status-codes)
 
 [Join the **FastAPI Cloud** waiting list 🚀](https://fastapicloud.com)
 
@@ -885,7 +1085,7 @@ Encoders - jsonable\_encoder - FastAPI
 
 **playwright**
 ```
-Encoders - jsonable\_encoder - FastAPI
+Status Codes - FastAPI
 
 
 
@@ -916,7 +1116,7 @@ visibility: hidden;
 
 
 
-[Skip to content](https://fastapi.tiangolo.com/reference/encoders/#encoders-jsonable_encoder)
+[Skip to content](https://fastapi.tiangolo.com/reference/status/#status-codes)
 
 [Join the **FastAPI Cloud** waiting list 🚀](https://fastapicloud.com)
 
@@ -932,9 +1132,9 @@ visibility: hidden;
 </details>
 
 <details>
-<summary>Per-page word counts and preamble [1]</summary>
+<summary>Per-page word counts and preamble [2]</summary>
 
-| URL | markcrawl words / preamble [1] | crawl4ai words / preamble [1] | crawl4ai-raw words / preamble [1] | scrapy+md words / preamble [1] | crawlee words / preamble [1] | colly+md words / preamble [1] | playwright words / preamble [1] | firecrawl words / preamble [1] |
+| URL | markcrawl words [6] / preamble [2] | crawl4ai words [6] / preamble [2] | crawl4ai-raw words [6] / preamble [2] | scrapy+md words [6] / preamble [2] | crawlee words [6] / preamble [2] | colly+md words [6] / preamble [2] | playwright words [6] / preamble [2] | firecrawl words [6] / preamble [2] |
 |---|---|---|---|---|---|---|---|---|
 | fastapi.tiangolo.com | 2243 / 13 | 3991 / 1538 | 3979 / 1526 | 3092 / 839 | 3374 / 1071 | 3404 / 1054 | 3362 / 1059 | — |
 | fastapi.tiangolo.com/about | 28 / 13 | 1303 / 1241 | 1303 / 1241 | 677 / 646 | 1015 / 882 | 998 / 863 | 1008 / 875 | — |
@@ -1094,7 +1294,7 @@ visibility: hidden;
 
 ## python-docs
 
-| Tool | Avg words | Preamble [1] | Repeat rate | Junk found | Headings | Code blocks | Precision | Recall |
+| Tool | Avg words [6] | Preamble [2] | Repeat rate [3] | Junk found [4] | Headings [7] | Code blocks [8] | Precision [5] | Recall [5] |
 |---|---|---|---|---|---|---|---|---|
 | **markcrawl** | 3766 | 5 | 0% | 378 | 11.9 | 7.3 | 98% | 82% |
 | crawl4ai | 4180 | 50 ⚠ | 0% | 3111 | 19.4 | 7.4 | 100% | 70% |
@@ -1105,147 +1305,147 @@ visibility: hidden;
 | playwright | 4140 | 47 | 0% | 3111 | 19.1 | 7.3 | 100% | 92% |
 | firecrawl | — | — | — | — | — | — | — | — |
 
-**[1]** Avg words per page before the first heading (nav chrome). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
+> **Column definitions:**
+> **[6] Avg words** = mean words per page. **[2] Preamble** = avg words per page before the first heading (nav chrome). **[3] Repeat rate** = fraction of sentences on >50% of pages.
+> **[4] Junk found** = total known boilerplate phrases detected across all pages. **[7] Headings** = avg headings per page. **[8] Code blocks** = avg fenced code blocks per page.
+> **[5] Precision/Recall** = cross-tool consensus (pages with <2 sentences excluded). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
 
 **Reading the numbers:**
 **scrapy+md** produces the cleanest output with 4 words of preamble per page, while **crawl4ai** injects 50 words of nav chrome before content begins.
 
 <details>
-<summary>Sample output — first 40 lines of <code>docs.python.org/3.12/contents.html</code></summary>
+<summary>Sample output — first 40 lines of <code>docs.python.org/3.10/library/pyclbr.html</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
 ```
-*What’s New in Python- What’s New In Python 3.12- Summary – Release highlights, New Features- PEP 695: Type Parameter Syntax, PEP 701: Syntactic formalization of f-strings, PEP 684: A Per-Interprete...*
+# [`pyclbr`](#module-pyclbr "pyclbr: Supports information extraction for a Python module browser.") — Python module browser support[¶](#module-pyclbr "Permalink to this headline")
 
+**Source code:** [Lib/pyclbr.py](https://github.com/python/cpython/tree/3.10/Lib/pyclbr.py)
 
-# Python Documentation contents[¶](#python-documentation-contents "Link to this heading")
+---
 
-* [What’s New in Python](whatsnew/index.html)
-  * [What’s New In Python 3.12](whatsnew/3.12.html)
-    * [Summary – Release highlights](whatsnew/3.12.html#summary-release-highlights)
-    * [New Features](whatsnew/3.12.html#new-features)
-      * [PEP 695: Type Parameter Syntax](whatsnew/3.12.html#pep-695-type-parameter-syntax)
-      * [PEP 701: Syntactic formalization of f-strings](whatsnew/3.12.html#pep-701-syntactic-formalization-of-f-strings)
-      * [PEP 684: A Per-Interpreter GIL](whatsnew/3.12.html#pep-684-a-per-interpreter-gil)
-      * [PEP 669: Low impact monitoring for CPython](whatsnew/3.12.html#pep-669-low-impact-monitoring-for-cpython)
-      * [PEP 688: Making the buffer protocol accessible in Python](whatsnew/3.12.html#pep-688-making-the-buffer-protocol-accessible-in-python)
-      * [PEP 709: Comprehension inlining](whatsnew/3.12.html#pep-709-comprehension-inlining)
-      * [Improved Error Messages](whatsnew/3.12.html#improved-error-messages)
-    * [New Features Related to Type Hints](whatsnew/3.12.html#new-features-related-to-type-hints)
-      * [PEP 692: Using `TypedDict` for more precise `**kwargs` typing](whatsnew/3.12.html#pep-692-using-typeddict-for-more-precise-kwargs-typing)
-      * [PEP 698: Override Decorator for Static Typing](whatsnew/3.12.html#pep-698-override-decorator-for-static-typing)
-    * [Other Language Changes](whatsnew/3.12.html#other-language-changes)
-    * [New Modules](whatsnew/3.12.html#new-modules)
-    * [Improved Modules](whatsnew/3.12.html#improved-modules)
-      * [array](whatsnew/3.12.html#array)
-      * [asyncio](whatsnew/3.12.html#asyncio)
-      * [calendar](whatsnew/3.12.html#calendar)
-      * [csv](whatsnew/3.12.html#csv)
-      * [dis](whatsnew/3.12.html#dis)
-      * [fractions](whatsnew/3.12.html#fractions)
-      * [importlib.resources](whatsnew/3.12.html#importlib-resources)
-      * [inspect](whatsnew/3.12.html#inspect)
-      * [itertools](whatsnew/3.12.html#itertools)
-      * [math](whatsnew/3.12.html#math)
-      * [os](whatsnew/3.12.html#os)
-      * [os.path](whatsnew/3.12.html#os-path)
-      * [pathlib](whatsnew/3.12.html#pathlib)
-      * [platform](whatsnew/3.12.html#platform)
-      * [pdb](whatsnew/3.12.html#pdb)
-      * [random](whatsnew/3.12.html#random)
-      * [shutil](whatsnew/3.12.html#shutil)
-      * [sqlite3](whatsnew/3.12.html#sqlite3)
+The [`pyclbr`](#module-pyclbr "pyclbr: Supports information extraction for a Python module browser.") module provides limited information about the
+functions, classes, and methods defined in a Python-coded module. The
+information is sufficient to implement a module browser. The
+information is extracted from the Python source code rather than by
+importing the module, so this module is safe to use with untrusted code.
+This restriction makes it impossible to use this module with modules not
+implemented in Python, including all standard and optional extension
+modules.
+
+`pyclbr.``readmodule`(*module*, *path=None*)[¶](#pyclbr.readmodule "Permalink to this definition")
+:   Return a dictionary mapping module-level class names to class
+    descriptors. If possible, descriptors for imported base classes are
+    included. Parameter *module* is a string with the name of the module
+    to read; it may be the name of a module within a package. If given,
+    *path* is a sequence of directory paths prepended to `sys.path`,
+    which is used to locate the module source code.
+
+    This function is the original interface and is only kept for back
+    compatibility. It returns a filtered version of the following.
+
+`pyclbr.``readmodule_ex`(*module*, *path=None*)[¶](#pyclbr.readmodule_ex "Permalink to this definition")
+:   Return a dictionary-based tree containing a function or class
+    descriptors for each function and class defined in the module with a
+    `def` or `class` statement. The returned dictionary maps
+    module-level function and class names to their descriptors. Nested
+    objects are entered into the children dictionary of their parent. As
+    with readmodule, *module* names the module to be read and *path* is
+    prepended to sys.path. If the module being read is a package, the
+    returned dictionary has a key `'__path__'` whose value is a list
+    containing the package search path.
+
+New in version 3.7: Descriptors for nested definitions. They are accessed through the
+new children attribute. Each has a new parent attribute.
 ```
 
 **crawl4ai**
 ```
-[ ![Python logo](https://docs.python.org/3.12/_static/py.svg) ](https://www.python.org/) dev (3.15) 3.14 3.13 3.12.13 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
+[ ![Python logo](https://docs.python.org/3.10/_static/py.svg) ](https://www.python.org/) dev (3.15) 3.14 3.13 3.12 3.11 3.10.20 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
 Greek | Ελληνικά English Spanish | español French | français Italian | italiano Japanese | 日本語 Korean | 한국어 Polish | polski Brazilian Portuguese | Português brasileiro Romanian | Românește Turkish | Türkçe Simplified Chinese | 简体中文 Traditional Chinese | 繁體中文
 Theme  Auto Light Dark
+### [Table of Contents](https://docs.python.org/3.10/contents.html)
+  * [`pyclbr` — Python module browser support](https://docs.python.org/3.10/library/pyclbr.html#)
+    * [Function Objects](https://docs.python.org/3.10/library/pyclbr.html#function-objects)
+    * [Class Objects](https://docs.python.org/3.10/library/pyclbr.html#class-objects)
+
+
+#### Previous topic
+[`tabnanny` — Detection of ambiguous indentation](https://docs.python.org/3.10/library/tabnanny.html "previous chapter")
 #### Next topic
-[What’s New in Python](https://docs.python.org/3.12/whatsnew/index.html "next chapter")
+[`py_compile` — Compile Python source files](https://docs.python.org/3.10/library/py_compile.html "next chapter")
 ### This Page
-  * [Report a Bug](https://docs.python.org/3.12/bugs.html)
-  * [Show Source ](https://github.com/python/cpython/blob/main/Doc/contents.rst)
+  * [Report a Bug](https://docs.python.org/3.10/bugs.html)
+  * [Show Source ](https://github.com/python/cpython/blob/3.10/Doc/library/pyclbr.rst)
 
 
 ### Navigation
-  * [index](https://docs.python.org/3.12/genindex.html "General Index")
-  * [modules](https://docs.python.org/3.12/py-modindex.html "Python Module Index") |
-  * [next](https://docs.python.org/3.12/whatsnew/index.html "What’s New in Python") |
-  * ![Python logo](https://docs.python.org/3.12/_static/py.svg)
+  * [index](https://docs.python.org/3.10/genindex.html "General Index")
+  * [modules](https://docs.python.org/3.10/py-modindex.html "Python Module Index") |
+  * [next](https://docs.python.org/3.10/library/py_compile.html "py_compile — Compile Python source files") |
+  * [previous](https://docs.python.org/3.10/library/tabnanny.html "tabnanny — Detection of ambiguous indentation") |
+  * ![Python logo](https://docs.python.org/3.10/_static/py.svg)
   * [Python](https://www.python.org/) »
   * Greek | Ελληνικά English Spanish | español French | français Italian | italiano Japanese | 日本語 Korean | 한국어 Polish | polski Brazilian Portuguese | Português brasileiro Romanian | Românește Turkish | Türkçe Simplified Chinese | 简体中文 Traditional Chinese | 繁體中文
-dev (3.15) 3.14 3.13 3.12.13 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
-  * [3.12.13 Documentation](https://docs.python.org/3.12/index.html) » 
-  * [Python Documentation contents](https://docs.python.org/3.12/contents.html)
+dev (3.15) 3.14 3.13 3.12 3.11 3.10.20 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
+  * [3.10.20 Documentation](https://docs.python.org/3.10/index.html) » 
+  * [The Python Standard Library](https://docs.python.org/3.10/library/index.html) »
+  * [Python Language Services](https://docs.python.org/3.10/library/language.html) »
+  * [`pyclbr` — Python module browser support](https://docs.python.org/3.10/library/pyclbr.html)
   * | 
   * Theme  Auto Light Dark |
 
 
-# Python Documentation contents[¶](https://docs.python.org/3.12/contents.html#python-documentation-contents "Link to this heading")
-  * [What’s New in Python](https://docs.python.org/3.12/whatsnew/index.html)
-    * [What’s New In Python 3.12](https://docs.python.org/3.12/whatsnew/3.12.html)
-      * [Summary – Release highlights](https://docs.python.org/3.12/whatsnew/3.12.html#summary-release-highlights)
-      * [New Features](https://docs.python.org/3.12/whatsnew/3.12.html#new-features)
-        * [PEP 695: Type Parameter Syntax](https://docs.python.org/3.12/whatsnew/3.12.html#pep-695-type-parameter-syntax)
-        * [PEP 701: Syntactic formalization of f-strings](https://docs.python.org/3.12/whatsnew/3.12.html#pep-701-syntactic-formalization-of-f-strings)
-        * [PEP 684: A Per-Interpreter GIL](https://docs.python.org/3.12/whatsnew/3.12.html#pep-684-a-per-interpreter-gil)
-        * [PEP 669: Low impact monitoring for CPython](https://docs.python.org/3.12/whatsnew/3.12.html#pep-669-low-impact-monitoring-for-cpython)
-        * [PEP 688: Making the buffer protocol accessible in Python](https://docs.python.org/3.12/whatsnew/3.12.html#pep-688-making-the-buffer-protocol-accessible-in-python)
-        * [PEP 709: Comprehension inlining](https://docs.python.org/3.12/whatsnew/3.12.html#pep-709-comprehension-inlining)
-        * [Improved Error Messages](https://docs.python.org/3.12/whatsnew/3.12.html#improved-error-messages)
-      * [New Features Related to Type Hints](https://docs.python.org/3.12/whatsnew/3.12.html#new-features-related-to-type-hints)
-        * [PEP 692: Using `TypedDict` for more precise `**kwargs` typing](https://docs.python.org/3.12/whatsnew/3.12.html#pep-692-using-typeddict-for-more-precise-kwargs-typing)
-        * [PEP 698: Override Decorator for Static Typing](https://docs.python.org/3.12/whatsnew/3.12.html#pep-698-override-decorator-for-static-typing)
-      * [Other Language Changes](https://docs.python.org/3.12/whatsnew/3.12.html#other-language-changes)
+#  [`pyclbr`](https://docs.python.org/3.10/library/pyclbr.html#module-pyclbr "pyclbr: Supports information extraction for a Python module browser.") — Python module browser support[¶](https://docs.python.org/3.10/library/pyclbr.html#module-pyclbr "Permalink to this headline")
+**Source code:** [Lib/pyclbr.py](https://github.com/python/cpython/tree/3.10/Lib/pyclbr.py)
+* * *
+The [`pyclbr`](https://docs.python.org/3.10/library/pyclbr.html#module-pyclbr "pyclbr: Supports information extraction for a Python module browser.") module provides limited information about the functions, classes, and methods defined in a Python-coded module. The information is sufficient to implement a module browser. The information is extracted from the Python source code rather than by importing the module, so this module is safe to use with untrusted code. This restriction makes it impossible to use this module with modules not implemented in Python, including all standard and optional extension modules. 
 ```
 
 **crawl4ai-raw**
 ```
-[ ![Python logo](https://docs.python.org/3.12/_static/py.svg) ](https://www.python.org/) dev (3.15) 3.14 3.13 3.12.13 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
+[ ![Python logo](https://docs.python.org/3.10/_static/py.svg) ](https://www.python.org/) dev (3.15) 3.14 3.13 3.12 3.11 3.10.20 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
 Greek | Ελληνικά English Spanish | español French | français Italian | italiano Japanese | 日本語 Korean | 한국어 Polish | polski Brazilian Portuguese | Português brasileiro Romanian | Românește Turkish | Türkçe Simplified Chinese | 简体中文 Traditional Chinese | 繁體中文
 Theme  Auto Light Dark
+### [Table of Contents](https://docs.python.org/3.10/contents.html)
+  * [`pyclbr` — Python module browser support](https://docs.python.org/3.10/library/pyclbr.html#)
+    * [Function Objects](https://docs.python.org/3.10/library/pyclbr.html#function-objects)
+    * [Class Objects](https://docs.python.org/3.10/library/pyclbr.html#class-objects)
+
+
+#### Previous topic
+[`tabnanny` — Detection of ambiguous indentation](https://docs.python.org/3.10/library/tabnanny.html "previous chapter")
 #### Next topic
-[What’s New in Python](https://docs.python.org/3.12/whatsnew/index.html "next chapter")
+[`py_compile` — Compile Python source files](https://docs.python.org/3.10/library/py_compile.html "next chapter")
 ### This Page
-  * [Report a Bug](https://docs.python.org/3.12/bugs.html)
-  * [Show Source ](https://github.com/python/cpython/blob/main/Doc/contents.rst)
+  * [Report a Bug](https://docs.python.org/3.10/bugs.html)
+  * [Show Source ](https://github.com/python/cpython/blob/3.10/Doc/library/pyclbr.rst)
 
 
 ### Navigation
-  * [index](https://docs.python.org/3.12/genindex.html "General Index")
-  * [modules](https://docs.python.org/3.12/py-modindex.html "Python Module Index") |
-  * [next](https://docs.python.org/3.12/whatsnew/index.html "What’s New in Python") |
-  * ![Python logo](https://docs.python.org/3.12/_static/py.svg)
+  * [index](https://docs.python.org/3.10/genindex.html "General Index")
+  * [modules](https://docs.python.org/3.10/py-modindex.html "Python Module Index") |
+  * [next](https://docs.python.org/3.10/library/py_compile.html "py_compile — Compile Python source files") |
+  * [previous](https://docs.python.org/3.10/library/tabnanny.html "tabnanny — Detection of ambiguous indentation") |
+  * ![Python logo](https://docs.python.org/3.10/_static/py.svg)
   * [Python](https://www.python.org/) »
   * Greek | Ελληνικά English Spanish | español French | français Italian | italiano Japanese | 日本語 Korean | 한국어 Polish | polski Brazilian Portuguese | Português brasileiro Romanian | Românește Turkish | Türkçe Simplified Chinese | 简体中文 Traditional Chinese | 繁體中文
-dev (3.15) 3.14 3.13 3.12.13 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
-  * [3.12.13 Documentation](https://docs.python.org/3.12/index.html) » 
-  * [Python Documentation contents](https://docs.python.org/3.12/contents.html)
+dev (3.15) 3.14 3.13 3.12 3.11 3.10.20 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
+  * [3.10.20 Documentation](https://docs.python.org/3.10/index.html) » 
+  * [The Python Standard Library](https://docs.python.org/3.10/library/index.html) »
+  * [Python Language Services](https://docs.python.org/3.10/library/language.html) »
+  * [`pyclbr` — Python module browser support](https://docs.python.org/3.10/library/pyclbr.html)
   * | 
   * Theme  Auto Light Dark |
 
 
-# Python Documentation contents[¶](https://docs.python.org/3.12/contents.html#python-documentation-contents "Link to this heading")
-  * [What’s New in Python](https://docs.python.org/3.12/whatsnew/index.html)
-    * [What’s New In Python 3.12](https://docs.python.org/3.12/whatsnew/3.12.html)
-      * [Summary – Release highlights](https://docs.python.org/3.12/whatsnew/3.12.html#summary-release-highlights)
-      * [New Features](https://docs.python.org/3.12/whatsnew/3.12.html#new-features)
-        * [PEP 695: Type Parameter Syntax](https://docs.python.org/3.12/whatsnew/3.12.html#pep-695-type-parameter-syntax)
-        * [PEP 701: Syntactic formalization of f-strings](https://docs.python.org/3.12/whatsnew/3.12.html#pep-701-syntactic-formalization-of-f-strings)
-        * [PEP 684: A Per-Interpreter GIL](https://docs.python.org/3.12/whatsnew/3.12.html#pep-684-a-per-interpreter-gil)
-        * [PEP 669: Low impact monitoring for CPython](https://docs.python.org/3.12/whatsnew/3.12.html#pep-669-low-impact-monitoring-for-cpython)
-        * [PEP 688: Making the buffer protocol accessible in Python](https://docs.python.org/3.12/whatsnew/3.12.html#pep-688-making-the-buffer-protocol-accessible-in-python)
-        * [PEP 709: Comprehension inlining](https://docs.python.org/3.12/whatsnew/3.12.html#pep-709-comprehension-inlining)
-        * [Improved Error Messages](https://docs.python.org/3.12/whatsnew/3.12.html#improved-error-messages)
-      * [New Features Related to Type Hints](https://docs.python.org/3.12/whatsnew/3.12.html#new-features-related-to-type-hints)
-        * [PEP 692: Using `TypedDict` for more precise `**kwargs` typing](https://docs.python.org/3.12/whatsnew/3.12.html#pep-692-using-typeddict-for-more-precise-kwargs-typing)
-        * [PEP 698: Override Decorator for Static Typing](https://docs.python.org/3.12/whatsnew/3.12.html#pep-698-override-decorator-for-static-typing)
-      * [Other Language Changes](https://docs.python.org/3.12/whatsnew/3.12.html#other-language-changes)
+#  [`pyclbr`](https://docs.python.org/3.10/library/pyclbr.html#module-pyclbr "pyclbr: Supports information extraction for a Python module browser.") — Python module browser support[¶](https://docs.python.org/3.10/library/pyclbr.html#module-pyclbr "Permalink to this headline")
+**Source code:** [Lib/pyclbr.py](https://github.com/python/cpython/tree/3.10/Lib/pyclbr.py)
+* * *
+The [`pyclbr`](https://docs.python.org/3.10/library/pyclbr.html#module-pyclbr "pyclbr: Supports information extraction for a Python module browser.") module provides limited information about the functions, classes, and methods defined in a Python-coded module. The information is sufficient to implement a module browser. The information is extracted from the Python source code rather than by importing the module, so this module is safe to use with untrusted code. This restriction makes it impossible to use this module with modules not implemented in Python, including all standard and optional extension modules. 
 ```
 
 **scrapy+md**
@@ -1255,46 +1455,46 @@ Auto
 Light
 Dark
 
+### [Table of Contents](../contents.html)
+
+* [`pyclbr` — Python module browser support](#)
+  + [Function Objects](#function-objects)
+  + [Class Objects](#class-objects)
+
+#### Previous topic
+
+[`tabnanny` — Detection of ambiguous indentation](tabnanny.html "previous chapter")
+
 #### Next topic
 
-[What’s New in Python](whatsnew/index.html "next chapter")
+[`py_compile` — Compile Python source files](py_compile.html "next chapter")
 
 ### This Page
 
-* [Report a Bug](bugs.html)
-* [Show Source](https://github.com/python/cpython/blob/main/Doc/contents.rst)
+* [Report a Bug](../bugs.html)
+* [Show Source](https://github.com/python/cpython/blob/3.10/Doc/library/pyclbr.rst)
 
 ### Navigation
 
-* [index](genindex.html "General Index")
-* [modules](py-modindex.html "Python Module Index") |
-* [next](whatsnew/index.html "What’s New in Python") |
+* [index](../genindex.html "General Index")
+* [modules](../py-modindex.html "Python Module Index") |
+* [next](py_compile.html "py_compile — Compile Python source files") |
+* [previous](tabnanny.html "tabnanny — Detection of ambiguous indentation") |
 * [Python](https://www.python.org/) »
 
-* [3.12.13 Documentation](index.html) »
-* Python Documentation contents
+* [3.10.20 Documentation](../index.html) »
+* [The Python Standard Library](index.html) »
+* [Python Language Services](language.html) »
+* `pyclbr` — Python module browser support
 * |
 * Theme
   Auto
   Light
-  Dark
-   |
-
-# Python Documentation contents[¶](#python-documentation-contents "Link to this heading")
-
-* [What’s New in Python](whatsnew/index.html)
-  + [What’s New In Python 3.12](whatsnew/3.12.html)
-    - [Summary – Release highlights](whatsnew/3.12.html#summary-release-highlights)
-    - [New Features](whatsnew/3.12.html#new-features)
-      * [PEP 695: Type Parameter Syntax](whatsnew/3.12.html#pep-695-type-parameter-syntax)
-      * [PEP 701: Syntactic formalization of f-strings](whatsnew/3.12.html#pep-701-syntactic-formalization-of-f-strings)
-      * [PEP 684: A Per-Interpreter GIL](whatsnew/3.12.html#pep-684-a-per-interpreter-gil)
-      * [PEP 669: Low impact monitoring for CPython](whatsnew/3.12.html#pep-669-low-impact-monitoring-for-cpython)
 ```
 
 **crawlee**
 ```
-Python Documentation contents — Python 3.12.13 documentation
+pyclbr — Python module browser support — Python 3.10.20 documentation
 
 
 
@@ -1320,7 +1520,7 @@ width: 100%;
 
 
 
-dev (3.15)3.143.133.12.133.113.103.93.83.73.63.53.43.33.23.13.02.72.6
+dev (3.15)3.143.133.123.113.10.203.93.83.73.63.53.43.33.23.13.02.72.6
 
 Greek | ΕλληνικάEnglishSpanish | españolFrench | françaisItalian | italianoJapanese | 日本語Korean | 한국어Polish | polskiBrazilian Portuguese | Português brasileiroRomanian | RomâneșteTurkish | TürkçeSimplified Chinese | 简体中文Traditional Chinese | 繁體中文
 
@@ -1329,16 +1529,16 @@ Auto
 Light
 Dark
 
-#### Next topic
+### [Table of Contents](../contents.html)
 
-[What’s New in Python](whatsnew/index.html "next chapter")
-
-### This Page
+* [`pyclbr` — Python module browser support](#)
+  + [Function Objects](#function-objects)
+  + [Class Objects](#class-objects)
 ```
 
 **colly+md**
 ```
-Python Documentation contents — Python 3.12.13 documentation
+pyclbr — Python module browser support — Python 3.10.20 documentation
 
 
 
@@ -1369,19 +1569,20 @@ Auto
 Light
 Dark
 
-#### Next topic
+### [Table of Contents](../contents.html)
 
-[What’s New in Python](whatsnew/index.html "next chapter")
+* [`pyclbr` — Python module browser support](#)
+  + [Function Objects](#function-objects)
+  + [Class Objects](#class-objects)
 
-### This Page
+#### Previous topic
 
-* [Report a Bug](bugs.html)
-* [Show Source](https://github.com/python/cpython/blob/main/Doc/contents.rst)
+[`tabnanny` — Detection of ambiguous indentation](tabnanny.html "previous chapter")
 ```
 
 **playwright**
 ```
-Python Documentation contents — Python 3.12.13 documentation
+pyclbr — Python module browser support — Python 3.10.20 documentation
 
 
 
@@ -1407,7 +1608,7 @@ width: 100%;
 
 
 
-dev (3.15)3.143.133.12.133.113.103.93.83.73.63.53.43.33.23.13.02.72.6
+dev (3.15)3.143.133.123.113.10.203.93.83.73.63.53.43.33.23.13.02.72.6
 
 Greek | ΕλληνικάEnglishSpanish | españolFrench | françaisItalian | italianoJapanese | 日本語Korean | 한국어Polish | polskiBrazilian Portuguese | Português brasileiroRomanian | RomâneșteTurkish | TürkçeSimplified Chinese | 简体中文Traditional Chinese | 繁體中文
 
@@ -1416,11 +1617,11 @@ Auto
 Light
 Dark
 
-#### Next topic
+### [Table of Contents](../contents.html)
 
-[What’s New in Python](whatsnew/index.html "next chapter")
-
-### This Page
+* [`pyclbr` — Python module browser support](#)
+  + [Function Objects](#function-objects)
+  + [Class Objects](#class-objects)
 ```
 
 **firecrawl** — no output for this URL
@@ -1428,9 +1629,9 @@ Dark
 </details>
 
 <details>
-<summary>Per-page word counts and preamble [1]</summary>
+<summary>Per-page word counts and preamble [2]</summary>
 
-| URL | markcrawl words / preamble [1] | crawl4ai words / preamble [1] | crawl4ai-raw words / preamble [1] | scrapy+md words / preamble [1] | crawlee words / preamble [1] | colly+md words / preamble [1] | playwright words / preamble [1] | firecrawl words / preamble [1] |
+| URL | markcrawl words [6] / preamble [2] | crawl4ai words [6] / preamble [2] | crawl4ai-raw words [6] / preamble [2] | scrapy+md words [6] / preamble [2] | crawlee words [6] / preamble [2] | colly+md words [6] / preamble [2] | playwright words [6] / preamble [2] | firecrawl words [6] / preamble [2] |
 |---|---|---|---|---|---|---|---|---|
 | docs.python.org/2.6 | 189 / 0 | 323 / 0 | 323 / 0 | — | 349 / 20 | 349 / 20 | 349 / 20 | — |
 | docs.python.org/2.7 | 186 / 0 | 320 / 28 | 320 / 28 | — | 315 / 30 | 309 / 30 | 315 / 30 | — |
@@ -1939,7 +2140,7 @@ Dark
 
 ## react-dev
 
-| Tool | Avg words | Preamble [1] | Repeat rate | Junk found | Headings | Code blocks | Precision | Recall |
+| Tool | Avg words [6] | Preamble [2] | Repeat rate [3] | Junk found [4] | Headings [7] | Code blocks [8] | Precision [5] | Recall [5] |
 |---|---|---|---|---|---|---|---|---|
 | **markcrawl** | 1559 | 13 | 0% | 136 | 15.4 | 9.9 | 100% | 44% |
 | crawl4ai | 2277 | 12 | 0% | 142 | 19.8 | 9.8 | 100% | 37% |
@@ -1950,13 +2151,16 @@ Dark
 | playwright | 4292 | 289 ⚠ | 0% | 144 | 21.6 | 9.9 | 100% | 98% |
 | firecrawl | — | — | — | — | — | — | — | — |
 
-**[1]** Avg words per page before the first heading (nav chrome). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
+> **Column definitions:**
+> **[6] Avg words** = mean words per page. **[2] Preamble** = avg words per page before the first heading (nav chrome). **[3] Repeat rate** = fraction of sentences on >50% of pages.
+> **[4] Junk found** = total known boilerplate phrases detected across all pages. **[7] Headings** = avg headings per page. **[8] Code blocks** = avg fenced code blocks per page.
+> **[5] Precision/Recall** = cross-tool consensus (pages with <2 sentences excluded). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
 
 **Reading the numbers:**
 **scrapy+md** produces the cleanest output with 6 words of preamble per page, while **crawlee** injects 368 words of nav chrome before content begins. The word count gap (1559 vs 4370 avg words) is largely explained by preamble: 368 words of nav chrome account for ~8% of crawlee's output on this site. scrapy+md's lower recall (44% vs 100%) reflects stricter content filtering — the "missed" sentences are predominantly navigation, sponsor links, and footer text that other tools include as content. For RAG, this is typically a net positive: fewer junk tokens per chunk tends to improve embedding quality and retrieval precision.
 
 <details>
-<summary>Sample output — first 40 lines of <code>react.dev/learn/understanding-your-ui-as-a-tree</code></summary>
+<summary>Sample output — first 40 lines of <code>react.dev/learn/separating-events-from-effects</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
@@ -1968,41 +2172,40 @@ Nav boilerplate appears here before the real content starts.
 
 [Learn React](/learn)
 
-[Describing the UI](/learn/describing-the-ui)
+[Escape Hatches](/learn/escape-hatches)
 
 Copy pageCopy
 
-# Understanding Your UI as a Tree
+# Separating Events from Effects
 
-Your React app is taking shape with many components being nested within each other. How does React keep track of your app’s component structure?
-
-React, and many other UI libraries, model UI as a tree. Thinking of your app as a tree is useful for understanding the relationship between components. This understanding will help you debug future concepts like performance and state management.
+Event handlers only re-run when you perform the same interaction again. Unlike event handlers, Effects re-synchronize if some value they read, like a prop or a state variable, is different from what it was during the last render. Sometimes, you also want a mix of both behaviors: an Effect that re-runs in response to some values but not others. This page will teach you how to do that.
 
 ### You will learn
 
-* How React “sees” component structures
-* What a render tree is and what it is useful for
-* What a module dependency tree is and what it is useful for
+* How to choose between an event handler and an Effect
+* Why Effects are reactive, and event handlers are not
+* What to do when you want a part of your Effect’s code to not be reactive
+* What Effect Events are, and how to extract them from your Effects
+* How to read the latest props and state from Effects using Effect Events
 
-## Your UI as a tree
+## Choosing between event handlers and Effects
 
-Trees are a relationship model between items. The UI is often represented using tree structures. For example, browsers use tree structures to model HTML ([DOM](https://developer.mozilla.org/docs/Web/API/Document_Object_Model/Introduction)) and CSS ([CSSOM](https://developer.mozilla.org/docs/Web/API/CSS_Object_Model)). Mobile platforms also use trees to represent their view hierarchy.
+First, let’s recap the difference between event handlers and Effects.
 
-React creates a UI tree from your components. In this example, the UI tree is then used to render to the DOM.
+Imagine you’re implementing a chat room component. Your requirements look like this:
 
-Like browsers and mobile platforms, React also uses tree structures to manage and model the relationship between components in a React app. These trees are useful tools to understand how data flows through a React app and how to optimize rendering and app size.
+1. Your component should automatically connect to the selected chat room.
+2. When you click the “Send” button, it should send a message to the chat.
 
-## The Render Tree
+Let’s say you’ve already implemented the code for them, but you’re not sure where to put it. Should you use event handlers or Effects? Every time you need to answer this question, consider [*why* the code needs to run.](/learn/synchronizing-with-effects#what-are-effects-and-how-are-they-different-from-events)
 
-A major feature of components is the ability to compose components of other components. As we [nest components](/learn/your-first-component#nesting-and-organizing-components), we have the concept of parent and child components, where each parent component may itself be a child of another component.
+### Event handlers run in response to specific interactions
 
-When we render a React app, we can model this relationship in a tree, known as the render tree.
+From the user’s perspective, sending a message should happen *because* the particular “Send” button was clicked. The user will get rather upset if you send their message at any other time or for any other reason. This is why sending a message should be an event handler. Event handlers let you handle specific interactions:
 
-Here is a React app that renders inspirational quotes.
+```
+function ChatRoom({ roomId }) {
 
-App.jsFancyText.jsInspirationGenerator.jsCopyright.jsquotes.js
-
-App.js
 ```
 
 **crawl4ai**
@@ -2097,92 +2300,92 @@ App.js
 ```
 [Learn React](/learn)
 
-[Describing the UI](/learn/describing-the-ui)
+[Escape Hatches](/learn/escape-hatches)
 
  Copy pageCopy
 
-# Understanding Your UI as a Tree
+# Separating Events from Effects
 
-Your React app is taking shape with many components being nested within each other. How does React keep track of your app’s component structure?
-
-React, and many other UI libraries, model UI as a tree. Thinking of your app as a tree is useful for understanding the relationship between components. This understanding will help you debug future concepts like performance and state management.
+Event handlers only re-run when you perform the same interaction again. Unlike event handlers, Effects re-synchronize if some value they read, like a prop or a state variable, is different from what it was during the last render. Sometimes, you also want a mix of both behaviors: an Effect that re-runs in response to some values but not others. This page will teach you how to do that.
 
 ### You will learn
 
-* How React “sees” component structures
-* What a render tree is and what it is useful for
-* What a module dependency tree is and what it is useful for
+* How to choose between an event handler and an Effect
+* Why Effects are reactive, and event handlers are not
+* What to do when you want a part of your Effect’s code to not be reactive
+* What Effect Events are, and how to extract them from your Effects
+* How to read the latest props and state from Effects using Effect Events
 
-## Your UI as a tree
+## Choosing between event handlers and Effects
 
-Trees are a relationship model between items. The UI is often represented using tree structures. For example, browsers use tree structures to model HTML ([DOM](https://developer.mozilla.org/docs/Web/API/Document_Object_Model/Introduction)) and CSS ([CSSOM](https://developer.mozilla.org/docs/Web/API/CSS_Object_Model)). Mobile platforms also use trees to represent their view hierarchy.
+First, let’s recap the difference between event handlers and Effects.
 
-React creates a UI tree from your components. In this example, the UI tree is then used to render to the DOM.
+Imagine you’re implementing a chat room component. Your requirements look like this:
 
-Like browsers and mobile platforms, React also uses tree structures to manage and model the relationship between components in a React app. These trees are useful tools to understand how data flows through a React app and how to optimize rendering and app size.
+1. Your component should automatically connect to the selected chat room.
+2. When you click the “Send” button, it should send a message to the chat.
 
-## The Render Tree
+Let’s say you’ve already implemented the code for them, but you’re not sure where to put it. Should you use event handlers or Effects? Every time you need to answer this question, consider [*why* the code needs to run.](/learn/synchronizing-with-effects#what-are-effects-and-how-are-they-different-from-events)
 
-A major feature of components is the ability to compose components of other components. As we [nest components](/learn/your-first-component#nesting-and-organizing-components), we have the concept of parent and child components, where each parent component may itself be a child of another component.
+### Event handlers run in response to specific interactions
 
-When we render a React app, we can model this relationship in a tree, known as the render tree.
+From the user’s perspective, sending a message should happen *because* the particular “Send” button was clicked. The user will get rather upset if you send their message at any other time or for any other reason. This is why sending a message should be an event handler. Event handlers let you handle specific interactions:
 
-Here is a React app that renders inspirational quotes.
+```
+function ChatRoom({ roomId }) {
 
-App.jsFancyText.jsInspirationGenerator.jsCopyright.jsquotes.js
 
-App.js
 
-ReloadClear[Fork](https://codesandbox.io/api/v1/sandboxes/define?undefined&environment=create-react-app "Open in CodeSandbox")
+const [message, setMessage] = useState('');
 ```
 
 **crawlee**
 ```
-.ͼ1.cm-focused {outline: 1px dotted #212121;}
-.ͼ1 {position: relative !important; box-sizing: border-box; display: flex !important; flex-direction: column;}
-.ͼ1 .cm-scroller {display: flex !important; align-items: flex-start !important; font-family: monospace; line-height: 1.4; height: 100%; overflow-x: auto; position: relative; z-index: 0;}
-.ͼ1 .cm-content[contenteditable=true] {-webkit-user-modify: read-write-plaintext-only;}
-.ͼ1 .cm-content {margin: 0; flex-grow: 2; flex-shrink: 0; display: block; white-space: pre; word-wrap: normal; box-sizing: border-box; padding: 4px 0; outline: none;}
-.ͼ1 .cm-lineWrapping {white-space: pre-wrap; white-space: break-spaces; word-break: break-word; overflow-wrap: anywhere; flex-shrink: 1;}
-.ͼ2 .cm-content {caret-color: black;}
-.ͼ3 .cm-content {caret-color: white;}
-.ͼ1 .cm-line {display: block; padding: 0 2px 0 6px;}
-.ͼ1 .cm-layer > \* {position: absolute;}
-.ͼ1 .cm-layer {position: absolute; left: 0; top: 0; contain: size style;}
-.ͼ2 .cm-selectionBackground {background: #d9d9d9;}
-.ͼ3 .cm-selectionBackground {background: #222;}
-.ͼ2.cm-focused .cm-selectionBackground {background: #d7d4f0;}
-.ͼ3.cm-focused .cm-selectionBackground {background: #233;}
-.ͼ1 .cm-cursorLayer {pointer-events: none;}
-.ͼ1.cm-focused .cm-cursorLayer {animation: steps(1) cm-blink 1.2s infinite;}
-@keyframes cm-blink {50% {opacity: 0;}}
-@keyframes cm-blink2 {50% {opacity: 0;}}
-.ͼ1 .cm-cursor, .ͼ1 .cm-dropCursor {border-left: 1.2px solid black; margin-left: -0.6px; pointer-events: none;}
-.ͼ1 .cm-cursor {display: none;}
-.ͼ3 .cm-cursor {border-left-color: #444;}
-.ͼ1 .cm-dropCursor {position: absolute;}
-.ͼ1.cm-focused .cm-cursor {display: block;}
-.ͼ2 .cm-activeLine {background-color: #cceeff44;}
-.ͼ3 .cm-activeLine {background-color: #99eeff33;}
-.ͼ2 .cm-specialChar {color: red;}
-.ͼ3 .cm-specialChar {color: #f78;}
-.ͼ1 .cm-gutters {flex-shrink: 0; display: flex; height: 100%; box-sizing: border-box; left: 0; z-index: 200;}
-.ͼ2 .cm-gutters {background-color: #f5f5f5; color: #6c6c6c; border-right: 1px solid #ddd;}
-.ͼ3 .cm-gutters {background-color: #333338; color: #ccc;}
-.ͼ1 .cm-gutter {display: flex !important; flex-direction: column; flex-shrink: 0; box-sizing: border-box; min-height: 100%; overflow: hidden;}
-.ͼ1 .cm-gutterElement {box-sizing: border-box;}
-.ͼ1 .cm-lineNumbers .cm-gutterElement {padding: 0 3px 0 5px; min-width: 20px; text-align: right; white-space: nowrap;}
-.ͼ2 .cm-activeLineGutter {background-color: #e2f2ff;}
-.ͼ3 .cm-activeLineGutter {background-color: #222227;}
-.ͼ1 .cm-panels {box-sizing: border-box; position: sticky; left: 0; right: 0;}
-.ͼ2 .cm-panels {background-color: #f5f5f5; color: black;}
-.ͼ2 .cm-panels-top {border-bottom: 1px solid #ddd;}
-.ͼ2 .cm-panels-bottom {border-top: 1px solid #ddd;}
+Separating Events from Effects – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
+(function () {
+try {
+let logShown = false;
+function setUwu(isUwu) {
+try {
+if (isUwu) {
+localStorage.setItem('uwu', true);
+document.documentElement.classList.add('uwu');
+if (!logShown) {
+console.log('uwu mode! turn off with ?uwu=0');
+console.log('logo credit to @sawaratsuki1004 via https://github.com/SAWARATSUKI/KawaiiLogos');
+logShown = true;
+}
+} else {
+localStorage.removeItem('uwu');
+document.documentElement.classList.remove('uwu');
+console.log('uwu mode off. turn on with ?uwu');
+}
+} catch (err) { }
+}
+window.\_\_setUwu = setUwu;
+function checkQueryParam() {
+const params = new URLSearchParams(window.location.search);
+const value = params.get('uwu');
+switch(value) {
+case '':
+case 'true':
+case '1':
+return true;
+case 'false':
+case '0':
+return false;
+default:
+return null;
+}
+}
+function checkLocalStorage() {
+try {
+return localStorage.getItem('uwu') === 'true';
 ```
 
 **colly+md**
 ```
-Understanding Your UI as a Tree – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
+Separating Events from Effects – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
 (function () {
 try {
 let logShown = false;
@@ -2226,7 +2429,7 @@ return localStorage.getItem('uwu') === 'true';
 
 **playwright**
 ```
-Understanding Your UI as a Tree – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
+Separating Events from Effects – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
 (function () {
 try {
 let logShown = false;
@@ -2273,9 +2476,9 @@ return localStorage.getItem('uwu') === 'true';
 </details>
 
 <details>
-<summary>Per-page word counts and preamble [1]</summary>
+<summary>Per-page word counts and preamble [2]</summary>
 
-| URL | markcrawl words / preamble [1] | crawl4ai words / preamble [1] | crawl4ai-raw words / preamble [1] | scrapy+md words / preamble [1] | crawlee words / preamble [1] | colly+md words / preamble [1] | playwright words / preamble [1] | firecrawl words / preamble [1] |
+| URL | markcrawl words [6] / preamble [2] | crawl4ai words [6] / preamble [2] | crawl4ai-raw words [6] / preamble [2] | scrapy+md words [6] / preamble [2] | crawlee words [6] / preamble [2] | colly+md words [6] / preamble [2] | playwright words [6] / preamble [2] | firecrawl words [6] / preamble [2] |
 |---|---|---|---|---|---|---|---|---|
 | 18.react.dev/reference/react-dom/findDOMNode | — | — | — | 1202 / 3 | — | 3363 / 278 | — | — |
 | 18.react.dev/reference/react-dom/hydrate | — | — | — | 906 / 3 | — | 2599 / 278 | — | — |
@@ -2511,7 +2714,7 @@ return localStorage.getItem('uwu') === 'true';
 
 ## wikipedia-python
 
-| Tool | Avg words | Preamble [1] | Repeat rate | Junk found | Headings | Code blocks | Precision | Recall |
+| Tool | Avg words [6] | Preamble [2] | Repeat rate [3] | Junk found [4] | Headings [7] | Code blocks [8] | Precision [5] | Recall [5] |
 |---|---|---|---|---|---|---|---|---|
 | **markcrawl** | 3417 | 0 | 0% | 16 | 15.2 | 3.0 | 100% | 64% |
 | crawl4ai | 5106 | 252 ⚠ | 0% | 211 | 14.9 | 3.0 | 100% | 41% |
@@ -2522,63 +2725,66 @@ return localStorage.getItem('uwu') === 'true';
 | playwright | 5249 | 387 ⚠ | 1% | 140 | 15.4 | 3.6 | 100% | 98% |
 | firecrawl | — | — | — | — | — | — | — | — |
 
-**[1]** Avg words per page before the first heading (nav chrome). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
+> **Column definitions:**
+> **[6] Avg words** = mean words per page. **[2] Preamble** = avg words per page before the first heading (nav chrome). **[3] Repeat rate** = fraction of sentences on >50% of pages.
+> **[4] Junk found** = total known boilerplate phrases detected across all pages. **[7] Headings** = avg headings per page. **[8] Code blocks** = avg fenced code blocks per page.
+> **[5] Precision/Recall** = cross-tool consensus (pages with <2 sentences excluded). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
 
 **Reading the numbers:**
 **markcrawl** produces the cleanest output with 0 word of preamble per page, while **crawlee** injects 5245 words of nav chrome before content begins. The word count gap (3417 vs 10493 avg words) is largely explained by preamble: 5245 words of nav chrome account for ~50% of crawlee's output on this site. markcrawl's lower recall (64% vs 98%) reflects stricter content filtering — the "missed" sentences are predominantly navigation, sponsor links, and footer text that other tools include as content. For RAG, this is typically a net positive: fewer junk tokens per chunk tends to improve embedding quality and retrieval precision.
 
 <details>
-<summary>Sample output — first 40 lines of <code>en.wikipedia.org/wiki/Gmsh</code></summary>
+<summary>Sample output — first 40 lines of <code>en.wikipedia.org/wiki/Common_Language_Runtime</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
 ```
-# Gmsh
+# Common Language Runtime
 
-* [Català](https://ca.wikipedia.org/wiki/Gmsh "Gmsh – Catalan")
-* [Deutsch](https://de.wikipedia.org/wiki/Gmsh "Gmsh – German")
-* [Français](https://fr.wikipedia.org/wiki/Gmsh "Gmsh – French")
-* [हिन्दी](https://hi.wikipedia.org/wiki/%E0%A4%9C%E0%A5%80_%E0%A4%AE%E0%A5%87%E0%A4%B6 "जी मेश – Hindi")
-* [Italiano](https://it.wikipedia.org/wiki/Gmsh "Gmsh – Italian")
-* [日本語](https://ja.wikipedia.org/wiki/Gmsh "Gmsh – Japanese")
-* [Português](https://pt.wikipedia.org/wiki/Gmsh "Gmsh – Portuguese")
-* [中文](https://zh.wikipedia.org/wiki/Gmsh "Gmsh – Chinese")
+* [العربية](https://ar.wikipedia.org/wiki/%D9%88%D9%82%D8%AA_%D8%A7%D9%84%D8%AA%D9%86%D9%81%D9%8A%D8%B0_%D8%A7%D9%84%D9%85%D8%B4%D8%AA%D8%B1%D9%83_%D9%84%D9%84%D8%BA%D8%A7%D8%AA "وقت التنفيذ المشترك للغات – Arabic")
+* [Català](https://ca.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Catalan")
+* [Dansk](https://da.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Danish")
+* [Deutsch](https://de.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – German")
+* [Español](https://es.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Spanish")
+* [Eesti](https://et.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Estonian")
+* [Euskara](https://eu.wikipedia.org/wiki/CLR "CLR – Basque")
+* [فارسی](https://fa.wikipedia.org/wiki/%D8%B2%D9%85%D8%A7%D9%86_%D8%A7%D8%AC%D8%B1%D8%A7%DB%8C_%D8%B2%D8%A8%D8%A7%D9%86_%D9%85%D8%B4%D8%AA%D8%B1%DA%A9 "زمان اجرای زبان مشترک – Persian")
+* [Suomi](https://fi.wikipedia.org/wiki/CLR_(tietotekniikka) "CLR (tietotekniikka) – Finnish")
+* [Français](https://fr.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – French")
+* [עברית](https://he.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Hebrew")
+* [Magyar](https://hu.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Hungarian")
+* [Bahasa Indonesia](https://id.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Indonesian")
+* [Italiano](https://it.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Italian")
+* [日本語](https://ja.wikipedia.org/wiki/%E5%85%B1%E9%80%9A%E8%A8%80%E8%AA%9E%E3%83%A9%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0 "共通言語ランタイム – Japanese")
+* [한국어](https://ko.wikipedia.org/wiki/%EA%B3%B5%ED%86%B5_%EC%96%B8%EC%96%B4_%EB%9F%B0%ED%83%80%EC%9E%84 "공통 언어 런타임 – Korean")
+* [Nederlands](https://nl.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Dutch")
+* [Polski](https://pl.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Polish")
+* [Português](https://pt.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Portuguese")
+* [Русский](https://ru.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Russian")
+* [Slovenščina](https://sl.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Slovenian")
+* [Српски / srpski](https://sr.wikipedia.org/wiki/CLR "CLR – Serbian")
+* [Svenska](https://sv.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Swedish")
+* [ไทย](https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B1%E0%B8%99%E0%B9%84%E0%B8%97%E0%B8%A1%E0%B9%8C%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B8%A3%E0%B9%88%E0%B8%A7%E0%B8%A1 "รันไทม์ภาษาร่วม – Thai")
+* [Türkçe](https://tr.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Turkish")
+* [Українська](https://uk.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Ukrainian")
+* [中文](https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E8%AA%9E%E8%A8%80%E9%81%8B%E8%A1%8C%E5%BA%AB "通用語言運行庫 – Chinese")
 
-[Edit links](https://www.wikidata.org/wiki/Special:EntityPage/Q3109412#sitelinks-wikipedia "Edit interlanguage links")
+[Edit links](https://www.wikidata.org/wiki/Special:EntityPage/Q733134#sitelinks-wikipedia "Edit interlanguage links")
 
 From Wikipedia, the free encyclopedia
 
-Finite-element mesh generator
+Virtual machine component of Microsoft's .NET framework
 
-| Gmsh | |
-| --- | --- |
-| Clipped view of Tetrahedral mesh; generated and viewed in Gmsh 2.3.1 | |
-| [Developers](/wiki/Programmer "Programmer") | Christophe Geuzaine and Jean-François Remacle |
-|  | |
-| [Stable release](/wiki/Software_release_life_cycle "Software release life cycle") | 4.15.0 / October 26, 2025; 5 months ago (2025-10-26) |
-|  | |
-| Written in | [C++](/wiki/C%2B%2B "C++") |
-| [Operating system](/wiki/Operating_system "Operating system") | [Unix](/wiki/Unix "Unix")/[Linux](/wiki/Linux "Linux"), [macOS](/wiki/MacOS "MacOS"), [Windows](/wiki/Microsoft_Windows "Microsoft Windows") |
-| [License](/wiki/Software_license "Software license") | [GNU General Public License](/wiki/GNU_General_Public_License "GNU General Public License") |
-| Website | [gmsh.info](http://gmsh.info) |
-| [Repository](/wiki/Repository_(version_control) "Repository (version control)") | * [gitlab.onelab.info/gmsh/gmsh](https://gitlab.onelab.info/gmsh/gmsh) |
-
-**Gmsh** is a [finite-element](/wiki/Finite_element_method "Finite element method") [mesh generator](/wiki/Mesh_generation "Mesh generation") developed by Christophe Geuzaine and Jean-François Remacle. Released under the [GNU General Public License](/wiki/GNU_General_Public_License "GNU General Public License"), Gmsh is [free software](/wiki/Free_software "Free software").
-
-Gmsh contains 5 modules: for geometry description, meshing, solving and post-processing. Gmsh supports [parametric input](/wiki/Parametric_equation "Parametric equation") and has advanced visualization mechanisms. Since version 3.0, Gmsh supports full [constructive solid geometry](/wiki/Constructive_solid_geometry "Constructive solid geometry") features, based on [Open Cascade Technology](/wiki/Open_Cascade_Technology "Open Cascade Technology").[[1]](#cite_note-1)[[2]](#cite_note-2)
-
-A modified version of Gmsh is integrated with SwiftComp, a general-purpose multiscale modeling software. The modified version, called [Gmsh4SC](https://cdmhub.org/resources/scstandard), is compiled and deployed on the Composites Design and Manufacturing HUB ([cdmHUB](https://cdmhub.org/)).
-
-## Interfaces
-
-[[edit](/w/index.php?title=Gmsh&action=edit&section=1 "Edit section: Interfaces")]
+|  |  |  |  |  |  |
+| --- | --- | --- | --- | --- | --- |
+|  | **This article has multiple issues.** Please help **[improve it](/wiki/Special:EditPage/Common_Language_Runtime "Special:EditPage/Common Language Runtime")** or discuss these issues on the **[talk page](/wiki/Talk:Common_Language_Runtime "Talk:Common Language Runtime")**. *([Learn how and when to remove these messages](/wiki/Help:Maintenance_template_removal "Help:Maintenance template removal"))* |  |  | | --- | --- | |  | This article **may rely excessively on sources [too closely associated with the subject](/wiki/Wikipedia:NIS "Wikipedia:NIS")**, potentially preventing the article from being [verifiable](/wiki/Wikipedia:Verifiability "Wikipedia:Verifiability") and [neutral](/wiki/Wikipedia:Neutral_point_of_view "Wikipedia:Neutral point of view"). Please help [improve it](https://en.wikipedia.org/w/index.php?title=Common_Language_Runtime&action=edit) by replacing them with more appropriate [citations](/wiki/Wikipedia:Citing_sources "Wikipedia:Citing sources") to [reliable, independent sources](/wiki/Wikipedia:Independent_sources "Wikipedia:Independent sources"). *(March 2019)* *([Learn how and when to remove this message](/wiki/Help:Maintenance_template_removal "Help:Maintenance template removal"))* |  |  |  | | --- | --- | |  | This article **needs additional citations for [verification](/wiki/Wikipedia:Verifiability "Wikipedia:Verifiability")**. Please help [improve this article](/wiki/Special:EditPage/Common_Language_Runtime "Special:EditPage/Common Language Runtime") by [adding citations to reliable sources](/wiki/Help:Referencing_for_beginners "Help:Referencing for beginners"). Unsourced material may be challenged and removed. *Find sources:* ["Common Language Runtime"](https://www.google.com/search?as_eq=wikipedia&q=%22Common+Language+Runtime%22) – [news](https://www.google.com/search?tbm=nws&q=%22Common+Language+Runtime%22+-wikipedia&tbs=ar:1) **·** [newspapers](https://www.google.com/search?&q=%22Common+Language+Runtime%22&tbs=bkt:s&tbm=bks) **·** [books](https://www.google.com/search?tbs=bks:1&q=%22Common+Language+Runtime%22+-wikipedia) **·** [scholar](https://scholar.google.com/scholar?q=%22Common+Language+Runtime%22) **·** [JSTOR](https://www.jstor.org/action/doBasicSearch?Query=%22Common+Language+Runtime%22&acc=on&wc=on) *(September 2014)* *([Learn how and when to remove this message](/wiki/Help:Maintenance_template_removal "Help:Maintenance template removal"))* |  *([Learn how and when to remove this message](/wiki/Help:Maintenance_template_removal "Help:Maintenance template removal"))* |
 ```
 
 **crawl4ai**
 ```
-[Jump to content](https://en.wikipedia.org/wiki/Gmsh#bodyContent)
+[Jump to content](https://en.wikipedia.org/wiki/Common_Language_Runtime#bodyContent)
 Main menu
 Main menu
 move to sidebar hide
@@ -2622,7 +2828,7 @@ Color (beta)
 
 **crawl4ai-raw**
 ```
-[Jump to content](https://en.wikipedia.org/wiki/Gmsh#bodyContent)
+[Jump to content](https://en.wikipedia.org/wiki/Common_Language_Runtime#bodyContent)
 Main menu
 Main menu
 move to sidebar hide
@@ -2668,51 +2874,51 @@ Color (beta)
 ```
 Toggle the table of contents
 
-# Gmsh
+# Common Language Runtime
 
-8 languages
+27 languages
 
-* [Català](https://ca.wikipedia.org/wiki/Gmsh "Gmsh – Catalan")
-* [Deutsch](https://de.wikipedia.org/wiki/Gmsh "Gmsh – German")
-* [Français](https://fr.wikipedia.org/wiki/Gmsh "Gmsh – French")
-* [हिन्दी](https://hi.wikipedia.org/wiki/%E0%A4%9C%E0%A5%80_%E0%A4%AE%E0%A5%87%E0%A4%B6 "जी मेश – Hindi")
-* [Italiano](https://it.wikipedia.org/wiki/Gmsh "Gmsh – Italian")
-* [日本語](https://ja.wikipedia.org/wiki/Gmsh "Gmsh – Japanese")
-* [Português](https://pt.wikipedia.org/wiki/Gmsh "Gmsh – Portuguese")
-* [中文](https://zh.wikipedia.org/wiki/Gmsh "Gmsh – Chinese")
+* [العربية](https://ar.wikipedia.org/wiki/%D9%88%D9%82%D8%AA_%D8%A7%D9%84%D8%AA%D9%86%D9%81%D9%8A%D8%B0_%D8%A7%D9%84%D9%85%D8%B4%D8%AA%D8%B1%D9%83_%D9%84%D9%84%D8%BA%D8%A7%D8%AA "وقت التنفيذ المشترك للغات – Arabic")
+* [Català](https://ca.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Catalan")
+* [Dansk](https://da.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Danish")
+* [Deutsch](https://de.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – German")
+* [Español](https://es.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Spanish")
+* [Eesti](https://et.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Estonian")
+* [Euskara](https://eu.wikipedia.org/wiki/CLR "CLR – Basque")
+* [فارسی](https://fa.wikipedia.org/wiki/%D8%B2%D9%85%D8%A7%D9%86_%D8%A7%D8%AC%D8%B1%D8%A7%DB%8C_%D8%B2%D8%A8%D8%A7%D9%86_%D9%85%D8%B4%D8%AA%D8%B1%DA%A9 "زمان اجرای زبان مشترک – Persian")
+* [Suomi](https://fi.wikipedia.org/wiki/CLR_(tietotekniikka) "CLR (tietotekniikka) – Finnish")
+* [Français](https://fr.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – French")
+* [עברית](https://he.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Hebrew")
+* [Magyar](https://hu.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Hungarian")
+* [Bahasa Indonesia](https://id.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Indonesian")
+* [Italiano](https://it.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Italian")
+* [日本語](https://ja.wikipedia.org/wiki/%E5%85%B1%E9%80%9A%E8%A8%80%E8%AA%9E%E3%83%A9%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0 "共通言語ランタイム – Japanese")
+* [한국어](https://ko.wikipedia.org/wiki/%EA%B3%B5%ED%86%B5_%EC%96%B8%EC%96%B4_%EB%9F%B0%ED%83%80%EC%9E%84 "공통 언어 런타임 – Korean")
+* [Nederlands](https://nl.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Dutch")
+* [Polski](https://pl.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Polish")
+* [Português](https://pt.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Portuguese")
+* [Русский](https://ru.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Russian")
+* [Slovenščina](https://sl.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Slovenian")
+* [Српски / srpski](https://sr.wikipedia.org/wiki/CLR "CLR – Serbian")
+* [Svenska](https://sv.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Swedish")
+* [ไทย](https://th.wikipedia.org/wiki/%E0%B8%A3%E0%B8%B1%E0%B8%99%E0%B9%84%E0%B8%97%E0%B8%A1%E0%B9%8C%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B8%A3%E0%B9%88%E0%B8%A7%E0%B8%A1 "รันไทม์ภาษาร่วม – Thai")
+* [Türkçe](https://tr.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Turkish")
+* [Українська](https://uk.wikipedia.org/wiki/Common_Language_Runtime "Common Language Runtime – Ukrainian")
+* [中文](https://zh.wikipedia.org/wiki/%E9%80%9A%E7%94%A8%E8%AA%9E%E8%A8%80%E9%81%8B%E8%A1%8C%E5%BA%AB "通用語言運行庫 – Chinese")
 
-[Edit links](https://www.wikidata.org/wiki/Special:EntityPage/Q3109412#sitelinks-wikipedia "Edit interlanguage links")
+[Edit links](https://www.wikidata.org/wiki/Special:EntityPage/Q733134#sitelinks-wikipedia "Edit interlanguage links")
 
-* [Article](/wiki/Gmsh "View the content page [c]")
-* [Talk](/wiki/Talk:Gmsh "Discuss improvements to the content page [t]")
+* [Article](/wiki/Common_Language_Runtime "View the content page [c]")
+* [Talk](/wiki/Talk:Common_Language_Runtime "Discuss improvements to the content page [t]")
 
 English
-
-* [Read](/wiki/Gmsh)
-* [Edit](/w/index.php?title=Gmsh&action=edit "Edit this page [e]")
-* [View history](/w/index.php?title=Gmsh&action=history "Past revisions of this page [h]")
-
-
-
-Tools
-
-Tools
-
-move to sidebar
-hide
-
-Actions
-
-* [Read](/wiki/Gmsh)
-* [Edit](/w/index.php?title=Gmsh&action=edit "Edit this page [e]")
-* [View history](/w/index.php?title=Gmsh&action=history)
 ```
 
 **crawlee**
 ```
-Gmsh - Wikipedia
-(function(){var className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-menu-disabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled vector-toc-available skin-theme-clientpref-thumb-standard";var cookie=document.cookie.match(/(?:^|; )enwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"09a3a1e6-a417-4766-a65f-162c92941e68","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Gmsh","wgTitle":"Gmsh","wgCurRevisionId":1339869955,"wgRevisionId":1339869955,"wgArticleId":24126101,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["\*"],"wgCategories":["Articles with short description","Short description is different from Wikidata","Webarchive template wayback links","All stub articles","Free mathematics software","Free software programmed in C++","Cross-platform free software","Mesh generators","Numerical analysis software for Linux","Numerical analysis software for macOS","Numerical analysis software for Windows","Software that uses FLTK","Computer-aided engineering software for Linux","Science software stubs"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Gmsh","wgRelevantArticleId":24126101,"wgTempUserName":null,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgNoticeProject":"wikipedia","wgFlaggedRevsParams":{"tags":{"status":{"levels":1}}},"wgConfirmEditCaptchaNeededForGenericEdit":"hcaptcha","wgConfirmEditHCaptchaVisualEditorOnLoadIntegrationEnabled":false,"wgConfirmEditHCaptchaSiteKey":"5d0c670e-a5f4-4258-ad16-1f42792c9c62","wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":0,"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":4000,"wgEditSubmitButtonLabelPublish":true,"wgVisualEditorPageIsDisambiguation":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":false,"wgVector2022LanguageInHeader":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q3109412","wgCheckUserClientHintsHeadersJsApi":["brands","architecture","bitness","fullVersionList","mobile","model","platform","platformVersion"],"GEHomepageSuggestedEditsEnableTopics":true,"wgGESuggestedEditsTaskTypes":{"taskTypes":["copyedit","link-recommendation"],"unavailableTaskTypes":[]},"wgGETopicsMatchModeEnabled":false,"wgGELevelingUpEnabledForUser":false,"wgTestKitchenUserExperiments":{"overrides":[],"enrolled":[],"assigned":[],"subject\_ids":[]}};
-RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.wikimediamessages.styles":"ready","ext.cite.styles":"ready","skins.vector.search.codex.styles":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","jquery.makeCollapsible.styles":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready"};RLPAGEMODULES=["ext.parsermigration.survey","ext.cite.ux-enhancements","site","mediawiki.page.ready","jquery.makeCollapsible","mediawiki.toc","skins.vector.js","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.ReferenceTooltips","ext.gadget.switcher","ext.urlShortener.toolbar","ext.centralauth.centralautologin","mmv.bootstrap","ext.popups","ext.visualEditor.desktopArticleTarget.init","ext.echo.centralauth","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.uls.interface","ext.cx.eventlogging.campaigns","ext.cx.uls.quick.actions","wikibase.client.vector-2022","wikibase.databox.fromWikidata","ext.checkUser.clientHints","ext.quicksurveys.init","ext.growthExperiments.SuggestedEditSession","ext.testKitchen"];
+Common Language Runtime - Wikipedia
+(function(){var className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-menu-disabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled vector-toc-available skin-theme-clientpref-thumb-standard";var cookie=document.cookie.match(/(?:^|; )enwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"5db3c8d3-dd97-4df7-944c-ddf94314b59a","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Common\_Language\_Runtime","wgTitle":"Common Language Runtime","wgCurRevisionId":1317322509,"wgRevisionId":1317322509,"wgArticleId":46003,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["\*"],"wgCategories":["Articles with short description","Short description matches Wikidata","Articles lacking reliable references from March 2019","All articles lacking reliable references","Articles needing additional references from September 2014","All articles needing additional references","Articles with multiple maintenance issues",".NET Framework terminology","Stack-based virtual machines"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Common\_Language\_Runtime","wgRelevantArticleId":46003,"wgTempUserName":null,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgNoticeProject":"wikipedia","wgFlaggedRevsParams":{"tags":{"status":{"levels":1}}},"wgConfirmEditCaptchaNeededForGenericEdit":"hcaptcha","wgConfirmEditHCaptchaVisualEditorOnLoadIntegrationEnabled":false,"wgConfirmEditHCaptchaSiteKey":"5d0c670e-a5f4-4258-ad16-1f42792c9c62","wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":0,"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":4000,"wgEditSubmitButtonLabelPublish":true,"wgVisualEditorPageIsDisambiguation":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":false,"wgVector2022LanguageInHeader":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q733134","wgCheckUserClientHintsHeadersJsApi":["brands","architecture","bitness","fullVersionList","mobile","model","platform","platformVersion"],"GEHomepageSuggestedEditsEnableTopics":true,"wgGESuggestedEditsTaskTypes":{"taskTypes":["copyedit","link-recommendation"],"unavailableTaskTypes":[]},"wgGETopicsMatchModeEnabled":false,"wgGELevelingUpEnabledForUser":false,"wgTestKitchenUserExperiments":{"overrides":[],"enrolled":[],"assigned":[],"subject\_ids":[]}};
+RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.wikimediamessages.styles":"ready","ext.cite.styles":"ready","skins.vector.search.codex.styles":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","jquery.makeCollapsible.styles":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready"};RLPAGEMODULES=["ext.parsermigration.survey","ext.cite.ux-enhancements","site","mediawiki.page.ready","jquery.makeCollapsible","skins.vector.js","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.ReferenceTooltips","ext.gadget.switcher","ext.urlShortener.toolbar","ext.centralauth.centralautologin","mmv.bootstrap","ext.popups","ext.visualEditor.desktopArticleTarget.init","ext.echo.centralauth","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.uls.interface","ext.cx.eventlogging.campaigns","ext.cx.uls.quick.actions","wikibase.client.vector-2022","wikibase.databox.fromWikidata","ext.checkUser.clientHints","ext.quicksurveys.init","ext.growthExperiments.SuggestedEditSession","ext.testKitchen"];
 (RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
 }];});});
 
@@ -2727,8 +2933,6 @@ RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.style
 .ve-init-mw-progressBarWidget{height:1em;overflow:hidden;margin:0 25%}.ve-init-mw-progressBarWidget-bar{height:1em;width:0} .ve-init-mw-progressBarWidget{background-color:#fff;box-sizing:border-box;height:0.875em;border:1px solid #36c;border-radius:0.875em;box-shadow:0 1px 1px rgba(0,0,0,0.15)}.ve-init-mw-progressBarWidget-bar{background-color:#36c;height:0.875em}
 .rt-overlay{position:absolute;width:100%;font-size:calc(var(--font-size-medium,1rem) \* (13 / 14));line-height:1.5em; z-index:800; top:0} .skin-vector-legacy .rt-overlay{font-size:13px}.skin-monobook .rt-overlay{font-size:12.7px}.rt-tooltip{position:absolute;max-width:27em;background:var(--background-color-base,#fff);color:var(--color-base,#202122);border:1px solid var(--border-color-subtle,#c8ccd1);border-radius:2px;box-shadow:0 20px 48px 0 rgba(0,0,0,0.2)}html.skin-theme-clientpref-night .rt-tooltip{box-shadow:0 20px 48px 0 rgba(0,0,0,1)} .rt-tooltip-above .rt-hoverArea{margin-bottom:-0.6em;padding-bottom:0.6em}.rt-tooltip-below .rt-hoverArea{margin-top:-0.7em;padding-top:0.7em}.rt-scroll{overflow-x:auto}.rt-content{padding:0.7em 0.9em;overflow-wrap:break-word}.rt-tail{ background:linear-gradient(to top right,var(--border-color-subtle,#c8ccd1) 48%,rgba(0,0,0,0) 48%);--tail-left:19px;--tail-side-width:13px}.rt-tail,.rt-tail:after{position:absolute; z-index:-1;width:var(--tail-side-width);height:var(--tail-side-width)}.rt-tail:after{content:'';background:var(--background-color-base,#fff);bottom:1px;left:1px}.rt-tooltip-above .rt-tail{transform:rotate(-45deg);transform-origin:100% 100%;bottom:0;left:var(--tail-left)}.rt-tooltip-below .rt-tail{transform:rotate(135deg);transform-origin:0 0;top:0;left:calc(var(--tail-left) + var(--tail-side-width))}.rt-settingsLink{background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%0D%0A%20%20%20%20%3Cpath%20fill%3D%22%2354595d%22%20d%3D%22M20%2014.5v-2.9l-1.8-.3c-.1-.4-.3-.8-.6-1.4l1.1-1.5-2.1-2.1-1.5%201.1c-.5-.3-1-.5-1.4-.6L13.5%205h-2.9l-.3%201.8c-.5.1-.9.3-1.4.6L7.4%206.3%205.3%208.4l1%201.5c-.3.5-.4.9-.6%201.4l-1.7.2v2.9l1.8.3c.1.5.3.9.6%201.4l-1%201.5%202.1%202.1%201.5-1c.4.2.9.4%201.4.6l.3%201.8h3l.3-1.8c.5-.1.9-.3%201.4-.6l1.5%201.1%202.1-2.1-1.1-1.5c.3-.5.5-1%20.6-1.4l1.5-.3zM12%2016c-1.7%200-3-1.3-3-3s1.3-3%203-3%203%201.3%203%203-1.3%203-3%203z%22%2F%3E%0D%0A%3C%2Fsvg%3E);float:right;margin:-0.5em -0.5em 0 0.5em;box-sizing:border-box;height:32px;width:32px;border:1px solid transparent;border-radius:2px;background-position:center center;background-repeat:no-repeat;background-size:24px 24px}html.skin-theme-clientpref-night .rt-settingsLink{background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%0D%0A%20%20%20%20%3Cpath%20fill%3D%22%23c8ccd1%22%20d%3D%22M20%2014.5v-2.9l-1.8-.3c-.1-.4-.3-.8-.6-1.4l1.1-1.5-2.1-2.1-1.5%201.1c-.5-.3-1-.5-1.4-.6L13.5%205h-2.9l-.3%201.8c-.5.1-.9.3-1.4.6L7.4%206.3%205.3%208.4l1%201.5c-.3.5-.4.9-.6%201.4l-1.7.2v2.9l1.8.3c.1.5.3.9.6%201.4l-1%201.5%202.1%202.1%201.5-1c.4.2.9.4%201.4.6l.3%201.8h3l.3-1.8c.5-.1.9-.3%201.4-.6l1.5%201.1%202.1-2.1-1.1-1.5c.3-.5.5-1%20.6-1.4l1.5-.3zM12%2016c-1.7%200-3-1.3-3-3s1.3-3%203-3%203%201.3%203%203-1.3%203-3%203z%22%2F%3E%0D%0A%3C%2Fsvg%3E)}.rt-settingsLink:hover,.rt-settingsLink:active{background-color:var(--background-color-interactive,#eaecf0)}.rt-settingsLink:active{border-color:var(--border-color-interactive,#72777d)}.rt-settingsLink:focus{outline:1px solid transparent}.rt-settingsLink:focus:not(:active){border-color:var(--border-color-progressive--focus,#36c);box-shadow:inset 0 0 0 1px var(--box-shadow-color-progressive--focus,#36c)}.rt-target{background-color:var(--background-color-progressive-subtle,#eaf3ff)}.rt-enableField{font-weight:bold;margin-bottom:1.25em}.rt-numberInput.rt-numberInput{width:10em}.rt-tooltipsForCommentsField.rt-tooltipsForCommentsField.rt-tooltipsForCommentsField{margin-top:1.25em}.rt-disabledHelp{border-collapse:collapse}.rt-disabledHelp td{padding:0}.rt-disabledNote.rt-disabledNote{vertical-align:bottom;padding-left:0.36em;font-weight:bold}@keyframes rt-fade-in-up{0%{opacity:0;transform:translate(0,20px)}100%{opacity:1;transform:translate(0,0)}}@keyframes rt-fade-in-down{0%{opacity:0;transform:translate(0,-20px)}100%{opacity:1;transform:translate(0,0)}}@keyframes rt-fade-out-down{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(0,20px)}}@keyframes rt-fade-out-up{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(0,-20px)}}.rt-fade-in-up{animation:rt-fade-in-up 0.2s ease forwards}.rt-fade-in-down{animation:rt-fade-in-down 0.2s ease forwards}.rt-fade-out-down{animation:rt-fade-out-down 0.2s ease forwards}.rt-fade-out-up{animation:rt-fade-out-up 0.2s ease forwards}
 .mw-collapsible-toggle{float:right;-webkit-user-select:none;-moz-user-select:none;user-select:none}.mw-collapsible-toggle-default{-webkit-appearance:none;-moz-appearance:none;appearance:none;background:none;margin:0;padding:0;border:0;font:inherit}.mw-collapsible-toggle-default .mw-collapsible-text{color:var(--color-progressive,#36c);border-radius:2px;text-decoration:none; }.mw-collapsible-toggle-default .mw-collapsible-text:visited{color:var(--color-visited,#6a60b0)}.mw-collapsible-toggle-default .mw-collapsible-text:visited:hover{color:var(--color-visited--hover,#534fa3)}.mw-collapsible-toggle-default .mw-collapsible-text:visited:active{color:var(--color-visited--active,#353262)}.mw-collapsible-toggle-default .mw-collapsible-text:hover{color:var(--color-progressive--hover,#3056a9);text-decoration:underline}.mw-collapsible-toggle-default .mw-collapsible-text:active{color:var(--color-progressive--active,#233566);text-decoration:underline}.mw-collapsible-toggle-default .mw-collapsible-text:focus-visible{outline:solid 2px var(--outline-color-progressive--focus,#36c)}@supports not selector(:focus-visible){.mw-collapsible-toggle-default .mw-collapsible-text:focus{outline:solid 2px var(--outline-color-progressive--focus,#36c)}}.mw-collapsible-toggle-default .mw-collapsible-text .cdx-icon:not(.cdx-thumbnail\_\_placeholder\_\_icon--vue):last-child{min-width:10px;min-height:10px;width:var(--font-size-medium,1rem);height:var(--font-size-medium,1rem);padding-left:4px;vertical-align:middle}.mw-underline-always .mw-collapsible-toggle-default .mw-collapsible-text{text-decoration:underline}.mw-underline-never .mw-collapsible-toggle-default .mw-collapsible-text{text-decoration:none}.mw-collapsible-toggle-default::before{content:'['}.mw-collapsible-toggle-default::after{content:']'}.mw-customtoggle,.mw-collapsible-toggle{cursor:pointer} caption .mw-collapsible-toggle,.mw-content-ltr caption .mw-collapsible-toggle,.mw-content-rtl caption .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr caption .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl caption .mw-collapsible-toggle{float:none}.mw-collapsible[hidden='until-found'],.mw-collapsible [hidden='until-found']{display:block;position:absolute; width:0 !important;height:0 !important;overflow:hidden !important;padding:0 !important;margin:0 !important;border:0 !important; }.wikitable.mw-collapsed{border:0}
-@media screen {
-.toctoggle{-webkit-user-select:none;-moz-user-select:none;user-select:none;font-size:94%}}
 @keyframes centralAuthPPersonalAnimation{0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}}.centralAuthPPersonalAnimation{animation-duration:1s;animation-fill-mode:both;animation-name:centralAuthPPersonalAnimation}
 .mw-file-element:not([srcset]),.mw-file-element--updated{object-fit:scale-down} #mw-teleport-target{position:absolute;z-index:450} #mw-teleport-target{font-size:var(--font-size-small,0.875rem)}
 #vector-appearance form{font-size:0.875rem;padding:6px 0}#vector-appearance a.skin-theme-beta-notice-success{color:var(--color-success,#177860);pointer-events:none}#vector-appearance .vector-icon.vector-icon--heart{ min-width:10px;min-height:10px;width:var(--font-size-medium,1rem);height:var(--font-size-medium,1rem);display:inline-block;vertical-align:text-bottom}@supports not ((-webkit-mask-image:none) or (mask-image:none)){#vector-appearance .vector-icon.vector-icon--heart{background-position:center;background-repeat:no-repeat; background-size:calc(max(var(--font-size-medium,1rem),10px))}}@supports (-webkit-mask-image:none) or (mask-image:none){#vector-appearance .vector-icon.vector-icon--heart{ -webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:calc(max(var(--font-size-medium,1rem),10px));mask-size:calc(max(var(--font-size-medium,1rem),10px)); }}@supports not ((-webkit-mask-image:none) or (mask-image:none)){#vector-appearance .vector-icon.vector-icon--heart{background-image:url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"%23000\"><path d=\"M14.75 1A5.24 5.24 0 0010 4 5.24 5.24 0 000 6.25C0 11.75 10 19 10 19s10-7.25 10-12.75A5.25 5.25 0 0014.75 1\"/></svg>");filter:invert(var(--filter-invert-icon,0));opacity:var(--opacity-icon-base,0.87)}}@supports (-webkit-mask-image:none) or (mask-image:none){#vector-appearance .vector-icon.vector-icon--heart{ -webkit-mask-image:url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"%23000\"><path d=\"M14.75 1A5.24 5.24 0 0010 4 5.24 5.24 0 000 6.25C0 11.75 10 19 10 19s10-7.25 10-12.75A5.25 5.25 0 0014.75 1\"/></svg>"); mask-image:url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"%23000\"><path d=\"M14.75 1A5.24 5.24 0 0010 4 5.24 5.24 0 000 6.25C0 11.75 10 19 10 19s10-7.25 10-12.75A5.25 5.25 0 0014.75 1\"/></svg>");background-color:var(--color-success,#177860)}}#skin-theme-beta-notice{display:none}@media screen and (prefers-color-scheme:dark){html.skin-theme-clientpref-os #skin-theme-beta-notice{display:block}}html.skin-theme-clientpref-night #skin-theme-beta-notice{display:block}
@@ -2750,13 +2954,15 @@ RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.style
 Main menu
 
 Main menu
+
+move to sidebar
 ```
 
 **colly+md**
 ```
-Gmsh - Wikipedia
-(function(){var className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-menu-disabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled vector-toc-available skin-theme-clientpref-thumb-standard";var cookie=document.cookie.match(/(?:^|; )enwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"09a3a1e6-a417-4766-a65f-162c92941e68","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Gmsh","wgTitle":"Gmsh","wgCurRevisionId":1339869955,"wgRevisionId":1339869955,"wgArticleId":24126101,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["\*"],"wgCategories":["Articles with short description","Short description is different from Wikidata","Webarchive template wayback links","All stub articles","Free mathematics software","Free software programmed in C++","Cross-platform free software","Mesh generators","Numerical analysis software for Linux","Numerical analysis software for macOS","Numerical analysis software for Windows","Software that uses FLTK","Computer-aided engineering software for Linux","Science software stubs"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Gmsh","wgRelevantArticleId":24126101,"wgTempUserName":null,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgNoticeProject":"wikipedia","wgFlaggedRevsParams":{"tags":{"status":{"levels":1}}},"wgConfirmEditCaptchaNeededForGenericEdit":"hcaptcha","wgConfirmEditHCaptchaVisualEditorOnLoadIntegrationEnabled":false,"wgConfirmEditHCaptchaSiteKey":"5d0c670e-a5f4-4258-ad16-1f42792c9c62","wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":0,"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":4000,"wgEditSubmitButtonLabelPublish":true,"wgVisualEditorPageIsDisambiguation":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":false,"wgVector2022LanguageInHeader":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q3109412","wgCheckUserClientHintsHeadersJsApi":["brands","architecture","bitness","fullVersionList","mobile","model","platform","platformVersion"],"GEHomepageSuggestedEditsEnableTopics":true,"wgGESuggestedEditsTaskTypes":{"taskTypes":["copyedit","link-recommendation"],"unavailableTaskTypes":[]},"wgGETopicsMatchModeEnabled":false,"wgGELevelingUpEnabledForUser":false,"wgTestKitchenUserExperiments":{"overrides":[],"enrolled":[],"assigned":[],"subject\_ids":[]}};
-RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.wikimediamessages.styles":"ready","ext.cite.styles":"ready","skins.vector.search.codex.styles":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","jquery.makeCollapsible.styles":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready"};RLPAGEMODULES=["ext.parsermigration.survey","ext.cite.ux-enhancements","site","mediawiki.page.ready","jquery.makeCollapsible","mediawiki.toc","skins.vector.js","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.ReferenceTooltips","ext.gadget.switcher","ext.urlShortener.toolbar","ext.centralauth.centralautologin","mmv.bootstrap","ext.popups","ext.visualEditor.desktopArticleTarget.init","ext.echo.centralauth","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.uls.interface","ext.cx.eventlogging.campaigns","ext.cx.uls.quick.actions","wikibase.client.vector-2022","wikibase.databox.fromWikidata","ext.checkUser.clientHints","ext.quicksurveys.init","ext.growthExperiments.SuggestedEditSession","ext.testKitchen"];
+Common Language Runtime - Wikipedia
+(function(){var className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-menu-disabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled vector-toc-available skin-theme-clientpref-thumb-standard";var cookie=document.cookie.match(/(?:^|; )enwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"5db3c8d3-dd97-4df7-944c-ddf94314b59a","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Common\_Language\_Runtime","wgTitle":"Common Language Runtime","wgCurRevisionId":1317322509,"wgRevisionId":1317322509,"wgArticleId":46003,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["\*"],"wgCategories":["Articles with short description","Short description matches Wikidata","Articles lacking reliable references from March 2019","All articles lacking reliable references","Articles needing additional references from September 2014","All articles needing additional references","Articles with multiple maintenance issues",".NET Framework terminology","Stack-based virtual machines"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Common\_Language\_Runtime","wgRelevantArticleId":46003,"wgTempUserName":null,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgNoticeProject":"wikipedia","wgFlaggedRevsParams":{"tags":{"status":{"levels":1}}},"wgConfirmEditCaptchaNeededForGenericEdit":"hcaptcha","wgConfirmEditHCaptchaVisualEditorOnLoadIntegrationEnabled":false,"wgConfirmEditHCaptchaSiteKey":"5d0c670e-a5f4-4258-ad16-1f42792c9c62","wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":0,"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":4000,"wgEditSubmitButtonLabelPublish":true,"wgVisualEditorPageIsDisambiguation":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":false,"wgVector2022LanguageInHeader":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q733134","wgCheckUserClientHintsHeadersJsApi":["brands","architecture","bitness","fullVersionList","mobile","model","platform","platformVersion"],"GEHomepageSuggestedEditsEnableTopics":true,"wgGESuggestedEditsTaskTypes":{"taskTypes":["copyedit","link-recommendation"],"unavailableTaskTypes":[]},"wgGETopicsMatchModeEnabled":false,"wgGELevelingUpEnabledForUser":false,"wgTestKitchenUserExperiments":{"overrides":[],"enrolled":[],"assigned":[],"subject\_ids":[]}};
+RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.wikimediamessages.styles":"ready","ext.cite.styles":"ready","skins.vector.search.codex.styles":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","jquery.makeCollapsible.styles":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready"};RLPAGEMODULES=["ext.parsermigration.survey","ext.cite.ux-enhancements","site","mediawiki.page.ready","jquery.makeCollapsible","skins.vector.js","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.ReferenceTooltips","ext.gadget.switcher","ext.urlShortener.toolbar","ext.centralauth.centralautologin","mmv.bootstrap","ext.popups","ext.visualEditor.desktopArticleTarget.init","ext.echo.centralauth","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.uls.interface","ext.cx.eventlogging.campaigns","ext.cx.uls.quick.actions","wikibase.client.vector-2022","wikibase.databox.fromWikidata","ext.checkUser.clientHints","ext.quicksurveys.init","ext.growthExperiments.SuggestedEditSession","ext.testKitchen"];
 (RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
 }];});});
 
@@ -2798,9 +3004,9 @@ Appearance
 
 **playwright**
 ```
-Gmsh - Wikipedia
-(function(){var className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-menu-disabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled vector-toc-available skin-theme-clientpref-thumb-standard";var cookie=document.cookie.match(/(?:^|; )enwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"09a3a1e6-a417-4766-a65f-162c92941e68","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Gmsh","wgTitle":"Gmsh","wgCurRevisionId":1339869955,"wgRevisionId":1339869955,"wgArticleId":24126101,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["\*"],"wgCategories":["Articles with short description","Short description is different from Wikidata","Webarchive template wayback links","All stub articles","Free mathematics software","Free software programmed in C++","Cross-platform free software","Mesh generators","Numerical analysis software for Linux","Numerical analysis software for macOS","Numerical analysis software for Windows","Software that uses FLTK","Computer-aided engineering software for Linux","Science software stubs"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Gmsh","wgRelevantArticleId":24126101,"wgTempUserName":null,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgNoticeProject":"wikipedia","wgFlaggedRevsParams":{"tags":{"status":{"levels":1}}},"wgConfirmEditCaptchaNeededForGenericEdit":"hcaptcha","wgConfirmEditHCaptchaVisualEditorOnLoadIntegrationEnabled":false,"wgConfirmEditHCaptchaSiteKey":"5d0c670e-a5f4-4258-ad16-1f42792c9c62","wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":0,"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":4000,"wgEditSubmitButtonLabelPublish":true,"wgVisualEditorPageIsDisambiguation":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":false,"wgVector2022LanguageInHeader":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q3109412","wgCheckUserClientHintsHeadersJsApi":["brands","architecture","bitness","fullVersionList","mobile","model","platform","platformVersion"],"GEHomepageSuggestedEditsEnableTopics":true,"wgGESuggestedEditsTaskTypes":{"taskTypes":["copyedit","link-recommendation"],"unavailableTaskTypes":[]},"wgGETopicsMatchModeEnabled":false,"wgGELevelingUpEnabledForUser":false,"wgTestKitchenUserExperiments":{"overrides":[],"enrolled":[],"assigned":[],"subject\_ids":[]}};
-RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.wikimediamessages.styles":"ready","ext.cite.styles":"ready","skins.vector.search.codex.styles":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","jquery.makeCollapsible.styles":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready"};RLPAGEMODULES=["ext.parsermigration.survey","ext.cite.ux-enhancements","site","mediawiki.page.ready","jquery.makeCollapsible","mediawiki.toc","skins.vector.js","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.ReferenceTooltips","ext.gadget.switcher","ext.urlShortener.toolbar","ext.centralauth.centralautologin","mmv.bootstrap","ext.popups","ext.visualEditor.desktopArticleTarget.init","ext.echo.centralauth","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.uls.interface","ext.cx.eventlogging.campaigns","ext.cx.uls.quick.actions","wikibase.client.vector-2022","wikibase.databox.fromWikidata","ext.checkUser.clientHints","ext.quicksurveys.init","ext.growthExperiments.SuggestedEditSession","ext.testKitchen"];
+Common Language Runtime - Wikipedia
+(function(){var className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-menu-disabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled vector-toc-available skin-theme-clientpref-thumb-standard";var cookie=document.cookie.match(/(?:^|; )enwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"5db3c8d3-dd97-4df7-944c-ddf94314b59a","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Common\_Language\_Runtime","wgTitle":"Common Language Runtime","wgCurRevisionId":1317322509,"wgRevisionId":1317322509,"wgArticleId":46003,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["\*"],"wgCategories":["Articles with short description","Short description matches Wikidata","Articles lacking reliable references from March 2019","All articles lacking reliable references","Articles needing additional references from September 2014","All articles needing additional references","Articles with multiple maintenance issues",".NET Framework terminology","Stack-based virtual machines"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Common\_Language\_Runtime","wgRelevantArticleId":46003,"wgTempUserName":null,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgNoticeProject":"wikipedia","wgFlaggedRevsParams":{"tags":{"status":{"levels":1}}},"wgConfirmEditCaptchaNeededForGenericEdit":"hcaptcha","wgConfirmEditHCaptchaVisualEditorOnLoadIntegrationEnabled":false,"wgConfirmEditHCaptchaSiteKey":"5d0c670e-a5f4-4258-ad16-1f42792c9c62","wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":0,"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":4000,"wgEditSubmitButtonLabelPublish":true,"wgVisualEditorPageIsDisambiguation":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":false,"wgVector2022LanguageInHeader":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q733134","wgCheckUserClientHintsHeadersJsApi":["brands","architecture","bitness","fullVersionList","mobile","model","platform","platformVersion"],"GEHomepageSuggestedEditsEnableTopics":true,"wgGESuggestedEditsTaskTypes":{"taskTypes":["copyedit","link-recommendation"],"unavailableTaskTypes":[]},"wgGETopicsMatchModeEnabled":false,"wgGELevelingUpEnabledForUser":false,"wgTestKitchenUserExperiments":{"overrides":[],"enrolled":[],"assigned":[],"subject\_ids":[]}};
+RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.wikimediamessages.styles":"ready","ext.cite.styles":"ready","skins.vector.search.codex.styles":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","jquery.makeCollapsible.styles":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready"};RLPAGEMODULES=["ext.parsermigration.survey","ext.cite.ux-enhancements","site","mediawiki.page.ready","jquery.makeCollapsible","skins.vector.js","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.ReferenceTooltips","ext.gadget.switcher","ext.urlShortener.toolbar","ext.centralauth.centralautologin","mmv.bootstrap","ext.popups","ext.visualEditor.desktopArticleTarget.init","ext.echo.centralauth","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.uls.interface","ext.cx.eventlogging.campaigns","ext.cx.uls.quick.actions","wikibase.client.vector-2022","wikibase.databox.fromWikidata","ext.checkUser.clientHints","ext.quicksurveys.init","ext.growthExperiments.SuggestedEditSession","ext.testKitchen"];
 (RLQ=window.RLQ||[]).push(function(){mw.loader.impl(function(){return["user.options@12s5i",function($,jQuery,require,module){mw.user.tokens.set({"patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
 }];});});
 
@@ -2845,9 +3051,9 @@ Appearance
 </details>
 
 <details>
-<summary>Per-page word counts and preamble [1]</summary>
+<summary>Per-page word counts and preamble [2]</summary>
 
-| URL | markcrawl words / preamble [1] | crawl4ai words / preamble [1] | crawl4ai-raw words / preamble [1] | scrapy+md words / preamble [1] | crawlee words / preamble [1] | colly+md words / preamble [1] | playwright words / preamble [1] | firecrawl words / preamble [1] |
+| URL | markcrawl words [6] / preamble [2] | crawl4ai words [6] / preamble [2] | crawl4ai-raw words [6] / preamble [2] | scrapy+md words [6] / preamble [2] | crawlee words [6] / preamble [2] | colly+md words [6] / preamble [2] | playwright words [6] / preamble [2] | firecrawl words [6] / preamble [2] |
 |---|---|---|---|---|---|---|---|---|
 | en.wikipedia.org/wiki/Apple_M1 | 4487 / 0 | 8663 / 252 | 8663 / 252 | 8636 / 5 | 14242 / 5200 | 9175 / 242 | 9175 / 242 | — |
 | en.wikipedia.org/wiki/Assertion_(programming) | 3295 / 0 | 3972 / 252 | 3972 / 252 | 3557 / 5 | 8996 / 5168 | 4052 / 247 | 4052 / 247 | — |
@@ -2904,7 +3110,7 @@ Appearance
 
 ## stripe-docs
 
-| Tool | Avg words | Preamble [1] | Repeat rate | Junk found | Headings | Code blocks | Precision | Recall |
+| Tool | Avg words [6] | Preamble [2] | Repeat rate [3] | Junk found [4] | Headings [7] | Code blocks [8] | Precision [5] | Recall [5] |
 |---|---|---|---|---|---|---|---|---|
 | **markcrawl** | 1165 | 13 | 0% | 35 | 10.3 | 2.2 | 98% | 22% |
 | crawl4ai | 1372 | 174 ⚠ | 0% | 819 | 12.0 | 2.2 | 100% | 18% |
@@ -2915,68 +3121,72 @@ Appearance
 | playwright | 18073 | 8955 ⚠ | 1% | 999 | 10.6 | 2.2 | 98% | 95% |
 | firecrawl | — | — | — | — | — | — | — | — |
 
-**[1]** Avg words per page before the first heading (nav chrome). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
+> **Column definitions:**
+> **[6] Avg words** = mean words per page. **[2] Preamble** = avg words per page before the first heading (nav chrome). **[3] Repeat rate** = fraction of sentences on >50% of pages.
+> **[4] Junk found** = total known boilerplate phrases detected across all pages. **[7] Headings** = avg headings per page. **[8] Code blocks** = avg fenced code blocks per page.
+> **[5] Precision/Recall** = cross-tool consensus (pages with <2 sentences excluded). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
 
 **Reading the numbers:**
 **markcrawl** produces the cleanest output with 13 words of preamble per page, while **playwright** injects 8955 words of nav chrome before content begins. The word count gap (1165 vs 18095 avg words) is largely explained by preamble: 8955 words of nav chrome account for ~49% of crawlee's output on this site. markcrawl's lower recall (22% vs 100%) reflects stricter content filtering — the "missed" sentences are predominantly navigation, sponsor links, and footer text that other tools include as content. For RAG, this is typically a net positive: fewer junk tokens per chunk tends to improve embedding quality and retrieval precision.
 
 <details>
-<summary>Sample output — first 40 lines of <code>docs.stripe.com/agentic-commerce/concepts</code></summary>
+<summary>Sample output — first 40 lines of <code>docs.stripe.com/payment-authentication/writing-queries</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
 ```
-*Learn about the concepts that enable agentic commerce.*
+*Use Stripe Sigma to retrieve information about authentication, conversion, and the SCA exemptions used.*
 
 
-# Key conceptsPrivate preview
+# Querying authentication conversion
 
-## Learn about the concepts that enable agentic commerce.
+## Use Stripe Sigma to retrieve information about authentication, conversion, and the SCA exemptions used.
 
 Ask about this page
 
 Copy for LLMView as Markdown
 
-Use an agent to manage transactions between a seller and buyers in your AI interface. The agent maintains customer relationships, including preferences, [payment methods](/api/payment_methods) used for subscriptions, and customer details. This information lets the agent make purchase recommendations directly in the AI interface to improve conversion rates and drive more high-intent purchases.
+See the `authentication_report_attempts` table under the **Analytics Tables** section of the Sigma schema. Each row within the `authentication_report_attempts` table represents data about an individual attempt object. Our [full-page documentation](https://dashboard.stripe.com/stripe-schema?tableName=authentication_report_attempts) also shows the schema in a split-view format.
 
-## Overview
+## Attempt conversion information
 
-In the AI interface, agents help customers and sellers discover products and complete transactions. Agents issue a [shared payment token](/agentic-commerce/concepts/shared-payment-tokens) (SPT) to manage payment methods.
+You can get a report for every attempt, with each [PaymentIntent](/api/payment_intents) or [SetupIntent](/api/payment_intents) having possibly more than one attempt.
 
-### Seller
+#### Note
 
-Sellers are individual businesses or platforms made up of multiple sellers, and typically provide e-commerce goods, subscriptions, digital content, or API functions. Use the agent as your sales channel to offer your products.
+In some cases there are multiple attempts for a single transaction, such as when a payment is declined and then retried. To filter to a specific transaction, use the `is_final_attempt` column. This column is eventually consist after a few days.
 
-### AI agent
+The following example query uses the `authentication_report_attempts` table to retrieve a list of PaymentIntents that were successfully authenticated using the challenge flow.
 
-Your AI agent uses large language models (LLMs) to discover and recommend products for purchase, and can display products in a user interface in response to a prompt. Your customers typically have an account or subscription with your agent. Your agent creates a `Customer` object for each customer and stores their payment information so you can reuse it for future purchases.
+```
+select
+  attempt_id,
+  intent_id,
+  payment_method,
+  threeds_reason as step_up_reason,
+  charge_outcome
+from authentication_report_attempts
+where intent_type = 'payment'
+  and threeds_outcome_result = 'authenticated'
+  and authentication_flow = 'challenge'
+  and is_final_attempt
+limit 5
+```
 
-### Shared payment tokens
-
-Your agent issues an SPT through the API—a scoped grant of a payment method. As a seller, you can use SPTs with a `PaymentIntent` or outside of Stripe. Stripe grants each SPT to your seller account only, so other sellers can’t use it. For added security and control, SPTs include usage limits and expiration windows. They never contain primary account numbers (PANs) or other raw credentials.
-
-Learn how to create and use [SPTs](/agentic-commerce/concepts/shared-payment-tokens).
-
-## Transaction process
-
-This diagram shows how your AI agents and customers transact, and how you register and process payment methods.
-
-1. Your customer provides a payment method to your agent through an existing subscription or as a new payment method.
-2. Your agent issues an SPT through Stripe. The request specifies the seller that receives the SPT, the transaction amount, and the payment method.
-3. Your agent sends the SPT and transaction amount to the seller through your API.
-4. You create a `PaymentIntent` using the SPT in your Stripe account, and Stripe processes the transaction.
+| attempt_id | intent_id | payment_method | step_up_reason | charge_outcome |
+| --- | --- | --- | --- | --- |
 ```
 
 **crawl4ai**
 ```
-[Skip to content](https://docs.stripe.com/agentic-commerce/concepts#main-content)
-Key concepts
-[Create account](https://dashboard.stripe.com/register) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fagentic-commerce%2Fconcepts)
+[Skip to content](https://docs.stripe.com/payment-authentication/writing-queries#main-content)
+Writing queries
+[Create account](https://dashboard.stripe.com/register) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fpayment-authentication%2Fwriting-queries)
 [The Stripe Docs logo](https://docs.stripe.com/)
 Search `/`Ask AI
-[Create account](https://dashboard.stripe.com/register)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fagentic-commerce%2Fconcepts)
+[Create account](https://dashboard.stripe.com/register)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fpayment-authentication%2Fwriting-queries)
 [Get started ](https://docs.stripe.com/get-started)
 [Payments ](https://docs.stripe.com/payments)
 [Revenue ](https://docs.stripe.com/revenue)
@@ -3002,25 +3212,24 @@ Payment operations
 Analytics
 [Balances and settlement time](https://docs.stripe.com/payments/balances)
 Compliance and security
-Currencies
-Declines
-Disputes
-Radar fraud protection
-Payouts
-[Receipts](https://docs.stripe.com/receipts)[Refunds and cancellations](https://docs.stripe.com/refunds)
-Advanced integrations
-Custom payment flows
-Flexible acquiring
+[3D Secure authentication](https://docs.stripe.com/payments/3d-secure)
+[Authenticate with 3D Secure](https://docs.stripe.com/payments/3d-secure/authentication-flow)
+[SCA exemptions](https://docs.stripe.com/payments/3d-secure/strong-customer-authentication-exemptions)
+[Standalone 3D Secure](https://docs.stripe.com/payments/3d-secure/standalone-three-d-secure)
+[Import 3D Secure results](https://docs.stripe.com/payments/payment-intents/three-d-secure-import)
+Writing queries
+[SCA readiness](https://docs.stripe.com/strong-customer-authentication)
+[India recurring payments](https://docs.stripe.com/india-recurring-payments)
 ```
 
 **crawl4ai-raw**
 ```
-[Skip to content](https://docs.stripe.com/agentic-commerce/concepts#main-content)
-Key concepts
-[Create account](https://dashboard.stripe.com/register) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fagentic-commerce%2Fconcepts)
+[Skip to content](https://docs.stripe.com/payment-authentication/writing-queries#main-content)
+Writing queries
+[Create account](https://dashboard.stripe.com/register) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fpayment-authentication%2Fwriting-queries)
 [The Stripe Docs logo](https://docs.stripe.com/)
 Search `/`Ask AI
-[Create account](https://dashboard.stripe.com/register)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fagentic-commerce%2Fconcepts)
+[Create account](https://dashboard.stripe.com/register)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fpayment-authentication%2Fwriting-queries)
 [Get started ](https://docs.stripe.com/get-started)
 [Payments ](https://docs.stripe.com/payments)
 [Revenue ](https://docs.stripe.com/revenue)
@@ -3046,24 +3255,23 @@ Payment operations
 Analytics
 [Balances and settlement time](https://docs.stripe.com/payments/balances)
 Compliance and security
-Currencies
-Declines
-Disputes
-Radar fraud protection
-Payouts
-[Receipts](https://docs.stripe.com/receipts)[Refunds and cancellations](https://docs.stripe.com/refunds)
-Advanced integrations
-Custom payment flows
-Flexible acquiring
+[3D Secure authentication](https://docs.stripe.com/payments/3d-secure)
+[Authenticate with 3D Secure](https://docs.stripe.com/payments/3d-secure/authentication-flow)
+[SCA exemptions](https://docs.stripe.com/payments/3d-secure/strong-customer-authentication-exemptions)
+[Standalone 3D Secure](https://docs.stripe.com/payments/3d-secure/standalone-three-d-secure)
+[Import 3D Secure results](https://docs.stripe.com/payments/payment-intents/three-d-secure-import)
+Writing queries
+[SCA readiness](https://docs.stripe.com/strong-customer-authentication)
+[India recurring payments](https://docs.stripe.com/india-recurring-payments)
 ```
 
 **scrapy+md**
 ```
 [Skip to content](#main-content)
 
-Key concepts
+Writing queries
 
-[Create account](https://dashboard.stripe.com/register) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fagentic-commerce%2Fconcepts)
+[Create account](https://dashboard.stripe.com/register) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fpayment-authentication%2Fwriting-queries)
 
 [The Stripe Docs logo](/)
 
@@ -3071,7 +3279,7 @@ Search
 
 `/`Ask AI
 
-[Create account](https://dashboard.stripe.com/register)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fagentic-commerce%2Fconcepts)
+[Create account](https://dashboard.stripe.com/register)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fpayment-authentication%2Fwriting-queries)
 
 [Get started](/get-started)
 
@@ -3102,7 +3310,7 @@ Build a custom integration with Elements
 
 **crawlee**
 ```
-Key concepts | Stripe Documentation
+Querying authentication conversion | Stripe Documentation
 
 
 
@@ -3146,7 +3354,7 @@ box-shadow: var(--s--top-shadow), var(--s--keyline) 0 0 0 var(--s--keyline-width
 
 **colly+md**
 ```
-Key concepts | Stripe Documentation
+Querying authentication conversion | Stripe Documentation
 
 
 
@@ -3190,7 +3398,7 @@ box-shadow: var(--s--top-shadow), var(--s--keyline) 0 0 0 var(--s--keyline-width
 
 **playwright**
 ```
-Key concepts | Stripe Documentation
+Querying authentication conversion | Stripe Documentation
 
 
 
@@ -3237,9 +3445,9 @@ box-shadow: var(--s--top-shadow), var(--s--keyline) 0 0 0 var(--s--keyline-width
 </details>
 
 <details>
-<summary>Per-page word counts and preamble [1]</summary>
+<summary>Per-page word counts and preamble [2]</summary>
 
-| URL | markcrawl words / preamble [1] | crawl4ai words / preamble [1] | crawl4ai-raw words / preamble [1] | scrapy+md words / preamble [1] | crawlee words / preamble [1] | colly+md words / preamble [1] | playwright words / preamble [1] | firecrawl words / preamble [1] |
+| URL | markcrawl words [6] / preamble [2] | crawl4ai words [6] / preamble [2] | crawl4ai-raw words [6] / preamble [2] | scrapy+md words [6] / preamble [2] | crawlee words [6] / preamble [2] | colly+md words [6] / preamble [2] | playwright words [6] / preamble [2] | firecrawl words [6] / preamble [2] |
 |---|---|---|---|---|---|---|---|---|
 | docs.stripe.com/acceptable-verification-documents | 968 / 27 | 1378 / 144 | 1378 / 144 | 1116 / 141 | 16329 / 7825 | 16196 / 7771 | 16326 / 7843 | — |
 | docs.stripe.com/ach-deprecated | 2399 / 13 | 2558 / 36 | 2558 / 36 | 2453 / 33 | 30600 / 10574 | 30430 / 10511 | 30561 / 10556 | — |
@@ -3503,7 +3711,7 @@ box-shadow: var(--s--top-shadow), var(--s--keyline) 0 0 0 var(--s--keyline-width
 
 ## blog-engineering
 
-| Tool | Avg words | Preamble [1] | Repeat rate | Junk found | Headings | Code blocks | Precision | Recall |
+| Tool | Avg words [6] | Preamble [2] | Repeat rate [3] | Junk found [4] | Headings [7] | Code blocks [8] | Precision [5] | Recall [5] |
 |---|---|---|---|---|---|---|---|---|
 | **markcrawl** | 667 | 36 | 0% | 1 | 14.3 | 0.4 | 100% | 33% |
 | crawl4ai | 2301 | 697 ⚠ | 2% | 201 | 20.3 | 0.4 | 100% | 72% |
@@ -3514,42 +3722,43 @@ box-shadow: var(--s--top-shadow), var(--s--keyline) 0 0 0 var(--s--keyline-width
 | playwright | 3584 | 1930 ⚠ | 3% | 231 | 20.3 | 0.4 | 99% | 98% |
 | firecrawl | — | — | — | — | — | — | — | — |
 
-**[1]** Avg words per page before the first heading (nav chrome). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
+> **Column definitions:**
+> **[6] Avg words** = mean words per page. **[2] Preamble** = avg words per page before the first heading (nav chrome). **[3] Repeat rate** = fraction of sentences on >50% of pages.
+> **[4] Junk found** = total known boilerplate phrases detected across all pages. **[7] Headings** = avg headings per page. **[8] Code blocks** = avg fenced code blocks per page.
+> **[5] Precision/Recall** = cross-tool consensus (pages with <2 sentences excluded). **⚠** = likely nav/boilerplate problem (preamble >50 or repeat rate >20%).
 
 **Reading the numbers:**
 **scrapy+md** produces the cleanest output with 8 words of preamble per page, while **playwright** injects 1930 words of nav chrome before content begins. The word count gap (659 vs 3584 avg words) is largely explained by preamble: 1930 words of nav chrome account for ~54% of playwright's output on this site. scrapy+md's lower recall (33% vs 98%) reflects stricter content filtering — the "missed" sentences are predominantly navigation, sponsor links, and footer text that other tools include as content. For RAG, this is typically a net positive: fewer junk tokens per chunk tends to improve embedding quality and retrieval precision.
 
 <details>
-<summary>Sample output — first 40 lines of <code>github.blog/news-insights/the-library/diff-your-gist</code></summary>
+<summary>Sample output — first 40 lines of <code>github.blog/news-insights/the-library/tasty-tidbits</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
 ```
-*@NV has ported ucnv’s Diff for Gist Greasemonkey script to a Chrome Extension. img http://img.skitch.com/20100127-nxct1q4y315uwen8nr6w896upk.png http://chrome.google.com/extensions/detail/ekibhngllckenihijddjkmehiocljcpc Pretty cool – I’ve been using it since I first saw it. And if…*
+*Chris Wanstrath of Err the Blog (hey that’s me!) just posted an article covering some tasty GitHub tidbits. Range highlighting, key shortcuts, keeping dotfiles in git, and the GitHub gem…*
 
 
 [Home](https://github.blog/) / [News & insights](https://github.blog/news-insights/) / [The library](https://github.blog/news-insights/the-library/)
 
-# Diff Your Gist
+# Tasty Tidbits
 
-@NV has ported ucnv’s Diff for Gist Greasemonkey script to a Chrome Extension. img http://img.skitch.com/20100127-nxct1q4y315uwen8nr6w896upk.png http://chrome.google.com/extensions/detail/ekibhngllckenihijddjkmehiocljcpc Pretty cool – I’ve been using it since I first saw it. And if…
+Chris Wanstrath of Err the Blog (hey that’s me!) just posted an article covering some tasty GitHub tidbits. Range highlighting, key shortcuts, keeping dotfiles in git, and the GitHub gem…
 
 [Chris Wanstrath](https://github.blog/author/defunkt/ "Posts by Chris Wanstrath")·[@defunkt](https://github.com/defunkt)
 
-January 27, 2010
+May 11, 2008
 |
 
 Updated January 4, 2019
 
 * Share:
 
-@NV has ported [ucnv’s](http://userscripts.org/users/ucnv) [Diff for Gist](http://userscripts.org/scripts/show/62706) Greasemonkey script to a [Chrome Extension](http://chrome.google.com/extensions/detail/ekibhngllckenihijddjkmehiocljcpc).
+Chris Wanstrath of Err the Blog (hey that’s me!) just posted an article covering some [tasty GitHub tidbits](http://errtheblog.com/posts/89-huba-huba). Range highlighting, key shortcuts, keeping dotfiles in git, and the [GitHub gem](http://github.com/defunkt/github-gem) are covered.
 
-img <http://img.skitch.com/20100127-nxct1q4y315uwen8nr6w896upk.png> <http://chrome.google.com/extensions/detail/ekibhngllckenihijddjkmehiocljcpc>
-
-Pretty cool – I’ve been using it since I first saw it. And if you’re looking for more UserScripts, @NV has also released a [github-live-preview](http://github.com/NV/github-live-preview).
+Enjoy.
 
 ## Written by
 
@@ -3566,11 +3775,13 @@ Pretty cool – I’ve been using it since I first saw it. And if you’re looki
 In March, we experienced four incidents that resulted in degraded performance across GitHub services.
 
 [Company news](https://github.blog/news-insights/company-news/)
+
+### [GitHub Universe is back: We want you to take the stage](https://github.blog/news-insights/company-news/github-universe-is-back-we-want-you-to-take-the-stage/)
 ```
 
 **crawl4ai**
 ```
-[ Skip to content ](https://github.blog/news-insights/the-library/diff-your-gist/#start-of-content) [ Skip to sidebar ](https://github.blog/news-insights/the-library/diff-your-gist/#sidebar)
+[ Skip to content ](https://github.blog/news-insights/the-library/tasty-tidbits/#start-of-content) [ Skip to sidebar ](https://github.blog/news-insights/the-library/tasty-tidbits/#sidebar)
 [ ](https://github.com) / [ Blog](https://github.blog/)
   * [Changelog](https://github.blog/changelog/)
   * [Docs](https://docs.github.com/)
@@ -3614,7 +3825,7 @@ Learn more
 
 **crawl4ai-raw**
 ```
-[ Skip to content ](https://github.blog/news-insights/the-library/diff-your-gist/#start-of-content) [ Skip to sidebar ](https://github.blog/news-insights/the-library/diff-your-gist/#sidebar)
+[ Skip to content ](https://github.blog/news-insights/the-library/tasty-tidbits/#start-of-content) [ Skip to sidebar ](https://github.blog/news-insights/the-library/tasty-tidbits/#sidebar)
 [ ](https://github.com) / [ Blog](https://github.blog/)
   * [Changelog](https://github.blog/changelog/)
   * [Docs](https://docs.github.com/)
@@ -3660,24 +3871,22 @@ Learn more
 ```
 [Home](https://github.blog/) / [News & insights](https://github.blog/news-insights/) / [The library](https://github.blog/news-insights/the-library/)
 
-# Diff Your Gist
+# Tasty Tidbits
 
-@NV has ported ucnv’s Diff for Gist Greasemonkey script to a Chrome Extension. img http://img.skitch.com/20100127-nxct1q4y315uwen8nr6w896upk.png http://chrome.google.com/extensions/detail/ekibhngllckenihijddjkmehiocljcpc Pretty cool – I’ve been using it since I first saw it. And if…
+Chris Wanstrath of Err the Blog (hey that’s me!) just posted an article covering some tasty GitHub tidbits. Range highlighting, key shortcuts, keeping dotfiles in git, and the GitHub gem…
 
 [Chris Wanstrath](https://github.blog/author/defunkt/ "Posts by Chris Wanstrath")·[@defunkt](https://github.com/defunkt)
 
-January 27, 2010 
+May 11, 2008 
 |
 
 Updated January 4, 2019
 
 * Share:
 
-@NV has ported [ucnv’s](http://userscripts.org/users/ucnv) [Diff for Gist](http://userscripts.org/scripts/show/62706) Greasemonkey script to a [Chrome Extension](http://chrome.google.com/extensions/detail/ekibhngllckenihijddjkmehiocljcpc).
+Chris Wanstrath of Err the Blog (hey that’s me!) just posted an article covering some [tasty GitHub tidbits](http://errtheblog.com/posts/89-huba-huba). Range highlighting, key shortcuts, keeping dotfiles in git, and the [GitHub gem](http://github.com/defunkt/github-gem) are covered.
 
-img <http://img.skitch.com/20100127-nxct1q4y315uwen8nr6w896upk.png> <http://chrome.google.com/extensions/detail/ekibhngllckenihijddjkmehiocljcpc>
-
-Pretty cool – I’ve been using it since I first saw it. And if you’re looking for more UserScripts, @NV has also released a [github-live-preview](http://github.com/NV/github-live-preview).
+Enjoy.
 
 ## Written by
 
@@ -3698,11 +3907,13 @@ In March, we experienced four incidents that resulted in degraded performance ac
 [Company news](https://github.blog/news-insights/company-news/)
 
 ### [GitHub Universe is back: We want you to take the stage](https://github.blog/news-insights/company-news/github-universe-is-back-we-want-you-to-take-the-stage/)
+
+Get inspired by five of the most memorable, magical, and quirky Universe sessions to date.
 ```
 
 **crawlee**
 ```
-Diff Your Gist - The GitHub Blog
+Tasty Tidbits - The GitHub Blog
 
 
 
@@ -3716,9 +3927,9 @@ Diff Your Gist - The GitHub Blog
 
 
 
-{"@context":"https:\/\/schema.org","headline":"Diff Your Gist","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2010-01-27T20:54:21-08:00","abstract":"@NV has ported ucnv&#8217;s Diff for Gist Greasemonkey script to a Chrome Extension. img http:\/\/img.skitch.com\/20100127-nxct1q4y315uwen8nr6w896upk.png http:\/\/chrome.google.com\/extensions\/detail\/ekibhngllckenihijddjkmehiocljcpc Pretty cool &#8211; I&#8217;ve been using it since I first saw it. And if&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/diff-your-gist\/"},"@type":"TechArticle"}
-{"@context":"https:\/\/schema.org","headline":"Diff Your Gist","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2010-01-27T20:54:21-08:00","abstract":"@NV has ported ucnv&#8217;s Diff for Gist Greasemonkey script to a Chrome Extension. img http:\/\/img.skitch.com\/20100127-nxct1q4y315uwen8nr6w896upk.png http:\/\/chrome.google.com\/extensions\/detail\/ekibhngllckenihijddjkmehiocljcpc Pretty cool &#8211; I&#8217;ve been using it since I first saw it. And if&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/diff-your-gist\/"},"@type":"BlogPosting"}
-{"@context":"https:\/\/schema.org","@graph":[{"@type":"Article","@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/#article","isPartOf":{"@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/"},"author":[{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"}],"headline":"Diff Your Gist","datePublished":"2010-01-28T04:54:21+00:00","dateModified":"2019-01-04T16:40:55+00:00","mainEntityOfPage":{"@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/"},"wordCount":64,"articleSection":["News &amp; insights","The library"],"inLanguage":"en-US"},{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/","url":"https:\/\/github.blog\/news-insights\/diff-your-gist\/","name":"Diff Your Gist - The GitHub Blog","isPartOf":{"@id":"https:\/\/github.blog\/#website"},"datePublished":"2010-01-28T04:54:21+00:00","dateModified":"2019-01-04T16:40:55+00:00","author":{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"},"breadcrumb":{"@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/#breadcrumb"},"inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https:\/\/github.blog\/news-insights\/diff-your-gist\/"]}]},{"@type":"BreadcrumbList","@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https:\/\/github.blog\/"},{"@type":"ListItem","position":2,"name":"News &amp; insights","item":"https:\/\/github.blog\/news-insights\/"},{"@type":"ListItem","position":3,"name":"The library","item":"https:\/\/github.blog\/news-insights\/the-library\/"},{"@type":"ListItem","position":4,"name":"Diff Your Gist"}]},{"@type":"WebSite","@id":"https:\/\/github.blog\/#website","url":"https:\/\/github.blog\/","name":"The GitHub Blog","description":"Updates, ideas, and inspiration from GitHub to help developers build and design software.","potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/github.blog\/?s={search\_term\_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search\_term\_string"}}],"inLanguage":"en-US"},{"@type":"Person","@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d","name":"Chris Wanstrath","image":{"@type":"ImageObject","inLanguage":"en-US","@id":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g289c11bc82a60609a31604c4517156a7","url":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","contentUrl":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","caption":"Chris Wanstrath"},"sameAs":["http:\/\/chriswanstrath.com\/"],"url":"https:\/\/github.blog\/author\/defunkt\/"}]}
+{"@context":"https:\/\/schema.org","headline":"Tasty Tidbits","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2008-05-11T04:22:37-07:00","abstract":"Chris Wanstrath of Err the Blog (hey that&#8217;s me!) just posted an article covering some tasty GitHub tidbits. Range highlighting, key shortcuts, keeping dotfiles in git, and the GitHub gem&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/tasty-tidbits\/"},"@type":"TechArticle"}
+{"@context":"https:\/\/schema.org","headline":"Tasty Tidbits","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2008-05-11T04:22:37-07:00","abstract":"Chris Wanstrath of Err the Blog (hey that&#8217;s me!) just posted an article covering some tasty GitHub tidbits. Range highlighting, key shortcuts, keeping dotfiles in git, and the GitHub gem&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/tasty-tidbits\/"},"@type":"BlogPosting"}
+{"@context":"https:\/\/schema.org","@graph":[{"@type":"Article","@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/#article","isPartOf":{"@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/"},"author":[{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"}],"headline":"Tasty Tidbits","datePublished":"2008-05-11T11:22:37+00:00","dateModified":"2019-01-04T16:41:06+00:00","mainEntityOfPage":{"@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/"},"wordCount":36,"articleSection":["News &amp; insights","The library"],"inLanguage":"en-US"},{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/","url":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/","name":"Tasty Tidbits - The GitHub Blog","isPartOf":{"@id":"https:\/\/github.blog\/#website"},"datePublished":"2008-05-11T11:22:37+00:00","dateModified":"2019-01-04T16:41:06+00:00","author":{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"},"breadcrumb":{"@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/#breadcrumb"},"inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https:\/\/github.blog\/news-insights\/tasty-tidbits\/"]}]},{"@type":"BreadcrumbList","@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https:\/\/github.blog\/"},{"@type":"ListItem","position":2,"name":"News &amp; insights","item":"https:\/\/github.blog\/news-insights\/"},{"@type":"ListItem","position":3,"name":"The library","item":"https:\/\/github.blog\/news-insights\/the-library\/"},{"@type":"ListItem","position":4,"name":"Tasty Tidbits"}]},{"@type":"WebSite","@id":"https:\/\/github.blog\/#website","url":"https:\/\/github.blog\/","name":"The GitHub Blog","description":"Updates, ideas, and inspiration from GitHub to help developers build and design software.","potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/github.blog\/?s={search\_term\_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search\_term\_string"}}],"inLanguage":"en-US"},{"@type":"Person","@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d","name":"Chris Wanstrath","image":{"@type":"ImageObject","inLanguage":"en-US","@id":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g289c11bc82a60609a31604c4517156a7","url":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","contentUrl":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","caption":"Chris Wanstrath"},"sameAs":["http:\/\/chriswanstrath.com\/"],"url":"https:\/\/github.blog\/author\/defunkt\/"}]}
 
 
 
@@ -3746,7 +3957,7 @@ vertical-align: -0.1em !important;
 
 **colly+md**
 ```
-Diff Your Gist - The GitHub Blog
+Tasty Tidbits - The GitHub Blog
 
 
 
@@ -3760,9 +3971,9 @@ Diff Your Gist - The GitHub Blog
 
 
 
-{"@context":"https:\/\/schema.org","headline":"Diff Your Gist","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2010-01-27T20:54:21-08:00","abstract":"@NV has ported ucnv&#8217;s Diff for Gist Greasemonkey script to a Chrome Extension. img http:\/\/img.skitch.com\/20100127-nxct1q4y315uwen8nr6w896upk.png http:\/\/chrome.google.com\/extensions\/detail\/ekibhngllckenihijddjkmehiocljcpc Pretty cool &#8211; I&#8217;ve been using it since I first saw it. And if&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/diff-your-gist\/"},"@type":"TechArticle"}
-{"@context":"https:\/\/schema.org","headline":"Diff Your Gist","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2010-01-27T20:54:21-08:00","abstract":"@NV has ported ucnv&#8217;s Diff for Gist Greasemonkey script to a Chrome Extension. img http:\/\/img.skitch.com\/20100127-nxct1q4y315uwen8nr6w896upk.png http:\/\/chrome.google.com\/extensions\/detail\/ekibhngllckenihijddjkmehiocljcpc Pretty cool &#8211; I&#8217;ve been using it since I first saw it. And if&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/diff-your-gist\/"},"@type":"BlogPosting"}
-{"@context":"https:\/\/schema.org","@graph":[{"@type":"Article","@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/#article","isPartOf":{"@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/"},"author":[{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"}],"headline":"Diff Your Gist","datePublished":"2010-01-28T04:54:21+00:00","dateModified":"2019-01-04T16:40:55+00:00","mainEntityOfPage":{"@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/"},"wordCount":64,"articleSection":["News &amp; insights","The library"],"inLanguage":"en-US"},{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/","url":"https:\/\/github.blog\/news-insights\/diff-your-gist\/","name":"Diff Your Gist - The GitHub Blog","isPartOf":{"@id":"https:\/\/github.blog\/#website"},"datePublished":"2010-01-28T04:54:21+00:00","dateModified":"2019-01-04T16:40:55+00:00","author":{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"},"breadcrumb":{"@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/#breadcrumb"},"inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https:\/\/github.blog\/news-insights\/diff-your-gist\/"]}]},{"@type":"BreadcrumbList","@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https:\/\/github.blog\/"},{"@type":"ListItem","position":2,"name":"News &amp; insights","item":"https:\/\/github.blog\/news-insights\/"},{"@type":"ListItem","position":3,"name":"The library","item":"https:\/\/github.blog\/news-insights\/the-library\/"},{"@type":"ListItem","position":4,"name":"Diff Your Gist"}]},{"@type":"WebSite","@id":"https:\/\/github.blog\/#website","url":"https:\/\/github.blog\/","name":"The GitHub Blog","description":"Updates, ideas, and inspiration from GitHub to help developers build and design software.","potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/github.blog\/?s={search\_term\_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search\_term\_string"}}],"inLanguage":"en-US"},{"@type":"Person","@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d","name":"Chris Wanstrath","image":{"@type":"ImageObject","inLanguage":"en-US","@id":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g289c11bc82a60609a31604c4517156a7","url":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","contentUrl":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","caption":"Chris Wanstrath"},"sameAs":["http:\/\/chriswanstrath.com\/"],"url":"https:\/\/github.blog\/author\/defunkt\/"}]}
+{"@context":"https:\/\/schema.org","headline":"Tasty Tidbits","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2008-05-11T04:22:37-07:00","abstract":"Chris Wanstrath of Err the Blog (hey that&#8217;s me!) just posted an article covering some tasty GitHub tidbits. Range highlighting, key shortcuts, keeping dotfiles in git, and the GitHub gem&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/tasty-tidbits\/"},"@type":"TechArticle"}
+{"@context":"https:\/\/schema.org","headline":"Tasty Tidbits","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2008-05-11T04:22:37-07:00","abstract":"Chris Wanstrath of Err the Blog (hey that&#8217;s me!) just posted an article covering some tasty GitHub tidbits. Range highlighting, key shortcuts, keeping dotfiles in git, and the GitHub gem&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/tasty-tidbits\/"},"@type":"BlogPosting"}
+{"@context":"https:\/\/schema.org","@graph":[{"@type":"Article","@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/#article","isPartOf":{"@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/"},"author":[{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"}],"headline":"Tasty Tidbits","datePublished":"2008-05-11T11:22:37+00:00","dateModified":"2019-01-04T16:41:06+00:00","mainEntityOfPage":{"@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/"},"wordCount":36,"articleSection":["News &amp; insights","The library"],"inLanguage":"en-US"},{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/","url":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/","name":"Tasty Tidbits - The GitHub Blog","isPartOf":{"@id":"https:\/\/github.blog\/#website"},"datePublished":"2008-05-11T11:22:37+00:00","dateModified":"2019-01-04T16:41:06+00:00","author":{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"},"breadcrumb":{"@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/#breadcrumb"},"inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https:\/\/github.blog\/news-insights\/tasty-tidbits\/"]}]},{"@type":"BreadcrumbList","@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https:\/\/github.blog\/"},{"@type":"ListItem","position":2,"name":"News &amp; insights","item":"https:\/\/github.blog\/news-insights\/"},{"@type":"ListItem","position":3,"name":"The library","item":"https:\/\/github.blog\/news-insights\/the-library\/"},{"@type":"ListItem","position":4,"name":"Tasty Tidbits"}]},{"@type":"WebSite","@id":"https:\/\/github.blog\/#website","url":"https:\/\/github.blog\/","name":"The GitHub Blog","description":"Updates, ideas, and inspiration from GitHub to help developers build and design software.","potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/github.blog\/?s={search\_term\_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search\_term\_string"}}],"inLanguage":"en-US"},{"@type":"Person","@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d","name":"Chris Wanstrath","image":{"@type":"ImageObject","inLanguage":"en-US","@id":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g289c11bc82a60609a31604c4517156a7","url":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","contentUrl":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","caption":"Chris Wanstrath"},"sameAs":["http:\/\/chriswanstrath.com\/"],"url":"https:\/\/github.blog\/author\/defunkt\/"}]}
 
 
 
@@ -3790,7 +4001,7 @@ vertical-align: -0.1em !important;
 
 **playwright**
 ```
-Diff Your Gist - The GitHub Blog
+Tasty Tidbits - The GitHub Blog
 
 
 
@@ -3804,9 +4015,9 @@ Diff Your Gist - The GitHub Blog
 
 
 
-{"@context":"https:\/\/schema.org","headline":"Diff Your Gist","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2010-01-27T20:54:21-08:00","abstract":"@NV has ported ucnv&#8217;s Diff for Gist Greasemonkey script to a Chrome Extension. img http:\/\/img.skitch.com\/20100127-nxct1q4y315uwen8nr6w896upk.png http:\/\/chrome.google.com\/extensions\/detail\/ekibhngllckenihijddjkmehiocljcpc Pretty cool &#8211; I&#8217;ve been using it since I first saw it. And if&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/diff-your-gist\/"},"@type":"TechArticle"}
-{"@context":"https:\/\/schema.org","headline":"Diff Your Gist","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2010-01-27T20:54:21-08:00","abstract":"@NV has ported ucnv&#8217;s Diff for Gist Greasemonkey script to a Chrome Extension. img http:\/\/img.skitch.com\/20100127-nxct1q4y315uwen8nr6w896upk.png http:\/\/chrome.google.com\/extensions\/detail\/ekibhngllckenihijddjkmehiocljcpc Pretty cool &#8211; I&#8217;ve been using it since I first saw it. And if&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/diff-your-gist\/"},"@type":"BlogPosting"}
-{"@context":"https:\/\/schema.org","@graph":[{"@type":"Article","@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/#article","isPartOf":{"@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/"},"author":[{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"}],"headline":"Diff Your Gist","datePublished":"2010-01-28T04:54:21+00:00","dateModified":"2019-01-04T16:40:55+00:00","mainEntityOfPage":{"@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/"},"wordCount":64,"articleSection":["News &amp; insights","The library"],"inLanguage":"en-US"},{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/","url":"https:\/\/github.blog\/news-insights\/diff-your-gist\/","name":"Diff Your Gist - The GitHub Blog","isPartOf":{"@id":"https:\/\/github.blog\/#website"},"datePublished":"2010-01-28T04:54:21+00:00","dateModified":"2019-01-04T16:40:55+00:00","author":{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"},"breadcrumb":{"@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/#breadcrumb"},"inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https:\/\/github.blog\/news-insights\/diff-your-gist\/"]}]},{"@type":"BreadcrumbList","@id":"https:\/\/github.blog\/news-insights\/diff-your-gist\/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https:\/\/github.blog\/"},{"@type":"ListItem","position":2,"name":"News &amp; insights","item":"https:\/\/github.blog\/news-insights\/"},{"@type":"ListItem","position":3,"name":"The library","item":"https:\/\/github.blog\/news-insights\/the-library\/"},{"@type":"ListItem","position":4,"name":"Diff Your Gist"}]},{"@type":"WebSite","@id":"https:\/\/github.blog\/#website","url":"https:\/\/github.blog\/","name":"The GitHub Blog","description":"Updates, ideas, and inspiration from GitHub to help developers build and design software.","potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/github.blog\/?s={search\_term\_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search\_term\_string"}}],"inLanguage":"en-US"},{"@type":"Person","@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d","name":"Chris Wanstrath","image":{"@type":"ImageObject","inLanguage":"en-US","@id":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g289c11bc82a60609a31604c4517156a7","url":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","contentUrl":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","caption":"Chris Wanstrath"},"sameAs":["http:\/\/chriswanstrath.com\/"],"url":"https:\/\/github.blog\/author\/defunkt\/"}]}
+{"@context":"https:\/\/schema.org","headline":"Tasty Tidbits","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2008-05-11T04:22:37-07:00","abstract":"Chris Wanstrath of Err the Blog (hey that&#8217;s me!) just posted an article covering some tasty GitHub tidbits. Range highlighting, key shortcuts, keeping dotfiles in git, and the GitHub gem&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/tasty-tidbits\/"},"@type":"TechArticle"}
+{"@context":"https:\/\/schema.org","headline":"Tasty Tidbits","author":{"@type":"Person","name":"Chris Wanstrath"},"datePublished":"2008-05-11T04:22:37-07:00","abstract":"Chris Wanstrath of Err the Blog (hey that&#8217;s me!) just posted an article covering some tasty GitHub tidbits. Range highlighting, key shortcuts, keeping dotfiles in git, and the GitHub gem&hellip;","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/the-library\/tasty-tidbits\/"},"@type":"BlogPosting"}
+{"@context":"https:\/\/schema.org","@graph":[{"@type":"Article","@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/#article","isPartOf":{"@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/"},"author":[{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"}],"headline":"Tasty Tidbits","datePublished":"2008-05-11T11:22:37+00:00","dateModified":"2019-01-04T16:41:06+00:00","mainEntityOfPage":{"@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/"},"wordCount":36,"articleSection":["News &amp; insights","The library"],"inLanguage":"en-US"},{"@type":"WebPage","@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/","url":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/","name":"Tasty Tidbits - The GitHub Blog","isPartOf":{"@id":"https:\/\/github.blog\/#website"},"datePublished":"2008-05-11T11:22:37+00:00","dateModified":"2019-01-04T16:41:06+00:00","author":{"@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d"},"breadcrumb":{"@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/#breadcrumb"},"inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https:\/\/github.blog\/news-insights\/tasty-tidbits\/"]}]},{"@type":"BreadcrumbList","@id":"https:\/\/github.blog\/news-insights\/tasty-tidbits\/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https:\/\/github.blog\/"},{"@type":"ListItem","position":2,"name":"News &amp; insights","item":"https:\/\/github.blog\/news-insights\/"},{"@type":"ListItem","position":3,"name":"The library","item":"https:\/\/github.blog\/news-insights\/the-library\/"},{"@type":"ListItem","position":4,"name":"Tasty Tidbits"}]},{"@type":"WebSite","@id":"https:\/\/github.blog\/#website","url":"https:\/\/github.blog\/","name":"The GitHub Blog","description":"Updates, ideas, and inspiration from GitHub to help developers build and design software.","potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/github.blog\/?s={search\_term\_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search\_term\_string"}}],"inLanguage":"en-US"},{"@type":"Person","@id":"https:\/\/github.blog\/#\/schema\/person\/159f1a6ddb285af554ae75915884730d","name":"Chris Wanstrath","image":{"@type":"ImageObject","inLanguage":"en-US","@id":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g289c11bc82a60609a31604c4517156a7","url":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","contentUrl":"https:\/\/secure.gravatar.com\/avatar\/33666dec44de96b88e8c117b8c17efe29a62dacd06c4abf72cf969a74775381a?s=96&d=mm&r=g","caption":"Chris Wanstrath"},"sameAs":["http:\/\/chriswanstrath.com\/"],"url":"https:\/\/github.blog\/author\/defunkt\/"}]}
 
 
 
@@ -3837,9 +4048,9 @@ vertical-align: -0.1em !important;
 </details>
 
 <details>
-<summary>Per-page word counts and preamble [1]</summary>
+<summary>Per-page word counts and preamble [2]</summary>
 
-| URL | markcrawl words / preamble [1] | crawl4ai words / preamble [1] | crawl4ai-raw words / preamble [1] | scrapy+md words / preamble [1] | crawlee words / preamble [1] | colly+md words / preamble [1] | playwright words / preamble [1] | firecrawl words / preamble [1] |
+| URL | markcrawl words [6] / preamble [2] | crawl4ai words [6] / preamble [2] | crawl4ai-raw words [6] / preamble [2] | scrapy+md words [6] / preamble [2] | crawlee words [6] / preamble [2] | colly+md words [6] / preamble [2] | playwright words [6] / preamble [2] | firecrawl words [6] / preamble [2] |
 |---|---|---|---|---|---|---|---|---|
 | github.blog/engineering/architecture-optimization/intro | 2215 / 37 | 3900 / 697 | 3900 / 697 | 2211 / 7 | 5052 / 1847 | 4563 / 1449 | 5052 / 1847 | — |
 | github.blog/engineering/engineering-principles/move-fas | 4027 / 36 | 5717 / 697 | 5717 / 697 | 4023 / 6 | 7390 / 2372 | — | 6882 / 1865 | — |

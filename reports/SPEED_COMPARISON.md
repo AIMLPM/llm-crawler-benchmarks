@@ -3,7 +3,7 @@
 
 **markcrawl** is the fastest crawler at 14.0 pages/sec overall, followed by scrapy+md (9.3 p/s).
 
-Generated: 2026-04-13 09:31:34 UTC
+Generated: 2026-04-13 10:30:28 UTC
 
 ## Methodology
 
@@ -41,7 +41,7 @@ See [METHODOLOGY.md](METHODOLOGY.md) for full methodology.
 
 Max pages: 15
 
-| Tool | Pages | Time (s) | Pages/sec | Avg words | Output KB |
+| Tool | Pages (a) | Time (b) | Pages/sec [3] | Avg words [1] | Output KB [2] |
 |---|---|---|---|---|---|
 | **markcrawl** | 15 | 3.6 | 4.2 | 199 | 19 |
 | crawl4ai | 15 | 5.0 | 3.0 | 242 | 42 |
@@ -55,7 +55,7 @@ Max pages: 15
 
 Max pages: 60
 
-| Tool | Pages | Time (s) | Pages/sec | Avg words | Output KB |
+| Tool | Pages (a) | Time (b) | Pages/sec [3] | Avg words [1] | Output KB [2] |
 |---|---|---|---|---|---|
 | **markcrawl** | 60 | 4.2 | 14.3 | 339 | 155 |
 | crawl4ai | 60 | 11.4 | 5.3 | 493 | 482 |
@@ -69,7 +69,7 @@ Max pages: 60
 
 Max pages: 500
 
-| Tool | Pages | Time (s) | Pages/sec | Avg words | Output KB |
+| Tool | Pages (a) | Time (b) | Pages/sec [3] | Avg words [1] | Output KB [2] |
 |---|---|---|---|---|---|
 | **markcrawl** | 153 | 11.4 | 13.4 | 2084 | 2952 |
 | crawl4ai | 153 | 90.4 | 1.7 | 3519 | 6537 |
@@ -83,7 +83,7 @@ Max pages: 500
 
 Max pages: 500
 
-| Tool | Pages | Time (s) | Pages/sec | Avg words | Output KB |
+| Tool | Pages (a) | Time (b) | Pages/sec [3] | Avg words [1] | Output KB [2] |
 |---|---|---|---|---|---|
 | **markcrawl** | 500 | 22.1 | 22.7 | 3766 | 19103 |
 | crawl4ai | 500 | 131.0 | 3.9 | 4180 | 26207 |
@@ -97,7 +97,7 @@ Max pages: 500
 
 Max pages: 500
 
-| Tool | Pages | Time (s) | Pages/sec | Avg words | Output KB |
+| Tool | Pages (a) | Time (b) | Pages/sec [3] | Avg words [1] | Output KB [2] |
 |---|---|---|---|---|---|
 | **markcrawl** | 221 | 8.4 | 26.3 | 1559 | 2711 |
 | crawl4ai | 221 | 109.7 | 2.0 | 2277 | 5678 |
@@ -111,7 +111,7 @@ Max pages: 500
 
 Max pages: 50
 
-| Tool | Pages | Time (s) | Pages/sec | Avg words | Output KB |
+| Tool | Pages (a) | Time (b) | Pages/sec [3] | Avg words [1] | Output KB [2] |
 |---|---|---|---|---|---|
 | **markcrawl** | 50 | 6.7 | 7.5 | 3417 | 1848 |
 | crawl4ai | 50 | 41.7 | 1.2 | 5106 | 3664 |
@@ -125,7 +125,7 @@ Max pages: 50
 
 Max pages: 500
 
-| Tool | Pages | Time (s) | Pages/sec | Avg words | Output KB |
+| Tool | Pages (a) | Time (b) | Pages/sec [3] | Avg words [1] | Output KB [2] |
 |---|---|---|---|---|---|
 | **markcrawl** | 257 | 35.7 | 7.2 | 1165 | 2100 |
 | crawl4ai | 257 | 268.5 | 1.0 | 1372 | 3605 |
@@ -139,7 +139,7 @@ Max pages: 500
 
 Max pages: 200
 
-| Tool | Pages | Time (s) | Pages/sec | Avg words | Output KB |
+| Tool | Pages (a) | Time (b) | Pages/sec [3] | Avg words [1] | Output KB [2] |
 |---|---|---|---|---|---|
 | **markcrawl** | 200 | 11.7 | 17.5 | 667 | 1064 |
 | crawl4ai | 200 | 58.9 | 3.4 | 2301 | 5266 |
@@ -149,9 +149,14 @@ Max pages: 200
 | colly+md | 124 | 28.9 | 4.4 | 3048 | 7229 |
 | playwright | 200 | 40.2 | 5.0 | 3584 | 14500 |
 
+> **Column definitions:** **Pages (a)** = total pages fetched from the site (identical URL list for all tools).
+> **Time (b)** = wall-clock seconds to fetch and convert all pages (median of 3 iterations).
+> **[3] Pages/sec** = median throughput across 3 iterations. Approximately a÷b; small differences arise because each column is an independent median.
+> **[1] Avg words** = mean words per page. **[2] Output KB** = total Markdown output size across all pages.
+
 ## Overall summary
 
-| Tool | Total pages | Total time (s) | Avg pages/sec | Notes |
+| Tool | Total pages (a) | Total time (b) | Avg pages/sec (a÷b) | Notes |
 |---|---|---|---|---|
 | **markcrawl** | 1456 | 103.9 | 14.0 | |
 | crawl4ai | 1456 | 716.4 | 2.0 | |
@@ -160,6 +165,9 @@ Max pages: 200
 | crawlee | 1456 | 806.2 | 1.8 | |
 | colly+md | 1376 | 209.3 | 6.6 | |
 | playwright | 1448 | 692.8 | 2.1 | |
+
+> **Column definitions:** **Total pages (a)** = sum of pages fetched across all sites.
+> **Total time (b)** = sum of median wall-clock times across all sites. **Avg pages/sec (a÷b)** = overall throughput.
 
 > **Note on variance:** These benchmarks fetch pages from live public websites.
 > Network conditions, server load, and CDN caching can cause significant

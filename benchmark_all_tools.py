@@ -1059,15 +1059,15 @@ def generate_comparison_report(
 
     for site_name, site_config in COMPARISON_SITES.items():
         # Build header dynamically based on available data
-        header = "| Tool | Pages | Time (s) |"
+        header = "| Tool | Pages (a) | Time (b) |"
         sep = "|---|---|---|"
         if has_stddev:
             header += " Std dev |"
             sep += "---|"
-        header += " Pages/sec | Avg words | Output KB |"
+        header += " Pages/sec [3] | Avg words [1] | Output KB [2] |"
         sep += "---|---|---|"
         if has_peak_mem:
-            header += " Peak MB |"
+            header += " Peak MB [3] |"
             sep += "---|"
 
         lines.extend([
@@ -1101,8 +1101,29 @@ def generate_comparison_report(
 
         lines.append("")
 
+    # Column legend for per-site tables (printed once after all sites)
+    from report_utils import table_legend
+    legend_cols = [
+        ("Pages (a)", "total pages fetched from the site (identical URL list for all tools)"),
+        ("Time (b)", "wall-clock seconds to fetch and convert all pages (median of 3 iterations)"),
+        ("[3] Pages/sec", "median throughput across iterations. Approximately a÷b; small differences arise because each column is an independent median"),
+        ("[1] Avg words", "mean words per page"),
+        ("[2] Output KB", "total Markdown output size across all pages"),
+    ]
+    if has_stddev:
+        legend_cols.append(("Std dev", "standard deviation of Time across iterations"))
+    if has_peak_mem:
+        legend_cols.append(("[3] Peak MB", "peak resident memory (RSS) during crawl"))
+    lines.extend(table_legend(legend_cols))
+    lines.append("")
+
     # Overall summary
-    lines.extend(["## Overall summary", "", "| Tool | Total pages | Total time (s) | Avg pages/sec | Notes |", "|---|---|---|---|---|"])
+    lines.extend([
+        "## Overall summary",
+        "",
+        "| Tool | Total pages (a) | Total time (b) | Avg pages/sec (a÷b) | Notes |",
+        "|---|---|---|---|---|",
+    ])
 
     total_sites = len(COMPARISON_SITES)
     for tool in available_tools:
@@ -1121,6 +1142,12 @@ def generate_comparison_report(
         lines.append(f"| {tool_label} | {total_pages:.0f} | {total_time:.1f} | {avg_pps:.1f} |{note} |")
 
     lines.extend([
+        "",
+        *table_legend([
+            ("Total pages (a)", "sum of pages fetched across all sites"),
+            ("Total time (b)", "sum of median wall-clock times across all sites"),
+            ("Avg pages/sec (a÷b)", "overall throughput"),
+        ]),
         "",
         "> **Note on variance:** These benchmarks fetch pages from live public websites.",
         "> Network conditions, server load, and CDN caching can cause significant",

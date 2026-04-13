@@ -1485,6 +1485,8 @@ Hit rate = correct source page in top-K results. Higher is better.
 
 </details>
 
+> **Column definitions:** **Hit@K** = percentage of queries where the correct source page appeared in the top K results (shown as % with raw counts and Wilson 95% CI). **MRR** (Mean Reciprocal Rank) = average of 1/rank for correct results (1.0 = always rank 1). **Mode** = retrieval strategy (embedding, BM25, hybrid, reranked). **Chunks** = total text chunks for this tool. **Avg words** = mean words per chunk.
+
 ## Methodology
 
 - **Queries:** 92 across 8 sites (verified against crawled pages)
