@@ -707,6 +707,14 @@ def main():
         f.write(report)
     logger.info(f"Report saved to: {output_path}")
 
+    # Post-generation validation
+    from lint_reports import lint_file
+    lint_warnings = lint_file(output_path)
+    if lint_warnings:
+        logger.warning("Post-generation lint found %d issue(s):", len(lint_warnings))
+        for w in lint_warnings:
+            logger.warning("  - %s", w)
+
     # Also save raw timings as JSON
     json_path = run_dir / "pipeline_timings.json"
     raw_data = {

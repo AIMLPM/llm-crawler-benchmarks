@@ -1091,6 +1091,25 @@ def generate_comparison_report(
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(report)
+
+    # Post-generation validation: run lint checks on the generated report
+    from lint_reports import lint_file
+    from pathlib import Path
+    lint_warnings = lint_file(Path(output_path))
+    if lint_warnings:
+        logger.warning("Post-generation lint found %d issue(s):", len(lint_warnings))
+        for w in lint_warnings:
+            logger.warning("  - %s", w)
+        # Empty data tables are a critical error — the report is broken
+        empty_table_warnings = [w for w in lint_warnings if "has no data" in w]
+        if empty_table_warnings:
+            logger.error(
+                "CRITICAL: %d section(s) have empty data tables! "
+                "The report has missing benchmark results. "
+                "Re-run the benchmark for the affected sites.",
+                len(empty_table_warnings),
+            )
+
     return report
 
 

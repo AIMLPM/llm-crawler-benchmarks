@@ -522,6 +522,15 @@ def generate_report(results: List[SiteResult], output_path: str) -> str:
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(report)
 
+    # Post-generation validation
+    from lint_reports import lint_file
+    from pathlib import Path as _Path
+    lint_warnings = lint_file(_Path(output_path))
+    if lint_warnings:
+        logger.warning("Post-generation lint found %d issue(s):", len(lint_warnings))
+        for w in lint_warnings:
+            logger.warning("  - %s", w)
+
     return report
 
 

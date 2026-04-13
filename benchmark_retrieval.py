@@ -78,162 +78,149 @@ RRF_K = 60  # Reciprocal Rank Fusion constant
 #   - query text (what a user would ask)
 #   - expected URL substring (identifies the correct source page)
 #   - description (what the query tests)
+#   - category (query type for per-category analysis)
 #
-# ~50 total queries across 4 sites for statistical significance.
+# Categories:
+#   api-function   — looking up a specific API function, method, or endpoint
+#   code-example   — finding code samples or implementation patterns
+#   conceptual     — understanding a concept, architecture, or design pattern
+#   structured-data — querying structured/tabular content (prices, ratings, lists)
+#   factual-lookup — finding a specific fact, definition, or named entity
+#   cross-page     — answer requires content spread across multiple pages
+#   navigation     — finding an index, table of contents, or site structure
+#   js-rendered    — content that requires JS rendering to capture fully
+#
+# ~130 total queries across 8 sites.
 # All url_match values verified against actually-crawled pages.
 TEST_QUERIES: Dict[str, List[Dict]] = {
     "quotes-toscrape": [
         {
             "query": "What did Albert Einstein say about thinking and the world?",
-            "url_match": "quotes.toscrape.com",
-            "page_match": "einstein",
+            "url_match": "author/Albert-Einstein",
+            "page_match": "Albert-Einstein",
+            "category": "factual-lookup",
             "description": "Find a specific quote by author",
         },
         {
-            "query": "Which quotes are tagged with 'inspirational'?",
-            "url_match": "tag/inspirational",
-            "page_match": "inspirational",
-            "description": "Find content by tag",
-        },
-        {
-            "query": "What did Jane Austen say about novels and reading?",
-            "url_match": "author/Jane-Austen",
-            "page_match": "austen",
-            "description": "Find author-specific content",
-        },
-        {
-            "query": "What quotes are about the truth?",
-            "url_match": "tag/truth",
-            "page_match": "truth",
-            "description": "Find tag page for truth",
-        },
-        {
-            "query": "Which quotes are about humor and being funny?",
-            "url_match": "tag/humor",
-            "page_match": "humor",
-            "description": "Find humor tag page",
-        },
-        {
-            "query": "What did J.K. Rowling say about choices and abilities?",
-            "url_match": "author/J-K-Rowling",
-            "page_match": "rowling",
-            "description": "Find J.K. Rowling author page",
-        },
-        {
-            "query": "What quotes are tagged with 'change'?",
+            "query": "Which quotes are tagged with 'change'?",
             "url_match": "tag/change",
-            "page_match": "change",
+            "page_match": "tag/change",
+            "category": "cross-page",
             "description": "Find change tag page",
         },
         {
             "query": "What did Steve Martin say about sunshine?",
             "url_match": "author/Steve-Martin",
-            "page_match": "steve-martin",
+            "page_match": "Steve-Martin",
+            "category": "factual-lookup",
             "description": "Find Steve Martin author page",
-        },
-        {
-            "query": "Which quotes talk about believing in yourself?",
-            "url_match": "tag/be-yourself",
-            "page_match": "be-yourself",
-            "description": "Find be-yourself tag page",
-        },
-        {
-            "query": "What are the quotes about miracles and living life?",
-            "url_match": "tag/miracle",
-            "page_match": "miracle",
-            "description": "Find miracle tag page",
         },
         {
             "query": "What quotes are about thinking deeply?",
             "url_match": "tag/thinking",
-            "page_match": "thinking",
+            "page_match": "tag/thinking",
+            "category": "cross-page",
             "description": "Find thinking tag page",
         },
         {
-            "query": "What quotes talk about living life fully?",
-            "url_match": "tag/live",
-            "page_match": "live",
-            "description": "Find live tag page",
+            "query": "What did Eleanor Roosevelt say about life?",
+            "url_match": "author/Eleanor-Roosevelt",
+            "page_match": "Eleanor-Roosevelt",
+            "category": "factual-lookup",
+            "description": "Find Eleanor Roosevelt author page",
+        },
+        {
+            "query": "Which quotes are tagged about choices and abilities?",
+            "url_match": "tag/abilities",
+            "page_match": "tag/abilities",
+            "category": "cross-page",
+            "description": "Find abilities tag page",
+        },
+        {
+            "query": "What quotes are about friendship?",
+            "url_match": "tag/friendship",
+            "page_match": "tag/friendship",
+            "category": "cross-page",
+            "description": "Find friendship tag page",
+        },
+        {
+            "query": "What are the quotes about love?",
+            "url_match": "tag/love",
+            "page_match": "tag/love",
+            "category": "cross-page",
+            "description": "Find love tag page",
         },
     ],
     "books-toscrape": [
         {
-            "query": "What books are available for under 20 pounds?",
-            "url_match": "books.toscrape.com",
-            "page_match": "",
-            "description": "Price-based product search",
-        },
-        {
             "query": "What mystery and thriller books are in the catalog?",
-            "url_match": "mystery",
+            "url_match": "category/books/mystery",
             "page_match": "mystery",
+            "category": "structured-data",
             "description": "Category-based search",
         },
         {
-            "query": "What is the rating of the most expensive book?",
-            "url_match": "books.toscrape.com",
-            "page_match": "",
-            "description": "Find specific product detail",
-        },
-        {
             "query": "What science fiction books are available?",
-            "url_match": "science-fiction",
+            "url_match": "category/books/science-fiction",
             "page_match": "science-fiction",
+            "category": "structured-data",
             "description": "Find science fiction category",
-        },
-        {
-            "query": "What horror books are in the catalog?",
-            "url_match": "horror",
-            "page_match": "horror",
-            "description": "Find horror category",
-        },
-        {
-            "query": "What poetry books can I find?",
-            "url_match": "poetry",
-            "page_match": "poetry",
-            "description": "Find poetry category",
-        },
-        {
-            "query": "What romance novels are available?",
-            "url_match": "romance",
-            "page_match": "romance",
-            "description": "Find romance category",
-        },
-        {
-            "query": "What history books are in the collection?",
-            "url_match": "history",
-            "page_match": "history",
-            "description": "Find history category",
-        },
-        {
-            "query": "What philosophy books are available to read?",
-            "url_match": "philosophy",
-            "page_match": "philosophy",
-            "description": "Find philosophy category",
-        },
-        {
-            "query": "What humor and comedy books can I find?",
-            "url_match": "humor",
-            "page_match": "humor",
-            "description": "Find humor category",
-        },
-        {
-            "query": "What fantasy books are in the bookstore?",
-            "url_match": "fantasy",
-            "page_match": "fantasy",
-            "description": "Find fantasy category",
         },
         {
             "query": "What is the book Sharp Objects about?",
             "url_match": "sharp-objects",
             "page_match": "sharp-objects",
+            "category": "factual-lookup",
             "description": "Find specific book page",
         },
         {
             "query": "What biography books are in the catalog?",
-            "url_match": "biography",
+            "url_match": "category/books/biography",
             "page_match": "biography",
+            "category": "structured-data",
             "description": "Find biography category",
+        },
+        {
+            "query": "What horror books are in the catalog?",
+            "url_match": "category/books/horror",
+            "page_match": "horror",
+            "category": "structured-data",
+            "description": "Find horror category",
+        },
+        {
+            "query": "What poetry books can I find?",
+            "url_match": "category/books/poetry",
+            "page_match": "poetry",
+            "category": "structured-data",
+            "description": "Find poetry category",
+        },
+        {
+            "query": "What fantasy books are in the bookstore?",
+            "url_match": "category/books/fantasy",
+            "page_match": "fantasy",
+            "category": "structured-data",
+            "description": "Find fantasy category",
+        },
+        {
+            "query": "What philosophy books are available to read?",
+            "url_match": "category/books/philosophy",
+            "page_match": "philosophy",
+            "category": "structured-data",
+            "description": "Find philosophy category",
+        },
+        {
+            "query": "What is the book Sapiens about?",
+            "url_match": "sapiens",
+            "page_match": "sapiens",
+            "category": "factual-lookup",
+            "description": "Find specific book page",
+        },
+        {
+            "query": "What romance novels are available?",
+            "url_match": "category/books/romance",
+            "page_match": "romance",
+            "category": "structured-data",
+            "description": "Find romance category",
         },
     ],
     "fastapi-docs": [
@@ -241,414 +228,648 @@ TEST_QUERIES: Dict[str, List[Dict]] = {
             "query": "How do I add authentication to a FastAPI endpoint?",
             "url_match": "security",
             "page_match": "security",
-            "description": "Find conceptual/tutorial content",
-        },
-        {
-            "query": "What is the default response status code in FastAPI?",
-            "url_match": "fastapi",
-            "page_match": "response",
-            "description": "Find specific technical detail",
+            "category": "api-function",
+            "description": "Find security/auth tutorial",
         },
         {
             "query": "How do I define query parameters in the FastAPI reference?",
             "url_match": "reference/fastapi",
             "page_match": "reference",
+            "category": "api-function",
             "description": "Find API reference content",
         },
         {
             "query": "How does FastAPI handle JSON encoding and base64 bytes?",
             "url_match": "json-base64-bytes",
             "page_match": "json-base64",
+            "category": "code-example",
             "description": "Find advanced encoding content",
-        },
-        {
-            "query": "What Python types does FastAPI support for request bodies?",
-            "url_match": "body",
-            "page_match": "body",
-            "description": "Find reference content",
         },
         {
             "query": "How do I use OAuth2 with password flow in FastAPI?",
             "url_match": "simple-oauth2",
             "page_match": "oauth2",
-            "description": "Find OAuth2 tutorial",
+            "category": "code-example",
+            "description": "Find OAuth2 tutorial with code",
         },
         {
             "query": "How do I use WebSockets in FastAPI?",
             "url_match": "websockets",
             "page_match": "websocket",
+            "category": "api-function",
             "description": "Find WebSocket documentation",
-        },
-        {
-            "query": "How do I stream data responses in FastAPI?",
-            "url_match": "stream-data",
-            "page_match": "stream",
-            "description": "Find streaming documentation",
-        },
-        {
-            "query": "How do I return additional response types in FastAPI?",
-            "url_match": "additional-responses",
-            "page_match": "additional-response",
-            "description": "Find additional responses docs",
-        },
-        {
-            "query": "How do I write async tests for FastAPI applications?",
-            "url_match": "async-tests",
-            "page_match": "async-test",
-            "description": "Find testing documentation",
         },
         {
             "query": "How do I define nested Pydantic models for request bodies?",
             "url_match": "body-nested-models",
             "page_match": "body-nested",
+            "category": "code-example",
             "description": "Find nested model tutorial",
-        },
-        {
-            "query": "How do I handle startup and shutdown events in FastAPI?",
-            "url_match": "events",
-            "page_match": "event",
-            "description": "Find lifecycle events docs",
         },
         {
             "query": "How do I use middleware in FastAPI?",
             "url_match": "middleware",
             "page_match": "middleware",
+            "category": "api-function",
             "description": "Find middleware reference",
-        },
-        {
-            "query": "How do I use Jinja2 templates in FastAPI?",
-            "url_match": "templating",
-            "page_match": "templat",
-            "description": "Find templating reference",
         },
         {
             "query": "How do I deploy FastAPI to the cloud?",
             "url_match": "deployment",
             "page_match": "deploy",
+            "category": "conceptual",
             "description": "Find deployment documentation",
+        },
+        {
+            "query": "How do I handle file uploads in FastAPI?",
+            "url_match": "request-files",
+            "page_match": "request-files",
+            "category": "api-function",
+            "description": "Find file upload tutorial",
+        },
+        {
+            "query": "How do I write async tests for FastAPI applications?",
+            "url_match": "async-tests",
+            "page_match": "async-test",
+            "category": "code-example",
+            "description": "Find testing documentation",
+        },
+        {
+            "query": "How do I use Jinja2 templates in FastAPI?",
+            "url_match": "templating",
+            "page_match": "templat",
+            "category": "code-example",
+            "description": "Find templating reference",
+        },
+        {
+            "query": "How do I use dependency injection in FastAPI?",
+            "url_match": "dependencies",
+            "page_match": "dependencies",
+            "category": "conceptual",
+            "description": "Find dependency injection tutorial",
+        },
+        {
+            "query": "How do I return custom response classes in FastAPI?",
+            "url_match": "custom-response",
+            "page_match": "custom-response",
+            "category": "api-function",
+            "description": "Find custom response docs",
+        },
+        {
+            "query": "How do I configure CORS in FastAPI?",
+            "url_match": "cors",
+            "page_match": "cors",
+            "category": "api-function",
+            "description": "Find CORS middleware docs",
+        },
+        {
+            "query": "How do I use path parameters in FastAPI?",
+            "url_match": "path-params",
+            "page_match": "path-param",
+            "category": "api-function",
+            "description": "Find path parameters tutorial",
+        },
+        {
+            "query": "How do I run FastAPI with Docker?",
+            "url_match": "docker",
+            "page_match": "docker",
+            "category": "conceptual",
+            "description": "Find Docker deployment guide",
+        },
+        {
+            "query": "How do I configure FastAPI application settings?",
+            "url_match": "settings",
+            "page_match": "settings",
+            "category": "code-example",
+            "description": "Find settings/config docs",
+        },
+        {
+            "query": "How do I use background tasks in FastAPI?",
+            "url_match": "background-tasks",
+            "page_match": "background-task",
+            "category": "api-function",
+            "description": "Find background tasks tutorial",
+        },
+        {
+            "query": "What are the first steps to create a FastAPI application?",
+            "url_match": "first-steps",
+            "page_match": "first-steps",
+            "category": "conceptual",
+            "description": "Find getting started tutorial",
+        },
+        {
+            "query": "How do I handle errors and exceptions in FastAPI?",
+            "url_match": "handling-errors",
+            "page_match": "handling-error",
+            "category": "api-function",
+            "description": "Find error handling docs",
         },
     ],
     "python-docs": [
         {
             "query": "What new features were added in Python 3.10?",
-            "url_match": "whatsnew",
+            "url_match": "whatsnew/3.10",
             "page_match": "whatsnew",
+            "category": "factual-lookup",
             "description": "Find release notes content",
         },
         {
             "query": "What does the term 'decorator' mean in Python?",
             "url_match": "glossary",
             "page_match": "glossary",
+            "category": "factual-lookup",
             "description": "Find glossary definition",
         },
         {
             "query": "How do I report a bug in Python?",
             "url_match": "bugs",
             "page_match": "bugs",
+            "category": "factual-lookup",
             "description": "Find meta/process content",
-        },
-        {
-            "query": "What is structural pattern matching in Python?",
-            "url_match": "whatsnew",
-            "page_match": "whatsnew",
-            "description": "Find specific feature documentation",
         },
         {
             "query": "What is Python's glossary definition of a generator?",
             "url_match": "glossary",
             "page_match": "glossary",
+            "category": "factual-lookup",
             "description": "Find glossary generator definition",
-        },
-        {
-            "query": "What are the Python how-to guides about?",
-            "url_match": "howto",
-            "page_match": "howto",
-            "description": "Find how-to index page",
         },
         {
             "query": "What is the Python module index?",
             "url_match": "py-modindex",
             "page_match": "modindex",
+            "category": "navigation",
             "description": "Find module index page",
-        },
-        {
-            "query": "What Python tutorial topics are available?",
-            "url_match": "tutorial",
-            "page_match": "tutorial",
-            "description": "Find tutorial index page",
-        },
-        {
-            "query": "What is the Python license and copyright?",
-            "url_match": "license",
-            "page_match": "license",
-            "description": "Find license page",
-        },
-        {
-            "query": "What is the table of contents for Python 3.10 documentation?",
-            "url_match": "contents",
-            "page_match": "contents",
-            "description": "Find contents page",
         },
         {
             "query": "What does the term 'iterable' mean in Python?",
             "url_match": "glossary",
             "page_match": "glossary",
+            "category": "factual-lookup",
             "description": "Find glossary iterable definition",
         },
         {
             "query": "How do I install and configure Python on my system?",
             "url_match": "using",
             "page_match": "using",
+            "category": "conceptual",
             "description": "Find setup/usage guide",
         },
+        {
+            "query": "How do I use the os module for file and directory operations?",
+            "url_match": "library/os",
+            "page_match": "library/os",
+            "category": "api-function",
+            "description": "Find os module reference",
+        },
+        {
+            "query": "How do I use pathlib for filesystem paths in Python?",
+            "url_match": "library/pathlib",
+            "page_match": "library/pathlib",
+            "category": "api-function",
+            "description": "Find pathlib module reference",
+        },
+        {
+            "query": "How do I parse and generate JSON in Python?",
+            "url_match": "library/json",
+            "page_match": "library/json",
+            "category": "api-function",
+            "description": "Find json module reference",
+        },
+        {
+            "query": "How do I use asyncio for async programming in Python?",
+            "url_match": "library/asyncio",
+            "page_match": "library/asyncio",
+            "category": "api-function",
+            "description": "Find asyncio module reference",
+        },
+        {
+            "query": "How do I use type hints and the typing module in Python?",
+            "url_match": "library/typing",
+            "page_match": "library/typing",
+            "category": "api-function",
+            "description": "Find typing module reference",
+        },
+        {
+            "query": "How do I work with dates and times using the datetime module?",
+            "url_match": "library/datetime",
+            "page_match": "library/datetime",
+            "category": "api-function",
+            "description": "Find datetime module reference",
+        },
+        {
+            "query": "How do I use Python's logging module?",
+            "url_match": "library/logging",
+            "page_match": "library/logging",
+            "category": "api-function",
+            "description": "Find logging module reference",
+        },
+        {
+            "query": "How do I write unit tests with the unittest module?",
+            "url_match": "library/unittest",
+            "page_match": "library/unittest",
+            "category": "code-example",
+            "description": "Find unittest module reference",
+        },
+        {
+            "query": "How do I use Python dataclasses?",
+            "url_match": "library/dataclasses",
+            "page_match": "library/dataclasses",
+            "category": "api-function",
+            "description": "Find dataclasses module reference",
+        },
+        {
+            "query": "How do I use itertools for efficient iteration in Python?",
+            "url_match": "library/itertools",
+            "page_match": "library/itertools",
+            "category": "api-function",
+            "description": "Find itertools module reference",
+        },
+        {
+            "query": "How does Python's data model work with special methods?",
+            "url_match": "reference/datamodel",
+            "page_match": "datamodel",
+            "category": "conceptual",
+            "description": "Find data model reference",
+        },
+        {
+            "query": "What are Python's compound statements like if, for, and with?",
+            "url_match": "reference/compound_stmts",
+            "page_match": "compound_stmts",
+            "category": "conceptual",
+            "description": "Find compound statements reference",
+        },
     ],
-    # --- New diverse sites (SPA, wiki, API docs, blog) ---
     "react-dev": [
         {
             "query": "How do I manage state in a React component?",
             "url_match": "state",
             "page_match": "state",
+            "category": "conceptual",
             "description": "Find state management docs",
-        },
-        {
-            "query": "What are React hooks and how do I use them?",
-            "url_match": "hooks",
-            "page_match": "hook",
-            "description": "Find hooks introduction",
         },
         {
             "query": "How does the useEffect hook work in React?",
             "url_match": "useEffect",
-            "page_match": "effect",
+            "page_match": "useEffect",
+            "category": "api-function",
             "description": "Find useEffect reference",
         },
         {
-            "query": "How do I handle forms and user input in React?",
-            "url_match": "input",
-            "page_match": "form",
-            "description": "Find form handling docs",
-        },
-        {
             "query": "How do I create and use context in React?",
-            "url_match": "context",
+            "url_match": "useContext",
             "page_match": "context",
+            "category": "api-function",
             "description": "Find context API docs",
         },
         {
-            "query": "How do I handle events like clicks in React?",
-            "url_match": "event",
-            "page_match": "event",
-            "description": "Find event handling docs",
-        },
-        {
             "query": "What is JSX and how does React use it?",
-            "url_match": "jsx",
+            "url_match": "writing-markup-with-jsx",
             "page_match": "jsx",
+            "category": "conceptual",
             "description": "Find JSX explanation",
         },
         {
             "query": "How do I render lists and use keys in React?",
-            "url_match": "list",
-            "page_match": "list",
+            "url_match": "rendering-lists",
+            "page_match": "rendering-lists",
+            "category": "code-example",
             "description": "Find list rendering docs",
         },
         {
             "query": "How do I use the useRef hook in React?",
             "url_match": "useRef",
-            "page_match": "ref",
+            "page_match": "useRef",
+            "category": "api-function",
             "description": "Find useRef reference",
         },
         {
             "query": "How do I pass props between React components?",
-            "url_match": "props",
-            "page_match": "props",
+            "url_match": "passing-props",
+            "page_match": "passing-props",
+            "category": "conceptual",
             "description": "Find props tutorial",
         },
         {
             "query": "How do I conditionally render content in React?",
-            "url_match": "conditional",
+            "url_match": "conditional-rendering",
             "page_match": "conditional",
+            "category": "code-example",
             "description": "Find conditional rendering docs",
         },
         {
             "query": "What is the useMemo hook for in React?",
             "url_match": "useMemo",
-            "page_match": "memo",
+            "page_match": "useMemo",
+            "category": "api-function",
             "description": "Find useMemo reference",
+        },
+        {
+            "query": "How do I use the useState hook in React?",
+            "url_match": "useState",
+            "page_match": "useState",
+            "category": "api-function",
+            "description": "Find useState reference",
+        },
+        {
+            "query": "How do I use the useCallback hook in React?",
+            "url_match": "useCallback",
+            "page_match": "useCallback",
+            "category": "api-function",
+            "description": "Find useCallback reference",
+        },
+        {
+            "query": "How do I use the useReducer hook in React?",
+            "url_match": "useReducer",
+            "page_match": "useReducer",
+            "category": "api-function",
+            "description": "Find useReducer reference",
+        },
+        {
+            "query": "How do I handle events like clicks in React?",
+            "url_match": "responding-to-events",
+            "page_match": "responding-to-events",
+            "category": "code-example",
+            "description": "Find event handling docs",
+        },
+        {
+            "query": "What is the Suspense component in React?",
+            "url_match": "Suspense",
+            "page_match": "Suspense",
+            "category": "api-function",
+            "description": "Find Suspense reference",
+        },
+        {
+            "query": "How do I add interactivity to React components?",
+            "url_match": "adding-interactivity",
+            "page_match": "adding-interactivity",
+            "category": "conceptual",
+            "description": "Find interactivity tutorial",
+        },
+        {
+            "query": "How do I install and set up a new React project?",
+            "url_match": "installation",
+            "page_match": "installation",
+            "category": "conceptual",
+            "description": "Find installation guide",
         },
     ],
     "wikipedia-python": [
         {
             "query": "Who created the Python programming language?",
             "url_match": "Python_(programming_language)",
-            "page_match": "python",
+            "page_match": "Python_(programming_language)",
+            "category": "factual-lookup",
             "description": "Find Python main article",
-        },
-        {
-            "query": "What is the history and development of Python?",
-            "url_match": "Python_(programming_language)",
-            "page_match": "python",
-            "description": "Find Python history section",
-        },
-        {
-            "query": "What programming paradigms does Python support?",
-            "url_match": "Python_(programming_language)",
-            "page_match": "python",
-            "description": "Find Python paradigm info",
         },
         {
             "query": "What is the Python Software Foundation?",
             "url_match": "Python_Software_Foundation",
-            "page_match": "foundation",
+            "page_match": "Python_Software_Foundation",
+            "category": "factual-lookup",
             "description": "Find PSF article",
-        },
-        {
-            "query": "What is the syntax and design philosophy of Python?",
-            "url_match": "Python_(programming_language)",
-            "page_match": "python",
-            "description": "Find Python design philosophy",
-        },
-        {
-            "query": "What are Python's standard library modules?",
-            "url_match": "Python_(programming_language)",
-            "page_match": "python",
-            "description": "Find standard library info",
         },
         {
             "query": "Who is Guido van Rossum?",
             "url_match": "Guido_van_Rossum",
-            "page_match": "guido",
+            "page_match": "Guido_van_Rossum",
+            "category": "factual-lookup",
             "description": "Find Guido bio article",
         },
         {
             "query": "What is CPython and how does it work?",
             "url_match": "CPython",
-            "page_match": "cpython",
+            "page_match": "CPython",
+            "category": "factual-lookup",
             "description": "Find CPython article",
         },
         {
             "query": "How does Python compare to other programming languages?",
             "url_match": "Comparison_of_programming_languages",
-            "page_match": "comparison",
+            "page_match": "Comparison_of_programming_languages",
+            "category": "conceptual",
             "description": "Find language comparison",
         },
         {
-            "query": "What are Python Enhancement Proposals (PEPs)?",
-            "url_match": "Python_(programming_language)",
-            "page_match": "pep",
-            "description": "Find PEP information",
+            "query": "What is NumPy and what is it used for?",
+            "url_match": "NumPy",
+            "page_match": "NumPy",
+            "category": "factual-lookup",
+            "description": "Find NumPy article",
+        },
+        {
+            "query": "What is SQLAlchemy and how is it used with Python?",
+            "url_match": "SQLAlchemy",
+            "page_match": "SQLAlchemy",
+            "category": "factual-lookup",
+            "description": "Find SQLAlchemy article",
+        },
+        {
+            "query": "What is metaprogramming in computer science?",
+            "url_match": "Metaprogramming",
+            "page_match": "Metaprogramming",
+            "category": "conceptual",
+            "description": "Find metaprogramming article",
+        },
+        {
+            "query": "What are list comprehensions in programming?",
+            "url_match": "List_comprehension",
+            "page_match": "List_comprehension",
+            "category": "conceptual",
+            "description": "Find list comprehensions article",
+        },
+        {
+            "query": "How does memory management work in programming?",
+            "url_match": "Memory_management",
+            "page_match": "Memory_management",
+            "category": "conceptual",
+            "description": "Find memory management article",
         },
     ],
     "stripe-docs": [
         {
             "query": "How do I create a payment intent with Stripe?",
             "url_match": "payment-intent",
-            "page_match": "payment",
+            "page_match": "payment-intent",
+            "category": "api-function",
             "description": "Find payment intent docs",
         },
         {
             "query": "How do I handle webhooks from Stripe?",
             "url_match": "webhook",
             "page_match": "webhook",
+            "category": "api-function",
             "description": "Find webhook handling docs",
         },
         {
             "query": "How do I set up Stripe subscriptions?",
             "url_match": "subscription",
             "page_match": "subscription",
+            "category": "api-function",
             "description": "Find subscription docs",
         },
         {
             "query": "How do I authenticate with the Stripe API?",
             "url_match": "authentication",
-            "page_match": "auth",
+            "page_match": "authentication",
+            "category": "api-function",
             "description": "Find authentication docs",
         },
         {
             "query": "How do I handle errors in the Stripe API?",
-            "url_match": "error",
-            "page_match": "error",
+            "url_match": "error-handling",
+            "page_match": "error-handling",
+            "category": "api-function",
             "description": "Find error handling docs",
-        },
-        {
-            "query": "How do I create a customer in Stripe?",
-            "url_match": "customer",
-            "page_match": "customer",
-            "description": "Find customer creation docs",
         },
         {
             "query": "How do I process refunds with Stripe?",
             "url_match": "refund",
             "page_match": "refund",
+            "category": "api-function",
             "description": "Find refund docs",
         },
         {
             "query": "How do I use Stripe checkout for payments?",
             "url_match": "checkout",
             "page_match": "checkout",
-            "description": "Find checkout docs",
+            "category": "js-rendered",
+            "description": "Find checkout docs (JS-rendered tabbed content)",
         },
         {
             "query": "How do I test Stripe payments in development?",
-            "url_match": "test",
-            "page_match": "test",
-            "description": "Find testing docs",
+            "url_match": "testing",
+            "page_match": "testing",
+            "category": "code-example",
+            "description": "Find testing docs with code samples",
         },
         {
             "query": "What are Stripe Connect and platform payments?",
             "url_match": "connect",
             "page_match": "connect",
+            "category": "conceptual",
             "description": "Find Connect docs",
+        },
+        {
+            "query": "How do I set up usage-based billing with Stripe?",
+            "url_match": "usage-based",
+            "page_match": "usage-based",
+            "category": "js-rendered",
+            "description": "Find usage-based billing (JS tabbed content)",
+        },
+        {
+            "query": "How do I manage Stripe API keys?",
+            "url_match": "keys",
+            "page_match": "keys",
+            "category": "api-function",
+            "description": "Find API key management docs",
+        },
+        {
+            "query": "How do I handle Stripe rate limits?",
+            "url_match": "rate-limits",
+            "page_match": "rate-limit",
+            "category": "api-function",
+            "description": "Find rate limiting docs",
+        },
+        {
+            "query": "How do I use metadata with Stripe objects?",
+            "url_match": "metadata",
+            "page_match": "metadata",
+            "category": "api-function",
+            "description": "Find metadata docs",
+        },
+        {
+            "query": "How do I set up Apple Pay with Stripe?",
+            "url_match": "apple-pay",
+            "page_match": "apple-pay",
+            "category": "js-rendered",
+            "description": "Find Apple Pay integration (JS-rendered)",
+        },
+        {
+            "query": "How do I issue cards with Stripe Issuing?",
+            "url_match": "issuing",
+            "page_match": "issuing",
+            "category": "api-function",
+            "description": "Find Stripe Issuing docs",
+        },
+        {
+            "query": "How do I recover failed subscription payments?",
+            "url_match": "revenue-recovery",
+            "page_match": "revenue-recovery",
+            "category": "js-rendered",
+            "description": "Find revenue recovery docs (JS tabbed content)",
+        },
+        {
+            "query": "How does Stripe handle tax calculation for billing?",
+            "url_match": "billing/taxes",
+            "page_match": "billing/taxes",
+            "category": "js-rendered",
+            "description": "Find billing tax docs (JS-rendered)",
+        },
+        {
+            "query": "How do I migrate data to Stripe?",
+            "url_match": "data-migrations",
+            "page_match": "data-migration",
+            "category": "conceptual",
+            "description": "Find data migration guide",
         },
     ],
     "blog-engineering": [
         {
-            "query": "What are best practices for building reliable distributed systems?",
-            "url_match": "blog",
-            "page_match": "distribut",
-            "description": "Find distributed systems content",
+            "query": "How does GitHub handle Kubernetes at scale?",
+            "url_match": "engineering/",
+            "page_match": "kubernetes",
+            "category": "conceptual",
+            "description": "Find Kubernetes infrastructure content",
         },
         {
-            "query": "How do companies handle database migrations at scale?",
-            "url_match": "blog",
-            "page_match": "migrat",
-            "description": "Find migration content",
+            "query": "How does GitHub protect against DDoS attacks?",
+            "url_match": "engineering/",
+            "page_match": "ddos",
+            "category": "conceptual",
+            "description": "Find DDoS mitigation content",
         },
         {
-            "query": "What monitoring and observability tools do engineering teams use?",
-            "url_match": "blog",
-            "page_match": "monitor",
-            "description": "Find observability content",
+            "query": "How does GitHub handle MySQL database operations?",
+            "url_match": "engineering/",
+            "page_match": "mysql",
+            "category": "conceptual",
+            "description": "Find MySQL infrastructure content",
         },
         {
-            "query": "How do you implement continuous deployment pipelines?",
-            "url_match": "blog",
-            "page_match": "deploy",
-            "description": "Find CI/CD content",
+            "query": "How does GitHub handle load balancing?",
+            "url_match": "engineering/",
+            "page_match": "load-balanc",
+            "category": "conceptual",
+            "description": "Find load balancing content",
         },
         {
-            "query": "What are common microservices architecture patterns?",
-            "url_match": "blog",
-            "page_match": "microservice",
-            "description": "Find microservices content",
+            "query": "What is GitHub's approach to platform security?",
+            "url_match": "platform-security",
+            "page_match": "platform-security",
+            "category": "conceptual",
+            "description": "Find platform security content",
         },
         {
-            "query": "How do you handle API versioning in production?",
-            "url_match": "blog",
-            "page_match": "api",
-            "description": "Find API design content",
+            "query": "How does GitHub optimize its architecture?",
+            "url_match": "architecture-optimization",
+            "page_match": "architecture",
+            "category": "conceptual",
+            "description": "Find architecture optimization content",
         },
         {
-            "query": "What caching strategies work best for web applications?",
-            "url_match": "blog",
-            "page_match": "cach",
-            "description": "Find caching content",
+            "query": "What engineering principles does GitHub follow?",
+            "url_match": "engineering-principles",
+            "page_match": "engineering-principles",
+            "category": "conceptual",
+            "description": "Find engineering principles content",
         },
         {
-            "query": "How do you design for high availability and fault tolerance?",
-            "url_match": "blog",
-            "page_match": "availab",
-            "description": "Find HA content",
+            "query": "How does GitHub improve user experience?",
+            "url_match": "user-experience",
+            "page_match": "user-experience",
+            "category": "conceptual",
+            "description": "Find UX engineering content",
         },
     ],
 }
@@ -678,6 +899,7 @@ class QueryResult:
     top_k_scores: List[float]
     hit: bool
     hit_rank: Optional[int]  # 1-indexed rank where the hit was found, or None
+    category: str = ""  # query category (api-function, code-example, etc.)
 
 
 @dataclass
@@ -1265,6 +1487,7 @@ def run_retrieval_test(
                 top_k_scores=top_scores,
                 hit=hit,
                 hit_rank=hit_rank,
+                category=q.get("category", ""),
             ))
 
     search_time = time.time() - search_start
@@ -1503,7 +1726,105 @@ def generate_retrieval_report(
     lines.extend(["", ""])
 
     # ============================================================
-    # Section 3: Chunk size sensitivity (if available)
+    # Section 3: Per-category breakdown
+    # ============================================================
+    # Collect per-category results across all sites (embedding mode only)
+    # category -> tool -> {hits_at_k, total, rr_sum}
+    cat_stats: Dict[str, Dict[str, Dict]] = {}
+    for site, site_results in results.items():
+        if site not in common_sites:
+            continue
+        queries = TEST_QUERIES.get(site, [])
+        for tool in tool_names:
+            r = site_results.get(tool)
+            if not r:
+                continue
+            emb = r.mode_results.get("embedding")
+            if not emb:
+                continue
+            for qi, qr in enumerate(emb.query_results):
+                cat = qr.category or (queries[qi].get("category", "") if qi < len(queries) else "")
+                if not cat:
+                    continue
+                if cat not in cat_stats:
+                    cat_stats[cat] = {}
+                if tool not in cat_stats[cat]:
+                    cat_stats[cat][tool] = {"hits10": 0, "total": 0, "rr_sum": 0.0}
+                cs = cat_stats[cat][tool]
+                cs["total"] += 1
+                if qr.hit:
+                    cs["hits10"] += 1
+                if qr.hit_rank is not None:
+                    cs["rr_sum"] += 1.0 / qr.hit_rank
+
+    if cat_stats:
+        lines.extend(["## Per-category breakdown (embedding mode)", ""])
+        lines.append(
+            "Query categories reveal where crawlers actually differ. "
+            "Categories like `js-rendered` and `structured-data` stress-test "
+            "browser rendering and table extraction, while `api-function` and "
+            "`conceptual` queries test basic content retrieval."
+        )
+        lines.append("")
+
+        # Sort categories alphabetically
+        sorted_cats = sorted(cat_stats.keys())
+
+        lines.append("| Category | Tool | Hit@10 | MRR | Queries |")
+        lines.append("|---|---|---|---|---|")
+
+        for cat in sorted_cats:
+            tool_data = cat_stats[cat]
+            # Sort tools by hit rate descending within each category
+            sorted_tools = sorted(
+                tool_data.keys(),
+                key=lambda t: tool_data[t]["hits10"] / tool_data[t]["total"] if tool_data[t]["total"] else 0,
+                reverse=True,
+            )
+            for tool in sorted_tools:
+                cs = tool_data[tool]
+                rate = cs["hits10"] / cs["total"] if cs["total"] else 0
+                mrr = cs["rr_sum"] / cs["total"] if cs["total"] else 0
+                tname = f"**{tool}**" if tool == "markcrawl" else tool
+                lines.append(
+                    f"| {cat} | {tname} | {rate:.0%} ({cs['hits10']}/{cs['total']}) "
+                    f"| {mrr:.3f} | {cs['total']} |"
+                )
+
+        lines.extend(["", ""])
+
+        # Add a condensed "best tool per category" digest
+        lines.extend(["### Best tool per category", ""])
+        lines.append("| Category | Best tool | Hit@10 | Spread |")
+        lines.append("|---|---|---|---|")
+
+        for cat in sorted_cats:
+            tool_data = cat_stats[cat]
+            best_tool = max(
+                tool_data.keys(),
+                key=lambda t: tool_data[t]["hits10"] / tool_data[t]["total"] if tool_data[t]["total"] else 0,
+            )
+            worst_tool = min(
+                tool_data.keys(),
+                key=lambda t: tool_data[t]["hits10"] / tool_data[t]["total"] if tool_data[t]["total"] else 0,
+            )
+            best_rate = tool_data[best_tool]["hits10"] / tool_data[best_tool]["total"] if tool_data[best_tool]["total"] else 0
+            worst_rate = tool_data[worst_tool]["hits10"] / tool_data[worst_tool]["total"] if tool_data[worst_tool]["total"] else 0
+            spread = best_rate - worst_rate
+            tname = f"**{best_tool}**" if best_tool == "markcrawl" else best_tool
+            lines.append(
+                f"| {cat} | {tname} | {best_rate:.0%} | {spread:.0%} |"
+            )
+
+        lines.append("")
+        lines.append(
+            "_Spread = difference between best and worst tool. "
+            "High spread categories are where crawler choice matters most._"
+        )
+        lines.extend(["", ""])
+
+    # ============================================================
+    # Section 4: Chunk size sensitivity (if available)
     # ============================================================
     if chunk_sensitivity_results:
         lines.extend(["## Chunk size sensitivity analysis", ""])
@@ -1550,7 +1871,7 @@ def generate_retrieval_report(
         lines.extend(["", ""])
 
     # ============================================================
-    # Section 4: Per-site breakdown
+    # Section 5: Per-site breakdown
     # ============================================================
     for site, site_results in results.items():
         queries = TEST_QUERIES.get(site, [])
@@ -1592,8 +1913,9 @@ def generate_retrieval_report(
         lines.append("")
 
         for qi, q in enumerate(queries):
+            cat_label = f" [{q.get('category', '')}]" if q.get("category") else ""
             lines.extend([
-                f"**Q{qi+1}: {q['query']}**",
+                f"**Q{qi+1}: {q['query']}**{cat_label}",
                 f"*(expects URL containing: `{q.get('url_match', '')}`)*",
                 "",
                 "| Tool | Hit | Top-1 URL | Score | Top-2 URL | Score | Top-3 URL | Score |",
@@ -1602,7 +1924,7 @@ def generate_retrieval_report(
 
             for tool in tool_names:
                 r = site_results.get(tool)
-                if not r:
+                if not r or qi >= len(r.query_results):
                     lines.append(f"| {tool} | — | — | — | — | — | — | — |")
                     continue
 
@@ -1631,7 +1953,8 @@ def generate_retrieval_report(
     lines.extend([
         "## Methodology",
         "",
-        f"- **Queries:** {total_queries_count} across {len(results)} sites (verified against crawled pages)",
+        f"- **Queries:** {total_queries_count} across {len(results)} sites, categorized by type "
+        "(api-function, code-example, conceptual, structured-data, factual-lookup, cross-page, navigation, js-rendered)",
         f"- **Embedding model:** `{EMBEDDING_MODEL}` ({EMBEDDING_DIMENSIONS} dimensions)",
         f"- **Chunking:** Markdown-aware, {CHUNK_MAX_WORDS} word max, {CHUNK_OVERLAP} word overlap",
         f"- **Retrieval modes:** Embedding (cosine), BM25 (Okapi), Hybrid (RRF k={RRF_K}), Reranked (`{RERANK_MODEL}`)",
@@ -1719,6 +2042,7 @@ def _save_checkpoint(run_name: str, tool: str, site: str, config_label: str, res
                 "top_k_scores": qr.top_k_scores[:20],
                 "hit": qr.hit,
                 "hit_rank": qr.hit_rank,
+                "category": qr.category,
             })
         data["mode_results"][mode] = mode_data
 
@@ -1733,6 +2057,7 @@ def _save_checkpoint(run_name: str, tool: str, site: str, config_label: str, res
             "top_k_scores": qr.top_k_scores[:20],
             "hit": qr.hit,
             "hit_rank": qr.hit_rank,
+            "category": qr.category,
         })
 
     path = CHECKPOINT_DIR / f"{key}.json"
@@ -1763,6 +2088,7 @@ def _load_checkpoint(run_name: str, tool: str, site: str, config_label: str) -> 
                 top_k_scores=q["top_k_scores"],
                 hit=q["hit"],
                 hit_rank=q["hit_rank"],
+                category=q.get("category", ""),
             )
             for q in qr_list
         ]
@@ -2013,6 +2339,14 @@ def main():
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(report)
     logger.info(f"\nRetrieval report written to: {output_path}")
+
+    # Post-generation validation
+    from lint_reports import lint_file
+    lint_warnings = lint_file(Path(output_path))
+    if lint_warnings:
+        logger.warning("Post-generation lint found %d issue(s):", len(lint_warnings))
+        for w in lint_warnings:
+            logger.warning("  - %s", w)
 
     # Print summary
     logger.info("\n" + "=" * 60)

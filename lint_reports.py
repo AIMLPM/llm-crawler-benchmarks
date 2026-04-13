@@ -174,7 +174,75 @@ def lint_file(filepath: Path) -> list[str]:
         if not has_methodology_section and not has_methodology_link:
             warnings.append(f"{name}: no methodology section or link to METHODOLOGY.md")
 
+    # --- 9. Empty data tables (all dashes = missing benchmark data) ---
+    # Applied to ALL reports, not just comparative ones — any table section
+    # where every data row is all dashes indicates missing benchmark data.
+    current_section = None
+    section_rows = []
+    for i, line in enumerate(lines):
+        if line.startswith("## ") or line.startswith("### "):
+            # Check previous section
+            if current_section and section_rows:
+                all_empty = all(_is_all_dashes(row) for row in section_rows)
+                if all_empty and len(section_rows) >= 3:
+                    warnings.append(
+                        f"{name}: section '{current_section}' has no data — "
+                        f"all {len(section_rows)} tool rows are empty (all dashes)"
+                    )
+            current_section = line.lstrip("#").strip()
+            section_rows = []
+        elif line.startswith("|") and not _is_table_header_or_separator(line):
+            # Only collect data rows, skip headers and separators
+            if current_section:
+                section_rows.append(line)
+    # Check last section
+    if current_section and section_rows:
+        all_empty = all(_is_all_dashes(row) for row in section_rows)
+        if all_empty and len(section_rows) >= 3:
+            warnings.append(
+                f"{name}: section '{current_section}' has no data — "
+                f"all {len(section_rows)} tool rows are empty (all dashes)"
+            )
+
+    # --- 10. Query count consistency across reports ---
+    # Extract emphasized query counts (bolded with **) — these are authoritative
+    # "this benchmark used N queries" claims. Unbolded mentions may reference
+    # different scopes (e.g., firecrawl's 70 queries on 6 sites) and are not
+    # checked. Rate expressions like "100 queries/day" are excluded.
+    query_counts = re.findall(r"\*\*(\d+)\s+quer(?:ies|y)\*\*", text)
+    if query_counts and name in COMPARATIVE_REPORTS:
+        counts = set(int(c) for c in query_counts)
+        # If a single report claims multiple different authoritative query counts, flag it
+        if len(counts) > 1:
+            warnings.append(
+                f"{name}: inconsistent query counts within report: "
+                f"{sorted(counts)} — bolded query counts should be consistent"
+            )
+
     return warnings
+
+
+def _is_table_header_or_separator(line: str) -> bool:
+    """Check if a markdown table line is a header row or separator (not data)."""
+    stripped = line.strip()
+    # Separator rows: |---|---|---| or |:---|:---:|---:|
+    if re.match(r"^\|[\s\-:]+(\|[\s\-:]+)+\|?\s*$", stripped):
+        return True
+    # Common header patterns (case-insensitive)
+    lower = stripped.lower()
+    header_starts = ("| tool", "| category", "| site", "| metric", "| dimension",
+                     "| report", "| query", "| mode", "| scenario")
+    return any(lower.startswith(h) for h in header_starts)
+
+
+def _is_all_dashes(table_row: str) -> bool:
+    """Check if a markdown table row has all dash values (no real data)."""
+    cells = [c.strip() for c in table_row.split("|")[1:-1]]  # split and strip
+    if not cells:
+        return False
+    # Skip the first cell (tool name) — check if all remaining cells are dashes
+    data_cells = cells[1:]
+    return all(c in ("—", "-", "–", "---", "n/a", "") for c in data_cells)
 
 
 def fix_tags(filepath: Path) -> bool:
