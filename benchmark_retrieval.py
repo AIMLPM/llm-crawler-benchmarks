@@ -2523,6 +2523,14 @@ def main():
                 k_vals.append(f"{h}/{total_queries} ({h/total_queries:.0%})")
             logger.info(f"  {tool:>15}  {'  '.join(k_vals)}  |  {mrr:.3f}")
 
+    # Regenerate README from updated report data
+    try:
+        import subprocess as _sp
+        _sp.run([sys.executable, "generate_readme.py"], check=True)
+        logger.info("README.md regenerated from report data.")
+    except Exception as e:
+        logger.warning(f"Could not regenerate README.md: {e}")
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")

@@ -1,4 +1,4 @@
-.PHONY: test lint invariants preflight check check-invariants check-consistency check-lint review smoke
+.PHONY: test lint invariants preflight check check-invariants check-consistency check-lint review smoke readme
 
 PYTHON ?= .venv/bin/python
 
@@ -26,6 +26,10 @@ check-consistency:
 
 check-lint:
 	$(PYTHON) lint_reports.py
+
+# Regenerate README.md from report data
+readme:
+	$(PYTHON) generate_readme.py
 
 # Graduated smoke test: 5/30/100 pages per tool
 smoke:

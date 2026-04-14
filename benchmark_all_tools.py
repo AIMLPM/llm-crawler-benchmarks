@@ -1811,6 +1811,14 @@ def main():
     _remove_checkpoint(checkpoint_path)
     logger.info("Checkpoint cleared (run completed successfully).")
     logger.info(f"\nRun data saved to: {base_dir}")
+    # Regenerate README from updated report data
+    try:
+        import subprocess as _sp
+        _sp.run([sys.executable, "generate_readme.py"], check=True)
+        logger.info("README.md regenerated from report data.")
+    except Exception as e:
+        logger.warning(f"Could not regenerate README.md: {e}")
+
     logger.info("\nTo score extraction quality (preamble, repeat rate, precision/recall):")
     logger.info("  python benchmark_quality.py")
 

@@ -68,7 +68,7 @@ RUN python -m playwright install chromium && \
     chmod -R o+rx /root/.cache 2>/dev/null && chmod o+x /root || true
 
 # Copy benchmark scripts and reports
-COPY benchmark_*.py quality_scorer.py crawlee_worker.py lint_reports.py preflight.py test_crawl4ai_graduated.py ./
+COPY benchmark_*.py quality_scorer.py crawlee_worker.py lint_reports.py preflight.py test_crawl4ai_graduated.py generate_readme.py report_utils.py ./
 COPY runners/ runners/
 COPY reports/ reports/
 COPY self_improvement/ self_improvement/

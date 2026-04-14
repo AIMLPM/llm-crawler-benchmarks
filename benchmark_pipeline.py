@@ -885,6 +885,14 @@ def main():
         json.dump(raw_data, f, indent=2)
     logger.info(f"Raw timings saved to: {json_path}")
 
+    # Regenerate README from updated report data
+    try:
+        import subprocess as _sp
+        _sp.run([sys.executable, "generate_readme.py"], check=True)
+        logger.info("README.md regenerated from report data.")
+    except Exception as e:
+        logger.warning(f"Could not regenerate README.md: {e}")
+
 
 if __name__ == "__main__":
     main()

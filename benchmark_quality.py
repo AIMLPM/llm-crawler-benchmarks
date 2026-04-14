@@ -214,6 +214,14 @@ def main() -> None:
     Path(args.output).write_text(report, encoding="utf-8")
     logger.info(f"\nQuality report written to: {args.output}")
 
+    # Regenerate README from updated report data
+    try:
+        import subprocess as _sp
+        _sp.run([sys.executable, "generate_readme.py"], check=True)
+        logger.info("README.md regenerated from report data.")
+    except Exception as e:
+        logger.warning(f"Could not regenerate README.md: {e}")
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")
