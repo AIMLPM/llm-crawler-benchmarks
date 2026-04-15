@@ -117,7 +117,7 @@ grep -c "site.*:" benchmark_retrieval.py | head -20
 
 For each tool runner in `benchmark_all_tools.py`, verify:
 
-- [ ] Correct URL list is passed (from `.url_cache.json`)
+- [ ] Discovery mode is used (`url_list=None`) — each tool finds its own pages
 - [ ] Output is written to the expected directory structure
 - [ ] Timeout is enforced
 - [ ] Page count matches actual JSONL line count

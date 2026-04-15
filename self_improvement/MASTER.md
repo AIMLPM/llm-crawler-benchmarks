@@ -118,10 +118,8 @@ for full persona definitions and per-spec checklists.
 ## Data Lineage (quick reference)
 
 ```
-                     .url_cache.json
-                           |
-                           v
                  benchmark_all_tools.py
+              (each tool discovers own pages)
                    /         |         \
                   v          v          v
              runs/run_*/  SPEED_COMPARISON.md  QUALITY_COMPARISON.md
@@ -145,7 +143,6 @@ for full persona definitions and per-spec checklists.
 
 | Cache | Location | Key | Cleared By |
 |-------|----------|-----|------------|
-| URL discovery | `.url_cache.json` | site name | `--refresh-urls` |
 | Speed checkpoint | `.benchmark_checkpoint.json` | run args hash | `--no-resume` |
 | Embeddings | `embed_cache/` | SHA256 of text batch | `--fresh` |
 | Retrieval results | `retrieval_checkpoints/` | `run__tool__site__config` | `--fresh` or manual delete |

@@ -1795,9 +1795,10 @@ def generate_retrieval_report(
     lines.extend(["## What this means", ""])
     lines.extend([
         "All tools perform within a narrow band (MRR 0.757-0.799 on embedding mode). "
-        "This is expected: every tool crawls the same URLs, and we apply identical "
-        "chunking and embedding pipelines. The extraction differences that matter for "
-        "[content quality](QUALITY_COMPARISON.md) largely wash out at retrieval time.",
+        "This is expected: tools crawl similar pages from the same seed URLs, and we "
+        "apply identical chunking and embedding pipelines. The extraction differences "
+        "that matter for [content quality](QUALITY_COMPARISON.md) largely wash out at "
+        "retrieval time.",
         "",
         "**Retrieval mode matters more than crawler choice.** Embedding search beats "
         "BM25 by roughly 2x on MRR across all tools. Hybrid and reranked modes fall "

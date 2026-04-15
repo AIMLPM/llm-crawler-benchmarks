@@ -78,7 +78,6 @@ COMPARISON_SITES = {
         "url": "https://fastapi.tiangolo.com",
         "max_pages": 500,
         "description": "API documentation (code blocks, headings, tutorials)",
-        "skip_patterns": [r"/[a-z]{2}/"],  # skip translated pages (/tr/, /zh/, etc.)
     },
     "python-docs": {
         "url": "https://docs.python.org/3/library/",
@@ -195,223 +194,8 @@ from runners import TOOLS, BROWSER_TOOLS, HTTP_TOOLS  # noqa: E402
 from runners import firecrawl_runner  # noqa: E402 — needed for .status attribute
 
 
-# ---------------------------------------------------------------------------
-# URL discovery — cached with validation
-#
-# Edge cases handled:
-#
-# 1. max_pages increase: If the user requests more pages than the cache
-#    contains (and more than were originally discovered), the cache is
-#    invalidated and a full rediscovery runs.
-#
-# 2. skip_patterns change: The cache stores which skip_patterns were used.
-#    If they differ on the next run, the cache is invalidated. This prevents
-#    stale non-English URLs from leaking in (or English URLs being missing).
-#
-# 3. Network outage during validation: If >50% of cached URLs fail HEAD
-#    checks, we assume a temporary network issue and keep all cached URLs
-#    rather than wiping the cache. This prevents a flaky connection from
-#    destroying a valid cache that took minutes to build.
-#
-# 4. URL ordering: Thread-pool validation returns results in arbitrary
-#    order. We preserve the original discovery order so benchmarks are
-#    reproducible across runs (same pages in same order → comparable
-#    timing results).
-#
-# 5. Cache expiry: Entries older than _URL_CACHE_MAX_AGE_DAYS trigger a
-#    full rediscovery to catch structural site changes (new pages, removed
-#    sections, URL scheme changes).
-#
-# 6. Atomic writes: Cache is written to a .tmp file then os.replace()'d
-#    to avoid corruption if the process is killed mid-write.
-#
-# 7. Docker volume mount: .url_cache.json lives in the repo root, which is
-#    volume-mounted in Docker. A host-side cache speeds up Docker runs
-#    too. Fresh Docker builds (no volume) always do full discovery.
-# ---------------------------------------------------------------------------
 
-_URL_CACHE_PATH = os.path.join(os.path.dirname(__file__), ".url_cache.json")
-_URL_CACHE_MAX_AGE_DAYS = 7
-
-
-def _load_url_cache() -> dict:
-    """Load the URL cache from disk."""
-    if not os.path.isfile(_URL_CACHE_PATH):
-        return {}
-    try:
-        with open(_URL_CACHE_PATH, encoding="utf-8") as f:
-            return json.load(f)
-    except (json.JSONDecodeError, OSError):
-        return {}
-
-
-def _save_url_cache(cache: dict) -> None:
-    """Atomically write the URL cache."""
-    tmp = _URL_CACHE_PATH + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(cache, f, indent=2)
-    os.replace(tmp, _URL_CACHE_PATH)
-
-
-def _validate_urls(urls: List[str], concurrency: int = 20) -> tuple[List[str], List[str]]:
-    """Check which URLs are still live using HEAD requests.
-
-    Returns (live_urls, dead_urls) preserving the original order of `urls`.
-    If >50% of URLs fail, assumes a network issue and returns all as live
-    to avoid wiping the cache during a temporary outage.
-    """
-    import urllib.request
-    import urllib.error
-
-    # Map url → is_live, preserving order
-    status_map: Dict[str, bool] = {}
-    lock = threading.Lock()
-
-    def _check(url: str) -> None:
-        try:
-            req = urllib.request.Request(url, method="HEAD")
-            req.add_header("User-Agent", "llm-crawler-benchmarks/1.0")
-            resp = urllib.request.urlopen(req, timeout=10)
-            code = resp.getcode()
-        except (urllib.error.URLError, urllib.error.HTTPError, OSError):
-            # HEAD rejected — try GET
-            try:
-                req = urllib.request.Request(url)
-                req.add_header("User-Agent", "llm-crawler-benchmarks/1.0")
-                resp = urllib.request.urlopen(req, timeout=10)
-                code = resp.getcode()
-            except (urllib.error.URLError, urllib.error.HTTPError, OSError):
-                code = 0
-
-        with lock:
-            status_map[url] = (200 <= code < 400)
-
-    with ThreadPoolExecutor(max_workers=concurrency) as pool:
-        pool.map(_check, urls)
-
-    dead_count = sum(1 for ok in status_map.values() if not ok)
-    if len(urls) > 5 and dead_count > len(urls) * 0.5:
-        # Likely a network issue, not actual page removal — keep all
-        logger.warning(f"{dead_count}/{len(urls)} URLs unreachable, likely network issue -- keeping all cached URLs")
-        return list(urls), []
-
-    # Preserve original ordering
-    live = [u for u in urls if status_map.get(u, True)]
-    dead = [u for u in urls if not status_map.get(u, True)]
-    return live, dead
-
-
-def _discover_fresh(url: str, max_pages: int, skip_patterns: Optional[List[str]] = None) -> List[str]:
-    """Full crawl-based URL discovery (original method)."""
-    import re
-
-    from markcrawl.core import crawl
-
-    crawl_pages = max_pages * 2 if skip_patterns else max_pages
-
-    tmp_dir = tempfile.mkdtemp(prefix="mc_discover_")
-    crawl(
-        base_url=url,
-        out_dir=tmp_dir,
-        fmt="markdown",
-        max_pages=crawl_pages,
-        delay=0,
-        timeout=15,
-        show_progress=False,
-        min_words=5,
-    )
-
-    compiled = [re.compile(p) for p in (skip_patterns or [])]
-    urls = []
-    jsonl_path = os.path.join(tmp_dir, "pages.jsonl")
-    if os.path.isfile(jsonl_path):
-        with open(jsonl_path) as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    try:
-                        page = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
-                    page_url = page.get("url", "")
-                    if page_url and not any(p.search(page_url) for p in compiled):
-                        urls.append(page_url)
-
-    shutil.rmtree(tmp_dir, ignore_errors=True)
-    return urls[:max_pages]
-
-
-def discover_urls(
-    site_name: str,
-    url: str,
-    max_pages: int,
-    skip_patterns: Optional[List[str]] = None,
-    force_refresh: bool = False,
-) -> List[str]:
-    """Discover URLs with caching, validation, and staleness detection.
-
-    1. If a fresh cache exists (< 7 days old) with matching settings,
-       validate cached URLs with HEAD requests, remove dead ones, and return.
-    2. If cache is stale, settings changed, or missing, do a full crawl
-       discovery and cache results.
-    3. --refresh-urls forces a full rediscovery.
-    """
-    from datetime import datetime, timezone
-
-    cache = _load_url_cache()
-    entry = cache.get(site_name)
-    now = datetime.now(timezone.utc)
-    current_patterns = skip_patterns or []
-
-    # Check if cache is usable
-    if entry and not force_refresh:
-        cached_at = datetime.fromisoformat(entry["discovered_at"])
-        age_days = (now - cached_at).total_seconds() / 86400
-
-        # Invalidate if settings changed
-        cached_patterns = entry.get("skip_patterns", [])
-        cached_max = entry.get("max_pages", 0)
-        settings_changed = (cached_patterns != current_patterns)
-        needs_more = (max_pages > len(entry.get("urls", [])) and max_pages > cached_max)
-
-        if settings_changed:
-            logger.info("skip_patterns changed, rediscovering...")
-        elif needs_more:
-            logger.info(f"max_pages increased ({cached_max}->{max_pages}), rediscovering...")
-        elif age_days >= _URL_CACHE_MAX_AGE_DAYS:
-            logger.info(f"cache expired ({age_days:.0f} days old), rediscovering...")
-        else:
-            # Cache is usable — validate
-            cached_urls = entry["urls"]
-            logger.info(f"validating {len(cached_urls)} cached URLs...")
-            live, dead = _validate_urls(cached_urls)
-            if dead:
-                logger.info(f"{len(dead)} removed, {len(live)} live")
-            else:
-                logger.info("all live")
-
-            # Update cache with only live URLs
-            if dead:
-                entry["urls"] = live
-                entry["validated_at"] = now.isoformat()
-                _save_url_cache(cache)
-
-            return live[:max_pages]
-
-    # Full discovery
-    urls = _discover_fresh(url, max_pages, skip_patterns)
-
-    # Cache the results with settings for future invalidation checks
-    cache[site_name] = {
-        "urls": urls,
-        "base_url": url,
-        "max_pages": max_pages,
-        "skip_patterns": current_patterns,
-        "discovered_at": now.isoformat(),
-    }
-    _save_url_cache(cache)
-
-    return urls
+# (URL discovery removed — each tool now discovers its own pages from the seed URL)
 
 
 # ---------------------------------------------------------------------------
@@ -581,16 +365,14 @@ def _run_smoke_single(
     tool_name: str,
     tier: dict,
     base_dir: str,
-    url_list: List[str],
     concurrency: int,
 ) -> SmokeResult:
-    """Run a single tool on a single smoke tier."""
+    """Run a single tool on a single smoke tier (discovery mode)."""
     site_name = tier["site"]
     site_config = {
         **COMPARISON_SITES[site_name],
         "max_pages": tier["max_pages"],
     }
-    urls = url_list[:tier["max_pages"]]
 
     out_dir = os.path.join(base_dir, f"smoke_{tool_name}_{tier['name']}")
     os.makedirs(out_dir, exist_ok=True)
@@ -603,7 +385,7 @@ def _run_smoke_single(
     try:
         pages = run_fn(
             site_config["url"], out_dir, tier["max_pages"],
-            url_list=urls, concurrency=concurrency,
+            url_list=None, concurrency=concurrency,
         )
         error = None
     except Exception as exc:
@@ -635,10 +417,9 @@ def _run_smoke_tier(
     tier: dict,
     tools: List[str],
     base_dir: str,
-    url_list: List[str],
     concurrency: int,
 ) -> List[SmokeResult]:
-    """Execute one smoke tier across all provided tools."""
+    """Execute one smoke tier across all provided tools (discovery mode)."""
     results = []
     browser_sem = threading.Semaphore(1)
 
@@ -647,7 +428,7 @@ def _run_smoke_tier(
         if is_browser:
             browser_sem.acquire()
         try:
-            return _run_smoke_single(tool_name, tier, base_dir, url_list, concurrency)
+            return _run_smoke_single(tool_name, tier, base_dir, concurrency)
         finally:
             if is_browser:
                 browser_sem.release()
@@ -691,20 +472,8 @@ def run_smoke_tests(
             logger.warning(f"Smoke tier '{tier['name']}': site '{site_name}' not in COMPARISON_SITES, skipping")
             continue
 
-        # Discover URLs for this tier's site
-        urls = discover_urls(
-            site_name=site_name,
-            url=site_config["url"],
-            max_pages=tier["max_pages"],
-            skip_patterns=site_config.get("skip_patterns"),
-        )
-
-        if not urls:
-            logger.warning(f"Smoke tier '{tier['name']}': no URLs discovered for {site_name}, skipping")
-            continue
-
-        # Run tier for surviving tools
-        tier_results = _run_smoke_tier(tier, surviving_tools, base_dir, urls, concurrency)
+        # Each tool discovers its own pages from the seed URL
+        tier_results = _run_smoke_tier(tier, surviving_tools, base_dir, concurrency)
         all_results.extend(tier_results)
 
         # Log results inline
@@ -1004,18 +773,19 @@ def generate_comparison_report(
         "",
         "## Methodology",
         "",
-        "**Two-phase approach** for a fair comparison:",
-        "",
-        "1. **URL Discovery** — MarkCrawl crawls each site once to build a URL list",
-        "2. **Benchmarking** — All tools fetch the **identical URLs** (no discovery, pure fetch+convert speed)",
+        "**Per-tool discovery:** Each tool starts from the same seed URL and discovers",
+        "its own pages through link-following. This tests real-world crawl behavior —",
+        "discovery quality, link extraction, and content extraction are all measured.",
+        "Page counts may vary between tools depending on each tool's link-following strategy.",
         "",
         "Settings:",
+        "- **Seed URL:** Same for all tools per site",
+        "- **Max pages:** Same limit for all tools per site",
         "- **Delay:** 0 (no politeness throttle)",
         f"- **Concurrency:** {concurrency}",
         "- **Iterations:** 3 per tool per site (reporting median + std dev)",
         "- **Warm-up:** 1 throwaway run per site before timing",
         "- **Output:** Markdown files + JSONL index",
-        "- **URL list:** Identical for all tools (discovered in Phase 1)",
         "",
         "See [METHODOLOGY.md](METHODOLOGY.md) for full methodology.",
         "",
@@ -1136,7 +906,7 @@ def generate_comparison_report(
     # Column legend for per-site tables (printed once after all sites)
     from report_utils import table_legend
     legend_cols = [
-        ("Pages (a)", "total pages fetched from the site (identical URL list for all tools)"),
+        ("Pages (a)", "pages discovered and fetched by this tool (varies per tool)"),
         ("Time (b)", "wall-clock seconds to fetch and convert all pages (median of 3 iterations)"),
         ("[1] Pages/sec", "median throughput across iterations. Approximately a÷b; small differences arise because each column is an independent median"),
         ("[2] Avg words", "mean words per page"),
@@ -1438,8 +1208,6 @@ def main():
                         help="Exclude tools that fail any smoke tier (default: only tiers 1-2 exclude)")
     parser.add_argument("--no-resume", action="store_true",
                         help="Ignore any saved checkpoint and start fresh")
-    parser.add_argument("--refresh-urls", action="store_true",
-                        help="Force full URL rediscovery (ignore URL cache)")
     parser.add_argument("--run", default=None,
                         help="Regenerate report from a previous run's data (e.g. --run run_20260412_195003). "
                              "Skips crawling entirely — reads run_metadata.json and pages.jsonl files.")
@@ -1512,10 +1280,6 @@ def main():
         from preflight import print_ready_status, run_checks
         tool_results, _ = run_checks()
         print_ready_status(tool_results)
-        if not tool_results.get("markcrawl"):
-            logger.error("Pre-flight FAILED: markcrawl is required (used for URL discovery).")
-            logger.error("  Fix: pip install -e .  (from repo root)")
-            sys.exit(1)
         # Only fail on tools we're actually going to run (already passed check())
         not_ready = [t for t, ok in tool_results.items()
                      if not ok and t in available]
@@ -1569,11 +1333,9 @@ def main():
 
     cp = None if args.no_resume else _load_checkpoint(checkpoint_path, args_dict)
     resumed_results: Dict[str, Dict[str, ToolSiteResult]] = {}
-    resumed_urls: Dict[str, List[str]] = {}
     resumed_base_dir: Optional[str] = None
     if cp:
         resumed_results = _restore_results(cp)
-        resumed_urls = cp.get("site_urls", {})
         resumed_base_dir = cp.get("base_dir")
         completed = sum(len(s) for s in resumed_results.values())
         total = len(available) * len(sites)
@@ -1582,33 +1344,12 @@ def main():
         # No valid checkpoint — clean start
         pass
 
-    # Phase 1: Discover URLs for each site (all tools get identical pages)
-    phase1_start = time.time()
-    logger.info("\n--- Phase 1: URL Discovery ---")
-    site_urls: dict[str, List[str]] = {}
-    for site_name, site_config in sites.items():
-        if site_name in resumed_urls and resumed_urls[site_name]:
-            site_urls[site_name] = resumed_urls[site_name]
-            logger.info(f"  {site_name}: {len(site_urls[site_name])} URLs (from checkpoint)")
-        else:
-            logger.info(f"  {site_name}: discovering URLs...")
-            urls = discover_urls(
-                site_name=site_name,
-                url=site_config["url"],
-                max_pages=site_config["max_pages"],
-                skip_patterns=site_config.get("skip_patterns"),
-                force_refresh=args.refresh_urls,
-            )
-            site_urls[site_name] = urls
-            logger.info(f"  {site_name}: {len(urls)} URLs")
-    phase1_end = time.time()
-
-    # Phase 2: Benchmark all tools on identical URL lists
-    phase2_start = time.time()
+    # Each tool discovers its own pages from the seed URL (no shared URL list)
+    bench_start = time.time()
     if resumed_base_dir and os.path.isdir(resumed_base_dir):
         base_dir = resumed_base_dir
     else:
-        base_dir = tempfile.mkdtemp(prefix="markcrawl_comparison_")
+        base_dir = tempfile.mkdtemp(prefix="benchmark_comparison_")
     results: dict[str, dict[str, ToolSiteResult]] = {}
     tool_site_timing: dict[str, dict[str, dict]] = {}
 
@@ -1687,10 +1428,9 @@ def main():
 
         run_fn = TOOLS[tool_name]["run"]
         site_config = sites[site_name]
-        urls = site_urls[site_name]
         tool_site_start = time.time()
 
-        logger.info(f"\n  {tool_name} -> {site_name} ({len(urls)} URLs):")
+        logger.info(f"\n  {tool_name} -> {site_name} (discovery mode, max {site_config['max_pages']} pages):")
 
         # Warm-up — skip for firecrawl on free tier (wastes API credits)
         skip_warmup = args.skip_warmup or (tool_name == "firecrawl" and firecrawl_tier == "free")
@@ -1698,7 +1438,7 @@ def main():
             logger.info(f"    [{tool_name}/{site_name}] warm-up...")
             try:
                 run_single(tool_name, run_fn, site_name, site_config, base_dir,
-                           url_list=urls, concurrency=args.concurrency)
+                           url_list=None, concurrency=args.concurrency)
             except Exception as exc:
                 logger.warning(f"    [{tool_name}/{site_name}] warm-up failed: {exc}")
 
@@ -1706,7 +1446,7 @@ def main():
         runs = []
         for i in range(args.iterations):
             result = run_single(tool_name, run_fn, site_name, site_config, base_dir,
-                                url_list=urls, concurrency=args.concurrency)
+                                url_list=None, concurrency=args.concurrency)
             if result.error:
                 logger.warning(f"    [{tool_name}/{site_name}] run {i+1}/{args.iterations}: error: {result.error[:60]}")
             else:
@@ -1727,7 +1467,7 @@ def main():
 
         # Save checkpoint after each tool-site pair completes
         with _checkpoint_lock:
-            _save_checkpoint(checkpoint_path, site_urls, results, base_dir, args_dict)
+            _save_checkpoint(checkpoint_path, results, base_dir, args_dict)
 
         _print_progress(tool_name, site_name, agg.error)
 
@@ -1756,7 +1496,7 @@ def main():
 
         browser_avail = [t for t in available if t in BROWSER_TOOLS]
         http_avail = [t for t in available if t in HTTP_TOOLS]
-        logger.info("\n--- Phase 2: Benchmarking (resource-aware parallel) ---")
+        logger.info("\n--- Benchmarking (resource-aware parallel, per-tool discovery) ---")
         logger.info(f"  Browser lane (max 1 concurrent): {', '.join(browser_avail) or 'none'}")
         logger.info(f"  HTTP lane (unlimited): {', '.join(http_avail) or 'none'}")
 
@@ -1792,7 +1532,7 @@ def main():
     else:
         # Sequential mode — randomize tool order per site to eliminate
         # cache/CDN bias from fixed ordering.
-        logger.info("\n--- Phase 2: Benchmarking (identical URLs per site, randomized tool order) ---")
+        logger.info("\n--- Benchmarking (per-tool discovery, randomized tool order) ---")
         for site_name in sites:
             tool_order = list(available)
             random.shuffle(tool_order)
@@ -1800,7 +1540,7 @@ def main():
             for tool_name in tool_order:
                 _bench_tool_site(tool_name, site_name)
 
-    phase2_end = time.time()
+    bench_end = time.time()
     run_end = time.time()
 
     logger.info("\n" + "=" * 60)
@@ -1844,17 +1584,12 @@ def main():
             }
             for name in TOOLS
         },
+        "methodology": "per_tool_discovery",
         "phases": {
-            "url_discovery": {
-                "start_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(phase1_start)),
-                "end_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(phase1_end)),
-                "wall_seconds": round(phase1_end - phase1_start, 1),
-                "urls_discovered": {site: len(urls) for site, urls in site_urls.items()},
-            },
             "benchmarking": {
-                "start_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(phase2_start)),
-                "end_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(phase2_end)),
-                "wall_seconds": round(phase2_end - phase2_start, 1),
+                "start_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(bench_start)),
+                "end_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(bench_end)),
+                "wall_seconds": round(bench_end - bench_start, 1),
                 "results": tool_site_timing,
             },
             "parallel_mode": args.parallel,
@@ -1881,7 +1616,6 @@ _DEFAULT_CHECKPOINT = os.path.join(os.path.dirname(__file__), ".benchmark_checkp
 
 def _save_checkpoint(
     path: str,
-    site_urls: Dict[str, List[str]],
     results: Dict[str, Dict[str, ToolSiteResult]],
     base_dir: str,
     args_dict: dict,
@@ -1906,10 +1640,9 @@ def _save_checkpoint(
             }
 
     checkpoint = {
-        "version": 1,
+        "version": 2,
         "base_dir": base_dir,
         "args": args_dict,
-        "site_urls": site_urls,
         "results": serialized_results,
     }
     tmp = path + ".tmp"
@@ -1928,7 +1661,7 @@ def _load_checkpoint(path: str, args_dict: dict) -> Optional[dict]:
     except (json.JSONDecodeError, OSError):
         return None
 
-    if cp.get("version") != 1:
+    if cp.get("version") != 2:
         return None
 
     # Settings must match — different iterations/concurrency/sites means start fresh

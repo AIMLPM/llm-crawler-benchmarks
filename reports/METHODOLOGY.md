@@ -4,7 +4,9 @@
 
 ## Goal
 
-Compare MarkCrawl against Crawl4AI, FireCrawl (self-hosted), and Scrapy on the same sites with equivalent settings, measuring what matters for the "crawl a documentation site for RAG" use case.
+Compare MarkCrawl against Crawl4AI, FireCrawl (self-hosted), Scrapy, Crawlee, Playwright, and Colly on the same sites with equivalent settings, measuring what matters for the "crawl a documentation site for RAG" use case.
+
+Each tool starts from the same seed URL and discovers its own pages through link-following. This tests the full real-world workflow: URL discovery, content extraction, and Markdown conversion. Page counts may vary between tools depending on each tool's link-following strategy — this is itself a meaningful comparison dimension.
 
 If one tool is faster than another, the reports say so. The comparison is factual, not promotional.
 

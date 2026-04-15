@@ -32,7 +32,7 @@ from sync_markcrawl import (
     parse_speed,
 )
 
-BENCHMARK_VERSION = "1.0"
+BENCHMARK_VERSION = "2.0"
 
 
 # ---------------------------------------------------------------------------
@@ -400,6 +400,16 @@ configurations and fairness decisions.
 | [MarkCrawl Self-Benchmark](reports/MARKCRAWL_RESULTS.md) | MarkCrawl standalone performance |
 | [Methodology](reports/METHODOLOGY.md) | How were these benchmarks run? |
 
+## Transparency
+
+This benchmark is maintained by the creators of
+[markcrawl](https://github.com/AIMLPM/markcrawl), one of the tools tested.
+We designed the [methodology](reports/METHODOLOGY.md) to be fair (identical
+seed URLs, randomized execution order, published scripts), but readers should
+be aware of this relationship. All code and data are published so results can
+be independently verified. If you rerun and get different results,
+[open an issue](https://github.com/AIMLPM/llm-crawler-benchmarks/issues).
+
 ## Limitations
 
 - **Single machine, single location.** All benchmarks run on one machine in one
@@ -418,9 +428,9 @@ configurations and fairness decisions.
   reviewers. LLM judges have known biases (verbosity preference, position
   effects). We mitigate with 4-dimension scoring but the scores are not
   ground truth.
-- **No authentication or JS-heavy SPA stress testing.** All test sites are
-  publicly accessible. Sites behind login walls or with heavy client-side
-  rendering may produce different results.
+- **No anti-bot, authentication, or JS-heavy SPA testing.** All test sites are
+  publicly accessible and crawler-friendly. Results do not apply to sites with
+  bot detection, rate limiting, or login walls.
 
 ## Including a tool
 

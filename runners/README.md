@@ -25,11 +25,16 @@ Run the crawl and return the number of pages saved.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `url` | `str` | The seed URL (used for discovery mode, ignored when `url_list` is provided) |
+| `url` | `str` | The seed URL for discovery mode |
 | `out_dir` | `str` | Directory to write output files |
 | `max_pages` | `int` | Maximum pages to fetch |
-| `url_list` | `list[str] \| None` | Explicit list of URLs to fetch (benchmark mode -- no discovery) |
+| `url_list` | `list[str] \| None` | Explicit list of URLs to fetch (no discovery). `None` = discovery mode (default in benchmarks) |
 | `concurrency` | `int` | Number of concurrent fetches |
+
+**Discovery mode (`url_list=None`)** is the default in benchmarks. Each runner
+must support BFS link crawling from the seed URL, staying on the same domain,
+up to `max_pages`. The `url_list` parameter is retained for testing and batch
+scenarios.
 
 ## Output format
 

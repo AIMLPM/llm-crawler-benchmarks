@@ -22,7 +22,7 @@ import sys
 import time
 
 # Import from the benchmark module
-from benchmark_all_tools import discover_urls, COMPARISON_SITES
+from benchmark_all_tools import COMPARISON_SITES
 from runners.crawl4ai_runner import run as run_crawl4ai
 
 TIERS = [
@@ -32,18 +32,16 @@ TIERS = [
 ]
 
 
-def run_tier(tier: dict, urls: list[str], base_dir: str, site_name: str) -> dict:
-    """Run a single tier and return results dict."""
+def run_tier(tier: dict, base_dir: str, site_name: str) -> dict:
+    """Run a single tier in discovery mode and return results dict."""
     max_pages = tier["max_pages"]
-    tier_urls = urls[:max_pages]
     out_dir = os.path.join(base_dir, f"{tier['name']}_{site_name}")
     if os.path.exists(out_dir):
         shutil.rmtree(out_dir)
     os.makedirs(out_dir, exist_ok=True)
 
     print(f"\n{'='*60}")
-    print(f"  {tier['name']}: {max_pages} pages on {site_name}")
-    print(f"  URLs available: {len(tier_urls)}")
+    print(f"  {tier['name']}: {max_pages} pages on {site_name} (discovery mode)")
     print(f"{'='*60}")
 
     start = time.time()
@@ -52,7 +50,7 @@ def run_tier(tier: dict, urls: list[str], base_dir: str, site_name: str) -> dict
             url=COMPARISON_SITES[site_name]["url"],
             out_dir=out_dir,
             max_pages=max_pages,
-            url_list=tier_urls,
+            url_list=None,
         )
     except Exception as exc:
         elapsed = time.time() - start
@@ -122,28 +120,12 @@ def main():
     site_config = COMPARISON_SITES[site_name]
     tiers_to_run = [TIERS[args.tier - 1]] if args.tier else TIERS
 
-    # Discover URLs first
-    print(f"Discovering URLs for {site_name}...")
-    max_needed = max(t["max_pages"] for t in tiers_to_run)
-    urls = discover_urls(
-        site_name=site_name,
-        url=site_config["url"],
-        max_pages=max_needed,
-        skip_patterns=site_config.get("skip_patterns"),
-    )
-    print(f"  Found {len(urls)} URLs (need up to {max_needed})")
-
-    if not urls:
-        print("ERROR: No URLs discovered. Cannot test.")
-        sys.exit(1)
-
-    # Run tiers sequentially, stop on failure
+    # Run tiers sequentially (discovery mode), stop on failure
+    print(f"Testing crawl4ai on {site_name} (discovery mode)...")
     results = []
     all_passed = True
     for tier in tiers_to_run:
-        if len(urls) < tier["max_pages"]:
-            print(f"\n  WARNING: Only {len(urls)} URLs available, tier wants {tier['max_pages']}")
-        result = run_tier(tier, urls, args.output_dir, site_name)
+        result = run_tier(tier, args.output_dir, site_name)
         results.append(result)
         if not result["passed"]:
             all_passed = False
