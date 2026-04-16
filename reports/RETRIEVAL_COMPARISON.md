@@ -1,5 +1,5 @@
 # Retrieval Quality Comparison
-<!-- style: v2, 2026-04-15 -->
+<!-- style: v2, 2026-04-16 -->
 
 Crawler choice barely matters for retrieval — retrieval mode matters more.
 
@@ -87,7 +87,7 @@ _Computed over 99 queries on 7 common sites._
 
 ## What this means
 
-All tools perform within a narrow band (MRR 0.757-0.799 on embedding mode). This is expected: tools crawl similar pages from the same seed URLs, and we apply identical chunking and embedding pipelines. The extraction differences that matter for [content quality](QUALITY_COMPARISON.md) largely wash out at retrieval time.
+All tools perform within MRR 0.459-0.733 on embedding mode (a 0.274 spread). This is expected: tools crawl similar pages from the same seed URLs, and we apply identical chunking and embedding pipelines. The extraction differences that matter for [content quality](QUALITY_COMPARISON.md) largely wash out at retrieval time.
 
 **Retrieval mode matters more than crawler choice.** Embedding search beats BM25 by roughly 2x on MRR across all tools. Hybrid and reranked modes fall between the two. Choosing the right retrieval strategy will improve your RAG pipeline far more than switching crawlers.
 

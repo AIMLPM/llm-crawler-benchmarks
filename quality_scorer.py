@@ -750,12 +750,15 @@ def generate_quality_report(
                         "\U0001FA70-\U0001FAFF]"
                     )
                     sample_lines = [_emoji_re.sub("", ln) for ln in sample_lines]
+                    # Strip ``` markers from crawled content to prevent
+                    # nested code fence issues in the rendered report
+                    sample_lines = [ln.replace("```", "'''") for ln in sample_lines]
                     sample = "\n".join(sample_lines)
                     lines.extend([
                         f"**{tool}**",
-                        "```",
+                        "````",
                         sample,
-                        "```",
+                        "````",
                         "",
                     ])
                 elif page:

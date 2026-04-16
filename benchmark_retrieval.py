@@ -1793,8 +1793,22 @@ def generate_retrieval_report(
     # "What this means" narrative interpretation
     # ============================================================
     lines.extend(["## What this means", ""])
+    # Compute actual MRR range from the embedding summary rows
+    emb_mrrs = [mrr for mrr, _ in emb_summary_rows if mrr > 0]
+    if emb_mrrs:
+        mrr_min, mrr_max = min(emb_mrrs), max(emb_mrrs)
+        mrr_spread = mrr_max - mrr_min
+        if mrr_spread < 0.10:
+            band_desc = f"a narrow band (MRR {mrr_min:.3f}-{mrr_max:.3f} on embedding mode)"
+        else:
+            band_desc = (
+                f"MRR {mrr_min:.3f}-{mrr_max:.3f} on embedding mode "
+                f"(a {mrr_spread:.3f} spread)"
+            )
+    else:
+        band_desc = "similar MRR on embedding mode"
     lines.extend([
-        "All tools perform within a narrow band (MRR 0.757-0.799 on embedding mode). "
+        f"All tools perform within {band_desc}. "
         "This is expected: tools crawl similar pages from the same seed URLs, and we "
         "apply identical chunking and embedding pipelines. The extraction differences "
         "that matter for [content quality](QUALITY_COMPARISON.md) largely wash out at "
@@ -2424,6 +2438,11 @@ def main():
                 continue
             site_results: Dict[str, ToolSiteRetrievalResult] = {}
             for tool in available_tools:
+                # Skip tools that have no pages data for this site
+                tool_pages = run_dir / tool / site / "pages.jsonl"
+                if not tool_pages.exists():
+                    logger.debug("Skipping %s/%s — no pages.jsonl", tool, site)
+                    continue
                 cached = _load_checkpoint(run_name, tool, site, config_label)
                 if cached is not None:
                     site_results[tool] = cached

@@ -1,5 +1,5 @@
 # Extraction Quality Comparison
-<!-- style: v2, 2026-04-15 -->
+<!-- style: v2, 2026-04-16 -->
 
 **markcrawl** produces the cleanest Markdown for RAG: lowest preamble and highest content signal across all sites.
 
@@ -75,7 +75,7 @@ This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
-```
+````
 “The world as we have created it is a process of our thinking. It cannot be changed without changing our thinking.”
 by Albert Einstein
 [(about)](/author/Albert-Einstein)
@@ -115,10 +115,10 @@ by Eleanor Roosevelt
 “A day without sunshine is like, you know, night.”
 by Steve Martin
 [(about)](/author/Steve-Martin)
-```
+````
 
 **crawl4ai**
-```
+````
 #  [Quotes to Scrape](https://quotes.toscrape.com/)
 [Login](https://quotes.toscrape.com/login)
 “The world as we have created it is a process of our thinking. It cannot be changed without changing our thinking.” by Albert Einstein [(about)](https://quotes.toscrape.com/author/Albert-Einstein)
@@ -148,10 +148,10 @@ Tags: [humor](https://quotes.toscrape.com/tag/humor/page/1/) [obvious](https://q
 [love](https://quotes.toscrape.com/tag/love/) [inspirational](https://quotes.toscrape.com/tag/inspirational/) [life](https://quotes.toscrape.com/tag/life/) [humor](https://quotes.toscrape.com/tag/humor/) [books](https://quotes.toscrape.com/tag/books/) [reading](https://quotes.toscrape.com/tag/reading/) [friendship](https://quotes.toscrape.com/tag/friendship/) [friends](https://quotes.toscrape.com/tag/friends/) [truth](https://quotes.toscrape.com/tag/truth/) [simile](https://quotes.toscrape.com/tag/simile/)
 Quotes by: [GoodReads.com](https://www.goodreads.com/quotes)
 Made with ❤ by [Zyte](https://www.zyte.com)
-```
+````
 
 **crawl4ai-raw**
-```
+````
 #  [Quotes to Scrape](https://quotes.toscrape.com/)
 [Login](https://quotes.toscrape.com/login)
 “The world as we have created it is a process of our thinking. It cannot be changed without changing our thinking.” by Albert Einstein [(about)](https://quotes.toscrape.com/author/Albert-Einstein)
@@ -181,10 +181,10 @@ Tags: [humor](https://quotes.toscrape.com/tag/humor/page/1/) [obvious](https://q
 [love](https://quotes.toscrape.com/tag/love/) [inspirational](https://quotes.toscrape.com/tag/inspirational/) [life](https://quotes.toscrape.com/tag/life/) [humor](https://quotes.toscrape.com/tag/humor/) [books](https://quotes.toscrape.com/tag/books/) [reading](https://quotes.toscrape.com/tag/reading/) [friendship](https://quotes.toscrape.com/tag/friendship/) [friends](https://quotes.toscrape.com/tag/friends/) [truth](https://quotes.toscrape.com/tag/truth/) [simile](https://quotes.toscrape.com/tag/simile/)
 Quotes by: [GoodReads.com](https://www.goodreads.com/quotes)
 Made with ❤ by [Zyte](https://www.zyte.com)
-```
+````
 
 **scrapy+md**
-```
+````
 # [Quotes to Scrape](/)
 
 [Login](/login)
@@ -225,10 +225,10 @@ by Jane Austen
 Tags:
 [aliteracy](/tag/aliteracy/page/1/)
 [books](/tag/books/page/1/)
-```
+````
 
 **crawlee**
-```
+````
 Quotes to Scrape
 
 
@@ -269,10 +269,10 @@ Tags:
 “The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.”
 by Jane Austen
 [(about)](/author/Jane-Austen)
-```
+````
 
 **colly+md**
-```
+````
 Quotes to Scrape
 
 
@@ -313,10 +313,10 @@ Tags:
 “The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.”
 by Jane Austen
 [(about)](/author/Jane-Austen)
-```
+````
 
 **playwright**
-```
+````
 Quotes to Scrape
 
 
@@ -357,7 +357,7 @@ Tags:
 “The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.”
 by Jane Austen
 [(about)](/author/Jane-Austen)
-```
+````
 
 **firecrawl** — no output for this URL
 
@@ -449,7 +449,7 @@ This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
-```
+````
 * [Home](index.html)
 * All products
 
@@ -489,10 +489,10 @@ Nav boilerplate appears here before the real content starts.
 
    Add to basket
 5. ### [Sapiens: A Brief History ...](catalogue/sapiens-a-brief-history-of-humankind_996/index.html "Sapiens: A Brief History of Humankind")
-```
+````
 
 **crawl4ai**
-```
+````
 [Books to Scrape](https://books.toscrape.com/index.html) We love being scraped!
   * [Home](https://books.toscrape.com/index.html)
   * All products
@@ -533,10 +533,10 @@ Nav boilerplate appears here before the real content starts.
     * [ Food and Drink ](https://books.toscrape.com/catalogue/category/books/food-and-drink_33/index.html)
     * [ Christian Fiction ](https://books.toscrape.com/catalogue/category/books/christian-fiction_34/index.html)
     * [ Business ](https://books.toscrape.com/catalogue/category/books/business_35/index.html)
-```
+````
 
 **crawl4ai-raw**
-```
+````
 [Books to Scrape](https://books.toscrape.com/index.html) We love being scraped!
   * [Home](https://books.toscrape.com/index.html)
   * All products
@@ -577,10 +577,10 @@ Nav boilerplate appears here before the real content starts.
     * [ Food and Drink ](https://books.toscrape.com/catalogue/category/books/food-and-drink_33/index.html)
     * [ Christian Fiction ](https://books.toscrape.com/catalogue/category/books/christian-fiction_34/index.html)
     * [ Business ](https://books.toscrape.com/catalogue/category/books/business_35/index.html)
-```
+````
 
 **scrapy+md**
-```
+````
 [Books to Scrape](index.html) We love being scraped!
 
 * [Home](index.html)
@@ -621,10 +621,10 @@ Nav boilerplate appears here before the real content starts.
   + [Food and Drink](catalogue/category/books/food-and-drink_33/index.html)
   + [Christian Fiction](catalogue/category/books/christian-fiction_34/index.html)
   + [Business](catalogue/category/books/business_35/index.html)
-```
+````
 
 **crawlee**
-```
+````
 All products | Books to Scrape - Sandbox
 
 
@@ -665,10 +665,10 @@ All products | Books to Scrape - Sandbox
   + [Parenting](catalogue/category/books/parenting_28/index.html)
   + [Adult Fiction](catalogue/category/books/adult-fiction_29/index.html)
   + [Humor](catalogue/category/books/humor_30/index.html)
-```
+````
 
 **colly+md**
-```
+````
   
 
 
@@ -709,10 +709,10 @@ All products | Books to Scrape - Sandbox
   + [Art](catalogue/category/books/art_25/index.html)
   + [Psychology](catalogue/category/books/psychology_26/index.html)
   + [Autobiography](catalogue/category/books/autobiography_27/index.html)
-```
+````
 
 **playwright**
-```
+````
 All products | Books to Scrape - Sandbox
 
 
@@ -753,7 +753,7 @@ All products | Books to Scrape - Sandbox
   + [Parenting](catalogue/category/books/parenting_28/index.html)
   + [Adult Fiction](catalogue/category/books/adult-fiction_29/index.html)
   + [Humor](catalogue/category/books/humor_30/index.html)
-```
+````
 
 **firecrawl** — no output for this URL
 
@@ -1028,62 +1028,62 @@ All products | Books to Scrape - Sandbox
 **markcrawl** produces the cleanest output with 13 words of preamble per page, while **crawl4ai-raw** injects 1445 words of nav chrome before content begins. The word count gap (1593 vs 3628 avg words) is largely explained by preamble: 1445 words of nav chrome account for ~40% of crawl4ai-raw's output on this site. markcrawl's lower recall (37% vs 88%) reflects stricter content filtering — the "missed" sentences are predominantly navigation, sponsor links, and footer text that other tools include as content. For RAG, this is typically a net positive: fewer junk tokens per chunk tends to improve embedding quality and retrieval precision.
 
 <details>
-<summary>Sample output — first 40 lines of <code>fastapi.tiangolo.com/tutorial/testing</code></summary>
+<summary>Sample output — first 40 lines of <code>fastapi.tiangolo.com/deployment/https</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
-```
+````
 *FastAPI framework, high performance, easy to learn, fast to code, ready for production*
 
 
-# Testing[¶](#testing "Permanent link")
+# About HTTPS[¶](#about-https "Permanent link")
 
-Thanks to [Starlette](https://www.starlette.dev/testclient/), testing **FastAPI** applications is easy and enjoyable.
+It is easy to assume that HTTPS is something that is just "enabled" or not.
 
-It is based on [HTTPX](https://www.python-httpx.org), which in turn is designed based on Requests, so it's very familiar and intuitive.
+But it is way more complex than that.
 
-With it, you can use [pytest](https://docs.pytest.org/) directly with **FastAPI**.
+Tip
 
-## Using `TestClient`[¶](#using-testclient "Permanent link")
+If you are in a hurry or don't care, continue with the next sections for step by step instructions to set everything up with different techniques.
 
-Info
+To **learn the basics of HTTPS**, from a consumer perspective, check <https://howhttps.works/>.
 
-To use `TestClient`, first install [`httpx`](https://www.python-httpx.org).
+Now, from a **developer's perspective**, here are several things to keep in mind while thinking about HTTPS:
 
-Make sure you create a [virtual environment](../../virtual-environments/), activate it, and then install it, for example:
+* For HTTPS, **the server** needs to **have "certificates"** generated by a **third party**.
+  * Those certificates are actually **acquired** from the third party, not "generated".
+* Certificates have a **lifetime**.
+  * They **expire**.
+  * And then they need to be **renewed**, **acquired again** from the third party.
+* The encryption of the connection happens at the **TCP level**.
+  * That's one layer **below HTTP**.
+  * So, the **certificate and encryption** handling is done **before HTTP**.
+* **TCP doesn't know about "domains"**. Only about IP addresses.
+  * The information about the **specific domain** requested goes in the **HTTP data**.
+* The **HTTPS certificates** "certify" a **certain domain**, but the protocol and encryption happen at the TCP level, **before knowing** which domain is being dealt with.
+* **By default**, that would mean that you can only have **one HTTPS certificate per IP address**.
+  * No matter how big your server is or how small each application you have on it might be.
+  * There is a **solution** to this, however.
+* There's an **extension** to the **TLS** protocol (the one handling the encryption at the TCP level, before HTTP) called **[SNI](https://en.wikipedia.org/wiki/Server_Name_Indication)**.
+  * This SNI extension allows one single server (with a **single IP address**) to have **several HTTPS certificates** and serve **multiple HTTPS domains/applications**.
+  * For this to work, a **single** component (program) running on the server, listening on the **public IP address**, must have **all the HTTPS certificates** in the server.
+* **After** obtaining a secure connection, the communication protocol is **still HTTP**.
+  * The contents are **encrypted**, even though they are being sent with the **HTTP protocol**.
 
-```
-$ pip install httpx
-```
+It is a common practice to have **one program/HTTP server** running on the server (the machine, host, etc.) and **managing all the HTTPS parts**: receiving the **encrypted HTTPS requests**, sending the **decrypted HTTP requests** to the actual HTTP application running in the same server (the **FastAPI** application, in this case), take the **HTTP response** from the application, **encrypt it** using the appropriate **HTTPS certificate** and sending it back to the client using **HTTPS**. This server is often called a **[TLS Termination Proxy](https://en.wikipedia.org/wiki/TLS_termination_proxy)**.
 
-Import `TestClient`.
-
-Create a `TestClient` by passing your **FastAPI** application to it.
-
-Create functions with a name that starts with `test_` (this is standard `pytest` conventions).
-
-Use the `TestClient` object the same way as you do with `httpx`.
-
-Write simple `assert` statements with the standard Python expressions that you need to check (again, standard `pytest`).
-
-Python 3.10+
-
-```
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
-
-app = FastAPI()
-```
+Some of the options you could use as a TLS Termination Proxy are:
+````
 
 **crawl4ai**
-```
-[ Skip to content ](https://fastapi.tiangolo.com/tutorial/testing/#testing)
-[ **FastAPI Cloud** waiting list ](https://fastapicloud.com)
+````
+[ Skip to content ](https://fastapi.tiangolo.com/deployment/https/#about-https)
+[ **FastAPI Cloud** waiting list  ](https://fastapicloud.com)
 [ Follow **@fastapi** on **X (Twitter)** to stay updated ](https://x.com/fastapi)
 [ Follow **FastAPI** on **LinkedIn** to stay updated ](https://www.linkedin.com/company/fastapi)
-[ **FastAPI and friends** newsletter ](https://fastapi.tiangolo.com/newsletter/)
+[ **FastAPI and friends** newsletter  ](https://fastapi.tiangolo.com/newsletter/)
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/blockbee-banner.png) ](https://blockbee.io?ref=fastapi "BlockBee Cryptocurrency Payment Gateway")
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/scalar-banner.svg) ](https://github.com/scalar/scalar/?utm_source=fastapi&utm_medium=website&utm_campaign=top-banner "Scalar: Beautiful Open-Source API References from Swagger/OpenAPI files")
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/propelauth-banner.png) ](https://www.propelauth.com/?utm_source=fastapi&utm_campaign=1223&utm_medium=topbanner "Auth, user management and more for your B2B product")
@@ -1097,7 +1097,7 @@ app = FastAPI()
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/greptile-banner.png) ](https://www.greptile.com/?utm_source=fastapi&utm_medium=sponsorship&utm_campaign=fastapi_sponsor_page "Greptile: The AI Code Reviewer")
 [ ![logo](https://fastapi.tiangolo.com/img/icon-white.svg) ](https://fastapi.tiangolo.com/ "FastAPI")
 FastAPI 
-Testing 
+About HTTPS 
   * [ en - English ](https://fastapi.tiangolo.com/)
   * [ de - Deutsch ](https://fastapi.tiangolo.com/de/)
   * [ es - español ](https://fastapi.tiangolo.com/es/)
@@ -1112,21 +1112,21 @@ Testing
   * [ zh-hant - 繁體中文 ](https://fastapi.tiangolo.com/zh-hant/)
 
 
-[ ](https://fastapi.tiangolo.com/tutorial/testing/?q= "Share")
+[ ](https://fastapi.tiangolo.com/deployment/https/?q= "Share")
 Type to start searching
 [ fastapi/fastapi 
   * 0.135.3
   * 97.3k
   * 9.1k
-```
+````
 
 **crawl4ai-raw**
-```
-[ Skip to content ](https://fastapi.tiangolo.com/tutorial/testing/#testing)
-[ **FastAPI Cloud** waiting list ](https://fastapicloud.com)
+````
+[ Skip to content ](https://fastapi.tiangolo.com/deployment/https/#about-https)
+[ **FastAPI Cloud** waiting list  ](https://fastapicloud.com)
 [ Follow **@fastapi** on **X (Twitter)** to stay updated ](https://x.com/fastapi)
 [ Follow **FastAPI** on **LinkedIn** to stay updated ](https://www.linkedin.com/company/fastapi)
-[ **FastAPI and friends** newsletter ](https://fastapi.tiangolo.com/newsletter/)
+[ **FastAPI and friends** newsletter  ](https://fastapi.tiangolo.com/newsletter/)
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/blockbee-banner.png) ](https://blockbee.io?ref=fastapi "BlockBee Cryptocurrency Payment Gateway")
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/scalar-banner.svg) ](https://github.com/scalar/scalar/?utm_source=fastapi&utm_medium=website&utm_campaign=top-banner "Scalar: Beautiful Open-Source API References from Swagger/OpenAPI files")
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/propelauth-banner.png) ](https://www.propelauth.com/?utm_source=fastapi&utm_campaign=1223&utm_medium=topbanner "Auth, user management and more for your B2B product")
@@ -1140,7 +1140,7 @@ Type to start searching
 [ sponsor ![](https://fastapi.tiangolo.com/img/sponsors/greptile-banner.png) ](https://www.greptile.com/?utm_source=fastapi&utm_medium=sponsorship&utm_campaign=fastapi_sponsor_page "Greptile: The AI Code Reviewer")
 [ ![logo](https://fastapi.tiangolo.com/img/icon-white.svg) ](https://fastapi.tiangolo.com/ "FastAPI")
 FastAPI 
-Testing 
+About HTTPS 
   * [ en - English ](https://fastapi.tiangolo.com/)
   * [ de - Deutsch ](https://fastapi.tiangolo.com/de/)
   * [ es - español ](https://fastapi.tiangolo.com/es/)
@@ -1155,16 +1155,16 @@ Testing
   * [ zh-hant - 繁體中文 ](https://fastapi.tiangolo.com/zh-hant/)
 
 
-[ ](https://fastapi.tiangolo.com/tutorial/testing/?q= "Share")
-Initializing search 
+[ ](https://fastapi.tiangolo.com/deployment/https/?q= "Share")
+Type to start searching
 [ fastapi/fastapi 
   * 0.135.3
   * 97.3k
   * 9.1k
-```
+````
 
 **scrapy+md**
-```
+````
 FastAPI
 
 [fastapi/fastapi](https://github.com/fastapi/fastapi "Go to repository")
@@ -1178,38 +1178,38 @@ FastAPI
   + [Concurrency and async / await](../../async/)
   + [Environment Variables](../../environment-variables/)
   + [Virtual Environments](../../virtual-environments/)
-  + [Tutorial - User Guide](../)
+  + [Tutorial - User Guide](../../tutorial/)
 
     Tutorial - User Guide
-    - [First Steps](../first-steps/)
-    - [Path Parameters](../path-params/)
-    - [Query Parameters](../query-params/)
-    - [Request Body](../body/)
-    - [Query Parameters and String Validations](../query-params-str-validations/)
-    - [Path Parameters and Numeric Validations](../path-params-numeric-validations/)
-    - [Query Parameter Models](../query-param-models/)
-    - [Body - Multiple Parameters](../body-multiple-params/)
-    - [Body - Fields](../body-fields/)
-    - [Body - Nested Models](../body-nested-models/)
-    - [Declare Request Example Data](../schema-extra-example/)
-    - [Extra Data Types](../extra-data-types/)
-    - [Cookie Parameters](../cookie-params/)
-    - [Header Parameters](../header-params/)
-    - [Cookie Parameter Models](../cookie-param-models/)
-    - [Header Parameter Models](../header-param-models/)
-    - [Response Model - Return Type](../response-model/)
-    - [Extra Models](../extra-models/)
-    - [Response Status Code](../response-status-code/)
-    - [Form Data](../request-forms/)
-    - [Form Models](../request-form-models/)
-    - [Request Files](../request-files/)
-    - [Request Forms and Files](../request-forms-and-files/)
-    - [Handling Errors](../handling-errors/)
-```
+    - [First Steps](../../tutorial/first-steps/)
+    - [Path Parameters](../../tutorial/path-params/)
+    - [Query Parameters](../../tutorial/query-params/)
+    - [Request Body](../../tutorial/body/)
+    - [Query Parameters and String Validations](../../tutorial/query-params-str-validations/)
+    - [Path Parameters and Numeric Validations](../../tutorial/path-params-numeric-validations/)
+    - [Query Parameter Models](../../tutorial/query-param-models/)
+    - [Body - Multiple Parameters](../../tutorial/body-multiple-params/)
+    - [Body - Fields](../../tutorial/body-fields/)
+    - [Body - Nested Models](../../tutorial/body-nested-models/)
+    - [Declare Request Example Data](../../tutorial/schema-extra-example/)
+    - [Extra Data Types](../../tutorial/extra-data-types/)
+    - [Cookie Parameters](../../tutorial/cookie-params/)
+    - [Header Parameters](../../tutorial/header-params/)
+    - [Cookie Parameter Models](../../tutorial/cookie-param-models/)
+    - [Header Parameter Models](../../tutorial/header-param-models/)
+    - [Response Model - Return Type](../../tutorial/response-model/)
+    - [Extra Models](../../tutorial/extra-models/)
+    - [Response Status Code](../../tutorial/response-status-code/)
+    - [Form Data](../../tutorial/request-forms/)
+    - [Form Models](../../tutorial/request-form-models/)
+    - [Request Files](../../tutorial/request-files/)
+    - [Request Forms and Files](../../tutorial/request-forms-and-files/)
+    - [Handling Errors](../../tutorial/handling-errors/)
+````
 
 **crawlee**
-```
-Testing - FastAPI
+````
+About HTTPS - FastAPI
 
 
 
@@ -1240,20 +1240,20 @@ visibility: hidden;
 
 
 
-[Skip to content](https://fastapi.tiangolo.com/tutorial/testing/#testing)
+[Skip to content](https://fastapi.tiangolo.com/deployment/https/#about-https)
 
-[Join the **FastAPI Cloud** waiting list](https://fastapicloud.com)
+[Join the **FastAPI Cloud** waiting list ](https://fastapicloud.com)
 
 [Follow **@fastapi** on **X (Twitter)** to stay updated](https://x.com/fastapi)
 
 [Follow **FastAPI** on **LinkedIn** to stay updated](https://www.linkedin.com/company/fastapi)
 
-[Subscribe to the **FastAPI and friends** newsletter](https://fastapi.tiangolo.com/newsletter/)
-```
+[Subscribe to the **FastAPI and friends** newsletter ](https://fastapi.tiangolo.com/newsletter/)
+````
 
 **colly+md**
-```
-Testing - FastAPI
+````
+About HTTPS - FastAPI
 
 
 
@@ -1269,15 +1269,15 @@ Testing - FastAPI
 
 
 
-[Skip to content](#testing)
+[Skip to content](#about-https)
 
-[Join the **FastAPI Cloud** waiting list](https://fastapicloud.com)
+[Join the **FastAPI Cloud** waiting list ](https://fastapicloud.com)
 
 [Follow **@fastapi** on **X (Twitter)** to stay updated](https://x.com/fastapi)
 
 [Follow **FastAPI** on **LinkedIn** to stay updated](https://www.linkedin.com/company/fastapi)
 
-[Subscribe to the **FastAPI and friends** newsletter](https://fastapi.tiangolo.com/newsletter/)
+[Subscribe to the **FastAPI and friends** newsletter ](https://fastapi.tiangolo.com/newsletter/)
 
 [sponsor](https://blockbee.io?ref=fastapi "BlockBee Cryptocurrency Payment Gateway")
 
@@ -1292,11 +1292,11 @@ Testing - FastAPI
 [sponsor](https://docs.render.com/deploy-fastapi?utm_source=deploydoc&utm_medium=referral&utm_campaign=fastapi "Deploy & scale any full-stack web app on Render. Focus on building apps, not infra.")
 
 [sponsor](https://www.coderabbit.ai/?utm_source=fastapi&utm_medium=banner&utm_campaign=fastapi "Cut Code Review Time & Bugs in Half with CodeRabbit")
-```
+````
 
 **playwright**
-```
-Testing - FastAPI
+````
+About HTTPS - FastAPI
 
 
 
@@ -1312,15 +1312,15 @@ Testing - FastAPI
 
 
 
-[Skip to content](https://fastapi.tiangolo.com/tutorial/testing/#testing)
+[Skip to content](https://fastapi.tiangolo.com/deployment/https/#about-https)
 
-[Join the **FastAPI Cloud** waiting list](https://fastapicloud.com)
+[Join the **FastAPI Cloud** waiting list ](https://fastapicloud.com)
 
 [Follow **@fastapi** on **X (Twitter)** to stay updated](https://x.com/fastapi)
 
 [Follow **FastAPI** on **LinkedIn** to stay updated](https://www.linkedin.com/company/fastapi)
 
-[Subscribe to the **FastAPI and friends** newsletter](https://fastapi.tiangolo.com/newsletter/)
+[Subscribe to the **FastAPI and friends** newsletter ](https://fastapi.tiangolo.com/newsletter/)
 
 [sponsor](https://blockbee.io?ref=fastapi "BlockBee Cryptocurrency Payment Gateway")
 
@@ -1335,7 +1335,7 @@ Testing - FastAPI
 [sponsor](https://docs.render.com/deploy-fastapi?utm_source=deploydoc&utm_medium=referral&utm_campaign=fastapi "Deploy & scale any full-stack web app on Render. Focus on building apps, not infra.")
 
 [sponsor](https://www.coderabbit.ai/?utm_source=fastapi&utm_medium=banner&utm_campaign=fastapi "Cut Code Review Time & Bugs in Half with CodeRabbit")
-```
+````
 
 **firecrawl** — no output for this URL
 
@@ -2201,7 +2201,7 @@ Testing - FastAPI
 **scrapy+md** produces the cleanest output with 4 words of preamble per page, while **crawl4ai** injects 67 words of nav chrome before content begins. scrapy+md's lower recall (5% vs 73%) reflects stricter content filtering — the "missed" sentences are predominantly navigation, sponsor links, and footer text that other tools include as content. For RAG, this is typically a net positive: fewer junk tokens per chunk tends to improve embedding quality and retrieval precision.
 
 <details>
-<summary>Sample output — first 40 lines of <code>docs.python.org/3/library/cmdline.html</code></summary>
+<summary>Sample output — first 40 lines of <code>docs.python.org/3/library/syslog.html</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
@@ -2209,107 +2209,113 @@ Nav boilerplate appears here before the real content starts.
 **markcrawl** — no output for this URL
 
 **crawl4ai**
-```
+````
 [ ![Python logo](https://docs.python.org/3/_static/py.svg) ](https://www.python.org/) dev (3.15) 3.14.4 3.13 3.12 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
 Greek | Ελληνικά English Spanish | español French | français Italian | italiano Japanese | 日本語 Korean | 한국어 Polish | polski Brazilian Portuguese | Português brasileiro Romanian | Românește Turkish | Türkçe Simplified Chinese | 简体中文 Traditional Chinese | 繁體中文
 Theme  Auto Light Dark
+### [Table of Contents](https://docs.python.org/3/contents.html)
+  * [`syslog` — Unix syslog library routines](https://docs.python.org/3/library/syslog.html#)
+    * [Examples](https://docs.python.org/3/library/syslog.html#examples)
+      * [Simple example](https://docs.python.org/3/library/syslog.html#simple-example)
+
+
 #### Previous topic
-[`syslog` — Unix syslog library routines](https://docs.python.org/3/library/syslog.html "previous chapter")
+[`resource` — Resource usage information](https://docs.python.org/3/library/resource.html "previous chapter")
 #### Next topic
-[Superseded Modules](https://docs.python.org/3/library/superseded.html "next chapter")
+[Modules command-line interface (CLI)](https://docs.python.org/3/library/cmdline.html "next chapter")
 ### This page
   * [Report a bug](https://docs.python.org/3/bugs.html)
-  * [Improve this page](https://docs.python.org/3/improve-page.html?pagetitle=Modules+command-line+interface+%28CLI%29&pageurl=https%3A%2F%2Fdocs.python.org%2F3%2Flibrary%2Fcmdline.html&pagesource=library%2Fcmdline.rst)
-  * [Show source ](https://github.com/python/cpython/blob/main/Doc/library/cmdline.rst?plain=1)
+  * [Improve this page](https://docs.python.org/3/improve-page.html?pagetitle=syslog+%E2%80%94+Unix+syslog+library+routines&pageurl=https%3A%2F%2Fdocs.python.org%2F3%2Flibrary%2Fsyslog.html&pagesource=library%2Fsyslog.rst)
+  * [Show source ](https://github.com/python/cpython/blob/main/Doc/library/syslog.rst?plain=1)
 
 
 ### Navigation
   * [index](https://docs.python.org/3/genindex.html "General Index")
   * [modules](https://docs.python.org/3/py-modindex.html "Python Module Index") |
-  * [next](https://docs.python.org/3/library/superseded.html "Superseded Modules") |
-  * [previous](https://docs.python.org/3/library/syslog.html "syslog — Unix syslog library routines") |
+  * [next](https://docs.python.org/3/library/cmdline.html "Modules command-line interface \(CLI\)") |
+  * [previous](https://docs.python.org/3/library/resource.html "resource — Resource usage information") |
   * ![Python logo](https://docs.python.org/3/_static/py.svg)
   * [Python](https://www.python.org/) »
   * Greek | Ελληνικά English Spanish | español French | français Italian | italiano Japanese | 日本語 Korean | 한국어 Polish | polski Brazilian Portuguese | Português brasileiro Romanian | Românește Turkish | Türkçe Simplified Chinese | 简体中文 Traditional Chinese | 繁體中文
 dev (3.15) 3.14.4 3.13 3.12 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
   * [3.14.4 Documentation](https://docs.python.org/3/index.html) » 
   * [The Python Standard Library](https://docs.python.org/3/library/index.html) »
-  * [Modules command-line interface (CLI)](https://docs.python.org/3/library/cmdline.html)
+  * [Unix-specific services](https://docs.python.org/3/library/unix.html) »
+  * [`syslog` — Unix syslog library routines](https://docs.python.org/3/library/syslog.html)
   * | 
   * Theme  Auto Light Dark |
 
 
-# Modules command-line interface (CLI)[¶](https://docs.python.org/3/library/cmdline.html#modules-command-line-interface-cli "Link to this heading")
-The following modules have a command-line interface.
-  * [ast](https://docs.python.org/3/library/ast.html#ast-cli)
-  * [asyncio](https://docs.python.org/3/library/asyncio.html#asyncio-cli)
-  * [`base64`](https://docs.python.org/3/library/base64.html#module-base64 "base64: RFC 4648: Base16, Base32, Base64 Data Encodings; Base85 and Ascii85")
-  * [calendar](https://docs.python.org/3/library/calendar.html#calendar-cli)
-  * [`code`](https://docs.python.org/3/library/code.html#module-code "code: Facilities to implement read-eval-print loops.")
-  * [compileall](https://docs.python.org/3/library/compileall.html#compileall-cli)
-  * [`cProfile`](https://docs.python.org/3/library/profile.html#module-cProfile "cProfile"): see [profile](https://docs.python.org/3/library/profile.html#profile-cli)
-  * [dis](https://docs.python.org/3/library/dis.html#dis-cli)
-  * [doctest](https://docs.python.org/3/library/doctest.html#doctest-cli)
-```
+#  `syslog` — Unix syslog library routines[¶](https://docs.python.org/3/library/syslog.html#module-syslog "Link to this heading")
+* * *
+This module provides an interface to the Unix `syslog` library routines. Refer to the Unix manual pages for a detailed description of the `syslog` facility.
+[Availability](https://docs.python.org/3/library/intro.html#availability): Unix, not WASI, not iOS.
+````
 
 **crawl4ai-raw**
-```
+````
 [ ![Python logo](https://docs.python.org/3/_static/py.svg) ](https://www.python.org/) dev (3.15) 3.14.4 3.13 3.12 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
 Greek | Ελληνικά English Spanish | español French | français Italian | italiano Japanese | 日本語 Korean | 한국어 Polish | polski Brazilian Portuguese | Português brasileiro Romanian | Românește Turkish | Türkçe Simplified Chinese | 简体中文 Traditional Chinese | 繁體中文
 Theme  Auto Light Dark
+### [Table of Contents](https://docs.python.org/3/contents.html)
+  * [`syslog` — Unix syslog library routines](https://docs.python.org/3/library/syslog.html#)
+    * [Examples](https://docs.python.org/3/library/syslog.html#examples)
+      * [Simple example](https://docs.python.org/3/library/syslog.html#simple-example)
+
+
 #### Previous topic
-[`syslog` — Unix syslog library routines](https://docs.python.org/3/library/syslog.html "previous chapter")
+[`resource` — Resource usage information](https://docs.python.org/3/library/resource.html "previous chapter")
 #### Next topic
-[Superseded Modules](https://docs.python.org/3/library/superseded.html "next chapter")
+[Modules command-line interface (CLI)](https://docs.python.org/3/library/cmdline.html "next chapter")
 ### This page
   * [Report a bug](https://docs.python.org/3/bugs.html)
-  * [Improve this page](https://docs.python.org/3/improve-page.html?pagetitle=Modules+command-line+interface+%28CLI%29&pageurl=https%3A%2F%2Fdocs.python.org%2F3%2Flibrary%2Fcmdline.html&pagesource=library%2Fcmdline.rst)
-  * [Show source ](https://github.com/python/cpython/blob/main/Doc/library/cmdline.rst?plain=1)
+  * [Improve this page](https://docs.python.org/3/improve-page.html?pagetitle=syslog+%E2%80%94+Unix+syslog+library+routines&pageurl=https%3A%2F%2Fdocs.python.org%2F3%2Flibrary%2Fsyslog.html&pagesource=library%2Fsyslog.rst)
+  * [Show source ](https://github.com/python/cpython/blob/main/Doc/library/syslog.rst?plain=1)
 
 
 ### Navigation
   * [index](https://docs.python.org/3/genindex.html "General Index")
   * [modules](https://docs.python.org/3/py-modindex.html "Python Module Index") |
-  * [next](https://docs.python.org/3/library/superseded.html "Superseded Modules") |
-  * [previous](https://docs.python.org/3/library/syslog.html "syslog — Unix syslog library routines") |
+  * [next](https://docs.python.org/3/library/cmdline.html "Modules command-line interface \(CLI\)") |
+  * [previous](https://docs.python.org/3/library/resource.html "resource — Resource usage information") |
   * ![Python logo](https://docs.python.org/3/_static/py.svg)
   * [Python](https://www.python.org/) »
   * Greek | Ελληνικά English Spanish | español French | français Italian | italiano Japanese | 日本語 Korean | 한국어 Polish | polski Brazilian Portuguese | Português brasileiro Romanian | Românește Turkish | Türkçe Simplified Chinese | 简体中文 Traditional Chinese | 繁體中文
 dev (3.15) 3.14.4 3.13 3.12 3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0 2.7 2.6
   * [3.14.4 Documentation](https://docs.python.org/3/index.html) » 
   * [The Python Standard Library](https://docs.python.org/3/library/index.html) »
-  * [Modules command-line interface (CLI)](https://docs.python.org/3/library/cmdline.html)
+  * [Unix-specific services](https://docs.python.org/3/library/unix.html) »
+  * [`syslog` — Unix syslog library routines](https://docs.python.org/3/library/syslog.html)
   * | 
   * Theme  Auto Light Dark |
 
 
-# Modules command-line interface (CLI)[¶](https://docs.python.org/3/library/cmdline.html#modules-command-line-interface-cli "Link to this heading")
-The following modules have a command-line interface.
-  * [ast](https://docs.python.org/3/library/ast.html#ast-cli)
-  * [asyncio](https://docs.python.org/3/library/asyncio.html#asyncio-cli)
-  * [`base64`](https://docs.python.org/3/library/base64.html#module-base64 "base64: RFC 4648: Base16, Base32, Base64 Data Encodings; Base85 and Ascii85")
-  * [calendar](https://docs.python.org/3/library/calendar.html#calendar-cli)
-  * [`code`](https://docs.python.org/3/library/code.html#module-code "code: Facilities to implement read-eval-print loops.")
-  * [compileall](https://docs.python.org/3/library/compileall.html#compileall-cli)
-  * [`cProfile`](https://docs.python.org/3/library/profile.html#module-cProfile "cProfile"): see [profile](https://docs.python.org/3/library/profile.html#profile-cli)
-  * [dis](https://docs.python.org/3/library/dis.html#dis-cli)
-  * [doctest](https://docs.python.org/3/library/doctest.html#doctest-cli)
-```
+#  `syslog` — Unix syslog library routines[¶](https://docs.python.org/3/library/syslog.html#module-syslog "Link to this heading")
+* * *
+This module provides an interface to the Unix `syslog` library routines. Refer to the Unix manual pages for a detailed description of the `syslog` facility.
+[Availability](https://docs.python.org/3/library/intro.html#availability): Unix, not WASI, not iOS.
+````
 
 **scrapy+md**
-```
+````
 Theme
 Auto
 Light
 Dark
 
+### [Table of Contents](../contents.html)
+
+* [`syslog` — Unix syslog library routines](#)
+  + [Examples](#examples)
+    - [Simple example](#simple-example)
+
 #### Previous topic
 
-[`syslog` — Unix syslog library routines](syslog.html "previous chapter")
+[`resource` — Resource usage information](resource.html "previous chapter")
 
 #### Next topic
 
-[Superseded Modules](superseded.html "next chapter")
+[Modules command-line interface (CLI)](cmdline.html "next chapter")
 
 document.addEventListener('DOMContentLoaded', () => {
 const title = document.querySelector('meta[property="og:title"]').content;
@@ -2319,7 +2325,7 @@ elements.forEach(element => {
 const url = new URL(element.href.split('?')[0].replace("-nojs", ""));
 url.searchParams.set('pagetitle', title);
 url.searchParams.set('pageurl', pageurl);
-url.searchParams.set('pagesource', "library/cmdline.rst");
+url.searchParams.set('pagesource', "library/syslog.rst");
 element.href = url.toString();
 });
 });
@@ -2328,20 +2334,14 @@ element.href = url.toString();
 
 * [Report a bug](../bugs.html)
 * [Improve this page](../improve-page-nojs.html)
-* [Show source](https://github.com/python/cpython/blob/main/Doc/library/cmdline.rst?plain=1)
+* [Show source](https://github.com/python/cpython/blob/main/Doc/library/syslog.rst?plain=1)
 
 ### Navigation
-
-* [index](../genindex.html "General Index")
-* [modules](../py-modindex.html "Python Module Index") |
-* [next](superseded.html "Superseded Modules") |
-* [previous](syslog.html "syslog — Unix syslog library routines") |
-* [Python](https://www.python.org/) »
-```
+````
 
 **crawlee**
-```
-Modules command-line interface (CLI) — Python 3.14.4 documentation
+````
+syslog — Unix syslog library routines — Python 3.14.4 documentation
 
 
 
@@ -2377,14 +2377,15 @@ Auto
 Light
 Dark
 
-#### Previous topic
+### [Table of Contents](../contents.html)
 
-[`syslog` — Unix syslog library routines](syslog.html "previous chapter")
-```
+* [`syslog` — Unix syslog library routines](#)
+  + [Examples](#examples)
+````
 
 **colly+md**
-```
-Modules command-line interface (CLI) — Python 3.14.4 documentation
+````
+syslog — Unix syslog library routines — Python 3.14.4 documentation
 
 
 
@@ -2416,18 +2417,18 @@ Auto
 Light
 Dark
 
+### [Table of Contents](../contents.html)
+
+* [`syslog` — Unix syslog library routines](#)
+  + [Examples](#examples)
+    - [Simple example](#simple-example)
+
 #### Previous topic
-
-[`syslog` — Unix syslog library routines](syslog.html "previous chapter")
-
-#### Next topic
-
-[Superseded Modules](superseded.html "next chapter")
-```
+````
 
 **playwright**
-```
-Modules command-line interface (CLI) — Python 3.14.4 documentation
+````
+syslog — Unix syslog library routines — Python 3.14.4 documentation
 
 
 
@@ -2463,10 +2464,11 @@ Auto
 Light
 Dark
 
-#### Previous topic
+### [Table of Contents](../contents.html)
 
-[`syslog` — Unix syslog library routines](syslog.html "previous chapter")
-```
+* [`syslog` — Unix syslog library routines](#)
+  + [Examples](#examples)
+````
 
 **firecrawl** — no output for this URL
 
@@ -4295,57 +4297,57 @@ Dark
 **scrapy+md** produces the cleanest output with 6 words of preamble per page, while **crawlee** injects 347 words of nav chrome before content begins. The word count gap (1559 vs 5549 avg words) is largely explained by preamble: 280 words of nav chrome account for ~5% of colly+md's output on this site. scrapy+md's lower recall (44% vs 98%) reflects stricter content filtering — the "missed" sentences are predominantly navigation, sponsor links, and footer text that other tools include as content. For RAG, this is typically a net positive: fewer junk tokens per chunk tends to improve embedding quality and retrieval precision.
 
 <details>
-<summary>Sample output — first 40 lines of <code>react.dev/learn/your-first-component</code></summary>
+<summary>Sample output — first 40 lines of <code>react.dev/community/translations</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
-```
+````
 *The library for web and native user interfaces*
 
 
-[Learn React](/learn)
-
-[Describing the UI](/learn/describing-the-ui)
+[Community](/community)
 
 Copy pageCopy
 
-# Your First Component
+# Translations
 
-*Components* are one of the core concepts of React. They are the foundation upon which you build user interfaces (UI), which makes them the perfect place to start your React journey!
+React docs are translated by the global community into many languages all over the world.
 
-### You will learn
+## Source site
 
-* What a component is
-* What role components play in a React application
-* How to write your first React component
+All translations are provided from the canonical source docs:
 
-## Components: UI building blocks
+* [English](https://react.dev/) — [Contribute](https://github.com/reactjs/react.dev/)
 
-On the Web, HTML lets us create rich structured documents with its built-in set of tags like `<h1>` and `<li>`:
+## Full translations
 
-```
-<article>
+* [French (Français)](https://fr.react.dev/) — [Contribute](https://github.com/reactjs/fr.react.dev)
+* [Japanese (日本語)](https://ja.react.dev/) — [Contribute](https://github.com/reactjs/ja.react.dev)
+* [Korean (한국어)](https://ko.react.dev/) — [Contribute](https://github.com/reactjs/ko.react.dev)
+* [Simplified Chinese (简体中文)](https://zh-hans.react.dev/) — [Contribute](https://github.com/reactjs/zh-hans.react.dev)
+* [Spanish (Español)](https://es.react.dev/) — [Contribute](https://github.com/reactjs/es.react.dev)
+* [Turkish (Türkçe)](https://tr.react.dev/) — [Contribute](https://github.com/reactjs/tr.react.dev)
 
+## In-progress translations
 
-<h1>My First Component</h1>
+For the progress of each translation, see: [Is React Translated Yet?](https://translations.react.dev/)
 
-
-<ol>
-
-
-<li>Components: UI Building Blocks</li>
-
-
-<li>Defining a Component</li>
-
-
-<li>Using a Component</li>
-```
+* [Arabic (العربية)](https://ar.react.dev/) — [Contribute](https://github.com/reactjs/ar.react.dev)
+* [Azerbaijani (Azərbaycanca)](https://az.react.dev/) — [Contribute](https://github.com/reactjs/az.react.dev)
+* [Belarusian (Беларуская)](https://be.react.dev/) — [Contribute](https://github.com/reactjs/be.react.dev)
+* [Bengali (বাংলা)](https://bn.react.dev/) — [Contribute](https://github.com/reactjs/bn.react.dev)
+* [Czech (Čeština)](https://cs.react.dev/) — [Contribute](https://github.com/reactjs/cs.react.dev)
+* [Finnish (Suomi)](https://fi.react.dev/) — [Contribute](https://github.com/reactjs/fi.react.dev)
+* [German (Deutsch)](https://de.react.dev/) — [Contribute](https://github.com/reactjs/de.react.dev)
+* [Gujarati (ગુજરાતી)](https://gu.react.dev/) — [Contribute](https://github.com/reactjs/gu.react.dev)
+* [Hebrew (עברית)](https://he.react.dev/) — [Contribute](https://github.com/reactjs/he.react.dev)
+* [Hindi (हिन्दी)](https://hi.react.dev/) — [Contribute](https://github.com/reactjs/hi.react.dev)
+````
 
 **crawl4ai**
-```
+````
 [![logo by @sawaratsuki1004](https://react.dev/_next/image?url=%2Fimages%2Fuwu.png&w=128&q=75)](https://react.dev/)
 [React](https://react.dev/)
 [v19.2](https://react.dev/versions)
@@ -4356,40 +4358,39 @@ On the Web, HTML lets us create rich structured documents with its built-in set 
 [Blog](https://react.dev/blog)
 [](https://react.dev/community/translations)
 [](https://github.com/facebook/react/releases)
-### GET STARTED
-  * [Quick Start ](https://react.dev/learn "Quick Start")
-    * [Tutorial: Tic-Tac-Toe ](https://react.dev/learn/tutorial-tic-tac-toe "Tutorial: Tic-Tac-Toe")
-    * [Thinking in React ](https://react.dev/learn/thinking-in-react "Thinking in React")
-  * [Installation ](https://react.dev/learn/installation "Installation")
-    * [Creating a React App ](https://react.dev/learn/creating-a-react-app "Creating a React App")
-    * [Build a React App from Scratch ](https://react.dev/learn/build-a-react-app-from-scratch "Build a React App from Scratch")
-    * [Add React to an Existing Project ](https://react.dev/learn/add-react-to-an-existing-project "Add React to an Existing Project")
-  * [Setup ](https://react.dev/learn/setup "Setup")
-    * [Editor Setup ](https://react.dev/learn/editor-setup "Editor Setup")
-    * [Using TypeScript ](https://react.dev/learn/typescript "Using TypeScript")
-    * [React Developer Tools ](https://react.dev/learn/react-developer-tools "React Developer Tools")
-  * [React Compiler ](https://react.dev/learn/react-compiler "React Compiler")
-    * [Introduction ](https://react.dev/learn/react-compiler/introduction "Introduction")
-    * [Installation ](https://react.dev/learn/react-compiler/installation "Installation")
-    * [Incremental Adoption ](https://react.dev/learn/react-compiler/incremental-adoption "Incremental Adoption")
-    * [Debugging and Troubleshooting ](https://react.dev/learn/react-compiler/debugging "Debugging and Troubleshooting")
-### LEARN REACT
-  * [Describing the UI ](https://react.dev/learn/describing-the-ui "Describing the UI")
-    * [Your First Component ](https://react.dev/learn/your-first-component "Your First Component")
-    * [Importing and Exporting Components ](https://react.dev/learn/importing-and-exporting-components "Importing and Exporting Components")
-    * [Writing Markup with JSX ](https://react.dev/learn/writing-markup-with-jsx "Writing Markup with JSX")
-    * [JavaScript in JSX with Curly Braces ](https://react.dev/learn/javascript-in-jsx-with-curly-braces "JavaScript in JSX with Curly Braces")
-    * [Passing Props to a Component ](https://react.dev/learn/passing-props-to-a-component "Passing Props to a Component")
-    * [Conditional Rendering ](https://react.dev/learn/conditional-rendering "Conditional Rendering")
-    * [Rendering Lists ](https://react.dev/learn/rendering-lists "Rendering Lists")
-    * [Keeping Components Pure ](https://react.dev/learn/keeping-components-pure "Keeping Components Pure")
-    * [Your UI as a Tree ](https://react.dev/learn/understanding-your-ui-as-a-tree "Your UI as a Tree")
-  * [Adding Interactivity ](https://react.dev/learn/adding-interactivity "Adding Interactivity")
-    * [Responding to Events ](https://react.dev/learn/responding-to-events "Responding to Events")
-```
+### GET INVOLVED
+  * [Community ](https://react.dev/community "Community")
+    * [React Conferences ](https://react.dev/community/conferences "React Conferences")
+    * [React Meetups ](https://react.dev/community/meetups "React Meetups")
+    * [React Videos ](https://react.dev/community/videos "React Videos")
+    * [Meet the Team ](https://react.dev/community/team "Meet the Team")
+    * [Docs Contributors ](https://react.dev/community/docs-contributors "Docs Contributors")
+    * [Translations ](https://react.dev/community/translations "Translations")
+    * [Acknowledgements ](https://react.dev/community/acknowledgements "Acknowledgements")
+    * [Versioning Policy ](https://react.dev/community/versioning-policy "Versioning Policy")
+
+
+[Community](https://react.dev/community)
+Copy pageCopy
+# Translations[](https://react.dev/community/translations#undefined "Link for this heading")
+React docs are translated by the global community into many languages all over the world.
+## Source site [](https://react.dev/community/translations#main-site "Link for Source site ")
+All translations are provided from the canonical source docs:
+  * [English](https://react.dev/) — [Contribute](https://github.com/reactjs/react.dev/)
+
+
+## Full translations [](https://react.dev/community/translations#full-translations "Link for Full translations ")
+  * [French (Français)](https://fr.react.dev/) — [Contribute](https://github.com/reactjs/fr.react.dev)
+  * [Japanese (日本語)](https://ja.react.dev/) — [Contribute](https://github.com/reactjs/ja.react.dev)
+  * [Korean (한국어)](https://ko.react.dev/) — [Contribute](https://github.com/reactjs/ko.react.dev)
+  * [Simplified Chinese (简体中文)](https://zh-hans.react.dev/) — [Contribute](https://github.com/reactjs/zh-hans.react.dev)
+  * [Spanish (Español)](https://es.react.dev/) — [Contribute](https://github.com/reactjs/es.react.dev)
+  * [Turkish (Türkçe)](https://tr.react.dev/) — [Contribute](https://github.com/reactjs/tr.react.dev)
+
+````
 
 **crawl4ai-raw**
-```
+````
 [![logo by @sawaratsuki1004](https://react.dev/_next/image?url=%2Fimages%2Fuwu.png&w=128&q=75)](https://react.dev/)
 [React](https://react.dev/)
 [v19.2](https://react.dev/versions)
@@ -4400,84 +4401,84 @@ On the Web, HTML lets us create rich structured documents with its built-in set 
 [Blog](https://react.dev/blog)
 [](https://react.dev/community/translations)
 [](https://github.com/facebook/react/releases)
-### GET STARTED
-  * [Quick Start ](https://react.dev/learn "Quick Start")
-    * [Tutorial: Tic-Tac-Toe ](https://react.dev/learn/tutorial-tic-tac-toe "Tutorial: Tic-Tac-Toe")
-    * [Thinking in React ](https://react.dev/learn/thinking-in-react "Thinking in React")
-  * [Installation ](https://react.dev/learn/installation "Installation")
-    * [Creating a React App ](https://react.dev/learn/creating-a-react-app "Creating a React App")
-    * [Build a React App from Scratch ](https://react.dev/learn/build-a-react-app-from-scratch "Build a React App from Scratch")
-    * [Add React to an Existing Project ](https://react.dev/learn/add-react-to-an-existing-project "Add React to an Existing Project")
-  * [Setup ](https://react.dev/learn/setup "Setup")
-    * [Editor Setup ](https://react.dev/learn/editor-setup "Editor Setup")
-    * [Using TypeScript ](https://react.dev/learn/typescript "Using TypeScript")
-    * [React Developer Tools ](https://react.dev/learn/react-developer-tools "React Developer Tools")
-  * [React Compiler ](https://react.dev/learn/react-compiler "React Compiler")
-    * [Introduction ](https://react.dev/learn/react-compiler/introduction "Introduction")
-    * [Installation ](https://react.dev/learn/react-compiler/installation "Installation")
-    * [Incremental Adoption ](https://react.dev/learn/react-compiler/incremental-adoption "Incremental Adoption")
-    * [Debugging and Troubleshooting ](https://react.dev/learn/react-compiler/debugging "Debugging and Troubleshooting")
-### LEARN REACT
-  * [Describing the UI ](https://react.dev/learn/describing-the-ui "Describing the UI")
-    * [Your First Component ](https://react.dev/learn/your-first-component "Your First Component")
-    * [Importing and Exporting Components ](https://react.dev/learn/importing-and-exporting-components "Importing and Exporting Components")
-    * [Writing Markup with JSX ](https://react.dev/learn/writing-markup-with-jsx "Writing Markup with JSX")
-    * [JavaScript in JSX with Curly Braces ](https://react.dev/learn/javascript-in-jsx-with-curly-braces "JavaScript in JSX with Curly Braces")
-    * [Passing Props to a Component ](https://react.dev/learn/passing-props-to-a-component "Passing Props to a Component")
-    * [Conditional Rendering ](https://react.dev/learn/conditional-rendering "Conditional Rendering")
-    * [Rendering Lists ](https://react.dev/learn/rendering-lists "Rendering Lists")
-    * [Keeping Components Pure ](https://react.dev/learn/keeping-components-pure "Keeping Components Pure")
-    * [Your UI as a Tree ](https://react.dev/learn/understanding-your-ui-as-a-tree "Your UI as a Tree")
-  * [Adding Interactivity ](https://react.dev/learn/adding-interactivity "Adding Interactivity")
-    * [Responding to Events ](https://react.dev/learn/responding-to-events "Responding to Events")
-```
+### GET INVOLVED
+  * [Community ](https://react.dev/community "Community")
+    * [React Conferences ](https://react.dev/community/conferences "React Conferences")
+    * [React Meetups ](https://react.dev/community/meetups "React Meetups")
+    * [React Videos ](https://react.dev/community/videos "React Videos")
+    * [Meet the Team ](https://react.dev/community/team "Meet the Team")
+    * [Docs Contributors ](https://react.dev/community/docs-contributors "Docs Contributors")
+    * [Translations ](https://react.dev/community/translations "Translations")
+    * [Acknowledgements ](https://react.dev/community/acknowledgements "Acknowledgements")
+    * [Versioning Policy ](https://react.dev/community/versioning-policy "Versioning Policy")
+
+
+[Community](https://react.dev/community)
+Copy pageCopy
+# Translations[](https://react.dev/community/translations#undefined "Link for this heading")
+React docs are translated by the global community into many languages all over the world.
+## Source site [](https://react.dev/community/translations#main-site "Link for Source site ")
+All translations are provided from the canonical source docs:
+  * [English](https://react.dev/) — [Contribute](https://github.com/reactjs/react.dev/)
+
+
+## Full translations [](https://react.dev/community/translations#full-translations "Link for Full translations ")
+  * [French (Français)](https://fr.react.dev/) — [Contribute](https://github.com/reactjs/fr.react.dev)
+  * [Japanese (日本語)](https://ja.react.dev/) — [Contribute](https://github.com/reactjs/ja.react.dev)
+  * [Korean (한국어)](https://ko.react.dev/) — [Contribute](https://github.com/reactjs/ko.react.dev)
+  * [Simplified Chinese (简体中文)](https://zh-hans.react.dev/) — [Contribute](https://github.com/reactjs/zh-hans.react.dev)
+  * [Spanish (Español)](https://es.react.dev/) — [Contribute](https://github.com/reactjs/es.react.dev)
+  * [Turkish (Türkçe)](https://tr.react.dev/) — [Contribute](https://github.com/reactjs/tr.react.dev)
+
+````
 
 **scrapy+md**
-```
-[Learn React](/learn)
-
-[Describing the UI](/learn/describing-the-ui)
+````
+[Community](/community)
 
  Copy pageCopy
 
-# Your First Component
+# Translations
 
-*Components* are one of the core concepts of React. They are the foundation upon which you build user interfaces (UI), which makes them the perfect place to start your React journey!
+React docs are translated by the global community into many languages all over the world.
 
-### You will learn
+## Source site
 
-* What a component is
-* What role components play in a React application
-* How to write your first React component
+All translations are provided from the canonical source docs:
 
-## Components: UI building blocks
+* [English](https://react.dev/) — [Contribute](https://github.com/reactjs/react.dev/)
 
-On the Web, HTML lets us create rich structured documents with its built-in set of tags like `<h1>` and `<li>`:
+## Full translations
 
-```
-<article>
+* [French (Français)](https://fr.react.dev/) — [Contribute](https://github.com/reactjs/fr.react.dev)
+* [Japanese (日本語)](https://ja.react.dev/) — [Contribute](https://github.com/reactjs/ja.react.dev)
+* [Korean (한국어)](https://ko.react.dev/) — [Contribute](https://github.com/reactjs/ko.react.dev)
+* [Simplified Chinese (简体中文)](https://zh-hans.react.dev/) — [Contribute](https://github.com/reactjs/zh-hans.react.dev)
+* [Spanish (Español)](https://es.react.dev/) — [Contribute](https://github.com/reactjs/es.react.dev)
+* [Turkish (Türkçe)](https://tr.react.dev/) — [Contribute](https://github.com/reactjs/tr.react.dev)
 
+## In-progress translations
 
+For the progress of each translation, see: [Is React Translated Yet?](https://translations.react.dev/)
 
-<h1>My First Component</h1>
-
-
-
-<ol>
-
-
-
-<li>Components: UI Building Blocks</li>
-
-
-
-<li>Defining a Component</li>
-
-```
+* [Arabic (العربية)](https://ar.react.dev/) — [Contribute](https://github.com/reactjs/ar.react.dev)
+* [Azerbaijani (Azərbaycanca)](https://az.react.dev/) — [Contribute](https://github.com/reactjs/az.react.dev)
+* [Belarusian (Беларуская)](https://be.react.dev/) — [Contribute](https://github.com/reactjs/be.react.dev)
+* [Bengali (বাংলা)](https://bn.react.dev/) — [Contribute](https://github.com/reactjs/bn.react.dev)
+* [Czech (Čeština)](https://cs.react.dev/) — [Contribute](https://github.com/reactjs/cs.react.dev)
+* [Finnish (Suomi)](https://fi.react.dev/) — [Contribute](https://github.com/reactjs/fi.react.dev)
+* [German (Deutsch)](https://de.react.dev/) — [Contribute](https://github.com/reactjs/de.react.dev)
+* [Gujarati (ગુજરાતી)](https://gu.react.dev/) — [Contribute](https://github.com/reactjs/gu.react.dev)
+* [Hebrew (עברית)](https://he.react.dev/) — [Contribute](https://github.com/reactjs/he.react.dev)
+* [Hindi (हिन्दी)](https://hi.react.dev/) — [Contribute](https://github.com/reactjs/hi.react.dev)
+* [Hungarian (magyar)](https://hu.react.dev/) — [Contribute](https://github.com/reactjs/hu.react.dev)
+* [Icelandic (Íslenska)](https://is.react.dev/) — [Contribute](https://github.com/reactjs/is.react.dev)
+* [Indonesian (Bahasa Indonesia)](https://id.react.dev/) — [Contribute](https://github.com/reactjs/id.react.dev)
+````
 
 **crawlee**
-```
-Your First Component – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
+````
+Translations – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
 (function () {
 try {
 let logShown = false;
@@ -4517,11 +4518,11 @@ return null;
 function checkLocalStorage() {
 try {
 return localStorage.getItem('uwu') === 'true';
-```
+````
 
 **colly+md**
-```
-Your First Component – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
+````
+Translations – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
 (function () {
 try {
 let logShown = false;
@@ -4561,11 +4562,11 @@ return null;
 function checkLocalStorage() {
 try {
 return localStorage.getItem('uwu') === 'true';
-```
+````
 
 **playwright**
-```
-Your First Component – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
+````
+Translations – Reactwindow.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-B1E83PJ3RT');
 (function () {
 try {
 let logShown = false;
@@ -4605,7 +4606,7 @@ return null;
 function checkLocalStorage() {
 try {
 return localStorage.getItem('uwu') === 'true';
-```
+````
 
 **firecrawl** — no output for this URL
 
@@ -5233,7 +5234,7 @@ This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
-```
+````
 # Python (programming language)
 
 * [abstract:Q28865](https://abstract.wikipedia.org/wiki/Q28865 "abstract:Q28865")
@@ -5274,10 +5275,10 @@ Nav boilerplate appears here before the real content starts.
 * [Galego](https://gl.wikipedia.org/wiki/Python "Python – Galician")
 * [گیلکی](https://glk.wikipedia.org/wiki/%D9%BE%D8%A7%D9%8A%D8%AA%D8%A4%D9%86_(%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D9%87%E2%80%8C%D9%86%D9%8A%D9%88%D9%8A%D8%B3%D9%8A_%D8%B2%D9%88%D8%A7%D9%86) "پايتؤن (برنامه‌نيويسي زوان) – Gilaki")
 * [ગુજરાતી](https://gu.wikipedia.org/wiki/%E0%AA%AA%E0%AA%BE%E0%AA%AF%E0%AA%A5%E0%AB%8B%E0%AA%A8_(%E0%AA%AA%E0%AB%8D%E0%AA%B0%E0%AB%8B%E0%AA%97%E0%AB%8D%E0%AA%B0%E0%AA%BE%E0%AA%AE%E0%AA%BF%E0%AA%82%E0%AA%97_%E0%AA%AD%E0%AA%BE%E0%AA%B7%E0%AA%BE) "પાયથોન (પ્રોગ્રામિંગ ભાષા) – Gujarati")
-```
+````
 
 **crawl4ai**
-```
+````
 [Jump to content](https://en.wikipedia.org/wiki/Python_\(programming_language\)#bodyContent)
 Main menu
 Main menu
@@ -5318,10 +5319,10 @@ Wide
 
 The content is as wide as possible for your browser window.
 Color (beta)
-```
+````
 
 **crawl4ai-raw**
-```
+````
 [Jump to content](https://en.wikipedia.org/wiki/Python_\(programming_language\)#bodyContent)
 Main menu
 Main menu
@@ -5362,10 +5363,10 @@ Wide
 
 The content is as wide as possible for your browser window.
 Color (beta)
-```
+````
 
 **scrapy+md**
-```
+````
 Toggle the table of contents
 
 # Python (programming language)
@@ -5406,10 +5407,10 @@ Toggle the table of contents
 * [فارسی](https://fa.wikipedia.org/wiki/%D9%BE%D8%A7%DB%8C%D8%AA%D9%88%D9%86_(%D8%B2%D8%A8%D8%A7%D9%86_%D8%A8%D8%B1%D9%86%D8%A7%D9%85%D9%87%E2%80%8C%D9%86%D9%88%DB%8C%D8%B3%DB%8C) "پایتون (زبان برنامه‌نویسی) – Persian")
 * [Suomi](https://fi.wikipedia.org/wiki/Python_(ohjelmointikieli) "Python (ohjelmointikieli) – Finnish")
 * [Na Vosa Vakaviti](https://fj.wikipedia.org/wiki/Python "Python – Fijian")
-```
+````
 
 **crawlee**
-```
+````
 Python (programming language) - Wikipedia
 (function(){var className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-menu-disabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled vector-toc-available skin-theme-clientpref-thumb-standard";var cookie=document.cookie.match(/(?:^|; )enwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"51ab37ab-e58b-409d-ae12-d8e42b219a34","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Python\_(programming\_language)","wgTitle":"Python (programming language)","wgCurRevisionId":1349031340,"wgRevisionId":1349031340,"wgArticleId":23862,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["\*"],"wgCategories":["Articles with short description","Short description matches Wikidata","Use dmy dates from November 2021","Use American English from December 2024","All Wikipedia articles written in American English","All articles with failed verification","Articles with failed verification from August 2025","Articles containing potentially dated statements from 2026","All articles containing potentially dated statements","Articles containing potentially dated statements from January 2026","Articles containing potentially dated statements from March 2025","All articles with specifically marked weasel-worded phrases","Articles with specifically marked weasel-worded phrases from August 2025","All articles with unsourced statements","Articles with unsourced statements from August 2025","Pages using Sister project links with wikidata namespace mismatch","Pages using Sister project links with hidden wikidata","Articles with example Python (programming language) code","Python (programming language)","Programming tools","Web frameworks","Free software programmed in Python","Class-based programming languages","Notebook interface","Computer science in the Netherlands","Concurrent programming languages","Cross-platform free software","Cross-platform software","Dutch inventions","Dynamically typed programming languages","Educational programming languages","High-level programming languages","Information technology in the Netherlands","Multi-paradigm programming languages","Object-oriented programming languages","Pattern matching programming languages","Programming languages","Programming languages created in 1991","Scripting languages","Text-oriented programming languages","Monty Python references"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Python\_(programming\_language)","wgRelevantArticleId":23862,"wgTempUserName":null,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgNoticeProject":"wikipedia","wgFlaggedRevsParams":{"tags":{"status":{"levels":1}}},"wgConfirmEditCaptchaNeededForGenericEdit":"hcaptcha","wgConfirmEditHCaptchaVisualEditorOnLoadIntegrationEnabled":false,"wgConfirmEditHCaptchaSiteKey":"5d0c670e-a5f4-4258-ad16-1f42792c9c62","wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":0,"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":100000,"wgEditSubmitButtonLabelPublish":true,"wgVisualEditorPageIsDisambiguation":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":false,"wgVector2022LanguageInHeader":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q28865","wgCheckUserClientHintsHeadersJsApi":["brands","architecture","bitness","fullVersionList","mobile","model","platform","platformVersion"],"GEHomepageSuggestedEditsEnableTopics":true,"wgGESuggestedEditsTaskTypes":{"taskTypes":["copyedit","link-recommendation"],"unavailableTaskTypes":[]},"wgGETopicsMatchModeEnabled":false,"wgGELevelingUpEnabledForUser":false,"wgTestKitchenUserExperiments":{"overrides":[],"enrolled":[],"assigned":[],"subject\_ids":[]}};
 RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.wikimediamessages.styles":"ready","ext.cite.styles":"ready","ext.pygments":"ready","skins.vector.search.codex.styles":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","jquery.makeCollapsible.styles":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready","ext.wikimediaBadges":"ready"};RLPAGEMODULES=["ext.parsermigration.survey","ext.cite.ux-enhancements","ext.pygments.view","mediawiki.page.media","ext.scribunto.logs","site","mediawiki.page.ready","jquery.makeCollapsible","mediawiki.toc","skins.vector.js","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.ReferenceTooltips","ext.gadget.switcher","ext.urlShortener.toolbar","ext.centralauth.centralautologin","mmv.bootstrap","ext.popups","ext.visualEditor.desktopArticleTarget.init","ext.echo.centralauth","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.uls.interface","ext.cx.eventlogging.campaigns","ext.cx.uls.quick.actions","wikibase.client.vector-2022","wikibase.databox.fromWikidata","ext.checkUser.clientHints","ext.quicksurveys.init","ext.growthExperiments.SuggestedEditSession","ext.testKitchen"];
@@ -5450,12 +5451,12 @@ RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.style
 [Jump to content](#bodyContent)
 
 Main menu
-```
+````
 
 **colly+md** — no output for this URL
 
 **playwright**
-```
+````
 Python (programming language) - Wikipedia
 (function(){var className="client-js vector-feature-language-in-header-enabled vector-feature-language-in-main-menu-disabled vector-feature-language-in-main-page-header-disabled vector-feature-page-tools-pinned-disabled vector-feature-toc-pinned-clientpref-1 vector-feature-main-menu-pinned-disabled vector-feature-limited-width-clientpref-1 vector-feature-limited-width-content-enabled vector-feature-custom-font-size-clientpref-1 vector-feature-appearance-pinned-clientpref-1 skin-theme-clientpref-day vector-sticky-header-enabled vector-toc-available skin-theme-clientpref-thumb-standard";var cookie=document.cookie.match(/(?:^|; )enwikimwclientpreferences=([^;]+)/);if(cookie){cookie[1].split('%2C').forEach(function(pref){className=className.replace(new RegExp('(^| )'+pref.replace(/-clientpref-\w+$|[^\w-]+/g,'')+'-clientpref-\\w+( |$)'),'$1'+pref+'$2');});}document.documentElement.className=className;}());RLCONF={"wgBreakFrames":false,"wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgRequestId":"eb29c30f-668e-4f66-ab75-526fc2e358e9","wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Python\_(programming\_language)","wgTitle":"Python (programming language)","wgCurRevisionId":1349031340,"wgRevisionId":1349031340,"wgArticleId":23862,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["\*"],"wgCategories":["Articles with short description","Short description matches Wikidata","Use dmy dates from November 2021","Use American English from December 2024","All Wikipedia articles written in American English","All articles with failed verification","Articles with failed verification from August 2025","Articles containing potentially dated statements from 2026","All articles containing potentially dated statements","Articles containing potentially dated statements from January 2026","Articles containing potentially dated statements from March 2025","All articles with specifically marked weasel-worded phrases","Articles with specifically marked weasel-worded phrases from August 2025","All articles with unsourced statements","Articles with unsourced statements from August 2025","Pages using Sister project links with wikidata namespace mismatch","Pages using Sister project links with hidden wikidata","Articles with example Python (programming language) code","Python (programming language)","Programming tools","Web frameworks","Free software programmed in Python","Class-based programming languages","Notebook interface","Computer science in the Netherlands","Concurrent programming languages","Cross-platform free software","Cross-platform software","Dutch inventions","Dynamically typed programming languages","Educational programming languages","High-level programming languages","Information technology in the Netherlands","Multi-paradigm programming languages","Object-oriented programming languages","Pattern matching programming languages","Programming languages","Programming languages created in 1991","Scripting languages","Text-oriented programming languages","Monty Python references"],"wgPageViewLanguage":"en","wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgRelevantPageName":"Python\_(programming\_language)","wgRelevantArticleId":23862,"wgTempUserName":null,"wgIsProbablyEditable":true,"wgRelevantPageIsProbablyEditable":true,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgNoticeProject":"wikipedia","wgFlaggedRevsParams":{"tags":{"status":{"levels":1}}},"wgConfirmEditCaptchaNeededForGenericEdit":"hcaptcha","wgConfirmEditHCaptchaVisualEditorOnLoadIntegrationEnabled":false,"wgConfirmEditHCaptchaSiteKey":"5d0c670e-a5f4-4258-ad16-1f42792c9c62","wgMediaViewerOnClick":true,"wgMediaViewerEnabledByDefault":true,"wgPopupsFlags":0,"wgVisualEditor":{"pageLanguageCode":"en","pageLanguageDir":"ltr","pageVariantFallbacks":"en"},"wgMFDisplayWikibaseDescriptions":{"search":true,"watchlist":true,"tagline":false,"nearby":true},"wgWMESchemaEditAttemptStepOversample":false,"wgWMEPageLength":100000,"wgEditSubmitButtonLabelPublish":true,"wgVisualEditorPageIsDisambiguation":false,"wgULSPosition":"interlanguage","wgULSisCompactLinksEnabled":false,"wgVector2022LanguageInHeader":true,"wgULSisLanguageSelectorEmpty":false,"wgWikibaseItemId":"Q28865","wgCheckUserClientHintsHeadersJsApi":["brands","architecture","bitness","fullVersionList","mobile","model","platform","platformVersion"],"GEHomepageSuggestedEditsEnableTopics":true,"wgGESuggestedEditsTaskTypes":{"taskTypes":["copyedit","link-recommendation"],"unavailableTaskTypes":[]},"wgGETopicsMatchModeEnabled":false,"wgGELevelingUpEnabledForUser":false,"wgTestKitchenUserExperiments":{"overrides":[],"enrolled":[],"assigned":[],"subject\_ids":[]}};
 RLSTATE={"ext.globalCssJs.user.styles":"ready","site.styles":"ready","user.styles":"ready","ext.globalCssJs.user":"ready","user":"ready","user.options":"loading","ext.wikimediamessages.styles":"ready","ext.cite.styles":"ready","ext.pygments":"ready","skins.vector.search.codex.styles":"ready","skins.vector.styles":"ready","skins.vector.icons":"ready","jquery.makeCollapsible.styles":"ready","ext.visualEditor.desktopArticleTarget.noscript":"ready","ext.uls.interlanguage":"ready","wikibase.client.init":"ready","ext.wikimediaBadges":"ready"};RLPAGEMODULES=["ext.parsermigration.survey","ext.cite.ux-enhancements","ext.pygments.view","mediawiki.page.media","ext.scribunto.logs","site","mediawiki.page.ready","jquery.makeCollapsible","mediawiki.toc","skins.vector.js","ext.centralNotice.geoIP","ext.centralNotice.startUp","ext.gadget.ReferenceTooltips","ext.gadget.switcher","ext.urlShortener.toolbar","ext.centralauth.centralautologin","mmv.bootstrap","ext.popups","ext.visualEditor.desktopArticleTarget.init","ext.echo.centralauth","ext.eventLogging","ext.wikimediaEvents","ext.navigationTiming","ext.uls.interface","ext.cx.eventlogging.campaigns","ext.cx.uls.quick.actions","wikibase.client.vector-2022","wikibase.databox.fromWikidata","ext.checkUser.clientHints","ext.quicksurveys.init","ext.growthExperiments.SuggestedEditSession","ext.testKitchen"];
@@ -5496,7 +5497,7 @@ Search
 Appearance
 
 * [Donate](https://donate.wikimedia.org/?wmf_source=donate&wmf_medium=sidebar&wmf_campaign=en.wikipedia.org&uselang=en)
-```
+````
 
 **firecrawl** — no output for this URL
 
@@ -5711,63 +5712,62 @@ Appearance
 **markcrawl** produces the cleanest output with 7 words of preamble per page, while **colly+md** injects 9503 words of nav chrome before content begins. The word count gap (727 vs 21170 avg words) is largely explained by preamble: 9503 words of nav chrome account for ~45% of colly+md's output on this site. markcrawl's lower recall (10% vs 90%) reflects stricter content filtering — the "missed" sentences are predominantly navigation, sponsor links, and footer text that other tools include as content. For RAG, this is typically a net positive: fewer junk tokens per chunk tends to improve embedding quality and retrieval precision.
 
 <details>
-<summary>Sample output — first 40 lines of <code>docs.stripe.com/billing/subscriptions/backdating</code></summary>
+<summary>Sample output — first 40 lines of <code>docs.stripe.com/customer-management/integrate-customer-portal</code></summary>
 
 This shows what each tool outputs at the *top* of the same page.
 Nav boilerplate appears here before the real content starts.
 
 **markcrawl**
-```
-*Bill customers for elapsed time by backdating subscriptions with prorated line items using flexible or classic billing modes.*
+````
+*Learn how to integrate the Stripe customer portal into your application using the API to provide subscription, billing, and invoicing management to your customers. Configure the portal's features and user interface in the Dashboard, then implement a redirect to a co-branded dashboard where customers can manage their accounts. Set up webhook listeners to receive updates about subscription changes, payment method updates, and customer information modifications. Optionally customize portal sessions to enable different features for different customer groups or connected accounts.*
 
 
-# Backdate subscriptions
+# Integrate the customer portal with the API
 
-## Learn how to backdate subscriptions.
+## Learn how to integrate the customer portal using the Stripe API.
 
 Ask about this page
 
 Copy for LLMView as Markdown
 
-You can backdate a subscription to bill customers for time that has already elapsed. This is often used when migrating to Stripe or for record keeping purposes. The `backdate_start_date` field specifies the subscription’s backdated start date. You also have the option to bill customers for this elapsed time and set the next billing date.
+### Use the Accounts v2 API to represent customers
 
-## Billing mode considerations
+If your integration uses [customer-configured Accounts](/api/v2/core/accounts/create#v2_create_accounts-configuration-customer), replace `Customer` and event references in the code examples with the equivalent Accounts v2 API references. For more information, see [Represent customers with Account objects](/connect/use-accounts-as-customers).
 
-As of [API version 2025-04-30](/changelog/basil#2025-04-30.preview), the behavior of backdating depends on your subscription’s [billing_mode](/api/subscription_schedules/create#create_subscription_schedule-billing_mode):
+With the customer portal, you can provide subscription, billing, and invoicing management to your customers without building it yourself. After you configure and integrate the portal, customers redirect to a co-branded dashboard where they can manage their account based on the functionality you configured.
 
-Before
+To integrate your application with the customer portal:
 
-After
+1. [Configure](#configure) the portal’s features and user interface (UI). You can do this in the Dashboard.
+2. [Implement a redirect](#redirect) to integrate the portal with your application.
+3. [Listen to webhooks](#webhooks) to receive updates to customers’ subscriptions and payment methods.
+4. [Launch the portal](#launch) in your production environment.
 
-Use `billing_mode=classic` to create a single prorated line item for the backdated period.
+You can optionally [customize](#customize) portal sessions to enable different features for different customers.
 
-Use `billing_mode=flexible` to generate one line item for each natural billing period that occurs during the backdated period, which behaves similarly to regular billing.
+[## Configure the portal](#configure)
 
-#### Note
+First, you need to .
 
-Backdating isn’t supported when an invoice has more than 250 line items, which is the default limit.
+Before you integrate the customer portal, use the Dashboard to define what your users can do with the portal. Choose your settings for [sandboxes](/sandboxes) and live mode, based on your product and price catalog.
 
-## Backdating and charging users
+#### Common mistake
 
-Sometimes users can have access to your service before you create a subscription for them, and you want to charge them for that access.
+If you’re using the customer portal with Stripe Connect, make sure you configure the customer portal for the platform, not a connected account.
 
-Dashboard
+If you want to create multiple portal configurations for different sets of customers (or if you’re a [Connect](/connect) platform and want to manage configurations for your connected accounts), you can do so using the [API](/api/customer_portal/configurations/object):
 
-API
-
-To charge users for this time through the Dashboard:
-
-1. Go to the **Payments** > **Subscriptions** page.
-```
+Command Line
+````
 
 **crawl4ai**
-```
-[Skip to content](https://docs.stripe.com/billing/subscriptions/backdating#main-content)
-Backdate subscriptions
-[Create account](https://dashboard.stripe.com/register/billing) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fbilling%2Fsubscriptions%2Fbackdating)
+````
+[Skip to content](https://docs.stripe.com/customer-management/integrate-customer-portal#main-content)
+Set up the customer portal with the API
+[Create account](https://dashboard.stripe.com/register/billing) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fcustomer-management%2Fintegrate-customer-portal)
 [The Stripe Docs logo](https://docs.stripe.com/)
 Search `/`Ask AI
-[Create account](https://dashboard.stripe.com/register/billing)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fbilling%2Fsubscriptions%2Fbackdating)
+[Create account](https://dashboard.stripe.com/register/billing)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fcustomer-management%2Fintegrate-customer-portal)
 [Get started ](https://docs.stripe.com/get-started)
 [Payments ](https://docs.stripe.com/payments)
 [Revenue ](https://docs.stripe.com/revenue)
@@ -5778,40 +5778,40 @@ APIs & SDKsHelp
 Billing
 [Overview](https://docs.stripe.com/billing)[About the Billing APIs](https://docs.stripe.com/billing/billing-apis)
 Subscriptions
-[Overview](https://docs.stripe.com/subscriptions)
-[How subscriptions work](https://docs.stripe.com/billing/subscriptions/overview)
-Get started
-[Quickstart](https://docs.stripe.com/billing/quickstart)
-[Design an integration](https://docs.stripe.com/billing/subscriptions/design-an-integration)
-[Build an integration](https://docs.stripe.com/billing/subscriptions/build-subscriptions)
-[Embed a pricing table](https://docs.stripe.com/payments/checkout/pricing-table)
-[Defer subscription payments](https://docs.stripe.com/billing/subscriptions/deferred-payment)
-[Migrate subscriptions to Stripe](https://docs.stripe.com/billing/subscriptions/migrate-subscriptions)
-[Configure subscription events](https://docs.stripe.com/billing/subscriptions/webhooks)
-Manage subscriptions
-[Set billing cycles](https://docs.stripe.com/billing/subscriptions/billing-cycle)
-[Configure trial offers](https://docs.stripe.com/billing/subscriptions/trials)
-[Enable billing mode](https://docs.stripe.com/billing/subscriptions/billing-mode)
-[Use mixed interval subscriptions](https://docs.stripe.com/billing/subscriptions/mixed-interval)
-[Apply coupons](https://docs.stripe.com/billing/subscriptions/coupons)
-[Entitlements](https://docs.stripe.com/billing/entitlements)
-[Modify subscriptions](https://docs.stripe.com/billing/subscriptions/change)
-[Cancel subscriptions](https://docs.stripe.com/billing/subscriptions/cancel)
-[Pause subscriptions](https://docs.stripe.com/billing/subscriptions/pause)
-[Bill customers in advance](https://docs.stripe.com/billing/subscriptions/prebilling)
-[Manage subscriptions on iOS](https://docs.stripe.com/billing/subscriptions/manage-ios)
-Invoice and collect payments
-[Subscription invoices](https://docs.stripe.com/billing/invoices/subscription)
-```
+Invoicing
+Usage-based billing
+Advanced usage-based billing
+Quotes
+Customer management
+[Customers](https://docs.stripe.com/billing/customer)
+[Customer invoice balance](https://docs.stripe.com/billing/customer/balance)
+Customer portal
+[Overview](https://docs.stripe.com/customer-management)
+[Set up the no-code customer portal](https://docs.stripe.com/customer-management/activate-no-code-customer-portal)
+Set up the customer portal with the API
+[Configure the customer portal](https://docs.stripe.com/customer-management/configure-portal)
+[Deep links and flows in the customer portal](https://docs.stripe.com/customer-management/portal-deep-links)
+[Add a cancellation page to the customer portal](https://docs.stripe.com/customer-management/cancellation-page)
+
+
+Billing with other products
+Revenue recovery
+Automations
+Scripts
+Test your integration
+Tax
+[Overview](https://docs.stripe.com/tax)
+Use Stripe Tax
+````
 
 **crawl4ai-raw**
-```
-[Skip to content](https://docs.stripe.com/billing/subscriptions/backdating#main-content)
-Backdate subscriptions
-[Create account](https://dashboard.stripe.com/register/billing) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fbilling%2Fsubscriptions%2Fbackdating)
+````
+[Skip to content](https://docs.stripe.com/customer-management/integrate-customer-portal#main-content)
+Set up the customer portal with the API
+[Create account](https://dashboard.stripe.com/register/billing) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fcustomer-management%2Fintegrate-customer-portal)
 [The Stripe Docs logo](https://docs.stripe.com/)
 Search `/`Ask AI
-[Create account](https://dashboard.stripe.com/register/billing)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fbilling%2Fsubscriptions%2Fbackdating)
+[Create account](https://dashboard.stripe.com/register/billing)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fcustomer-management%2Fintegrate-customer-portal)
 [Get started ](https://docs.stripe.com/get-started)
 [Payments ](https://docs.stripe.com/payments)
 [Revenue ](https://docs.stripe.com/revenue)
@@ -5822,39 +5822,39 @@ APIs & SDKsHelp
 Billing
 [Overview](https://docs.stripe.com/billing)[About the Billing APIs](https://docs.stripe.com/billing/billing-apis)
 Subscriptions
-[Overview](https://docs.stripe.com/subscriptions)
-[How subscriptions work](https://docs.stripe.com/billing/subscriptions/overview)
-Get started
-[Quickstart](https://docs.stripe.com/billing/quickstart)
-[Design an integration](https://docs.stripe.com/billing/subscriptions/design-an-integration)
-[Build an integration](https://docs.stripe.com/billing/subscriptions/build-subscriptions)
-[Embed a pricing table](https://docs.stripe.com/payments/checkout/pricing-table)
-[Defer subscription payments](https://docs.stripe.com/billing/subscriptions/deferred-payment)
-[Migrate subscriptions to Stripe](https://docs.stripe.com/billing/subscriptions/migrate-subscriptions)
-[Configure subscription events](https://docs.stripe.com/billing/subscriptions/webhooks)
-Manage subscriptions
-[Set billing cycles](https://docs.stripe.com/billing/subscriptions/billing-cycle)
-[Configure trial offers](https://docs.stripe.com/billing/subscriptions/trials)
-[Enable billing mode](https://docs.stripe.com/billing/subscriptions/billing-mode)
-[Use mixed interval subscriptions](https://docs.stripe.com/billing/subscriptions/mixed-interval)
-[Apply coupons](https://docs.stripe.com/billing/subscriptions/coupons)
-[Entitlements](https://docs.stripe.com/billing/entitlements)
-[Modify subscriptions](https://docs.stripe.com/billing/subscriptions/change)
-[Cancel subscriptions](https://docs.stripe.com/billing/subscriptions/cancel)
-[Pause subscriptions](https://docs.stripe.com/billing/subscriptions/pause)
-[Bill customers in advance](https://docs.stripe.com/billing/subscriptions/prebilling)
-[Manage subscriptions on iOS](https://docs.stripe.com/billing/subscriptions/manage-ios)
-Invoice and collect payments
-[Subscription invoices](https://docs.stripe.com/billing/invoices/subscription)
-```
+Invoicing
+Usage-based billing
+Advanced usage-based billing
+Quotes
+Customer management
+[Customers](https://docs.stripe.com/billing/customer)
+[Customer invoice balance](https://docs.stripe.com/billing/customer/balance)
+Customer portal
+[Overview](https://docs.stripe.com/customer-management)
+[Set up the no-code customer portal](https://docs.stripe.com/customer-management/activate-no-code-customer-portal)
+Set up the customer portal with the API
+[Configure the customer portal](https://docs.stripe.com/customer-management/configure-portal)
+[Deep links and flows in the customer portal](https://docs.stripe.com/customer-management/portal-deep-links)
+[Add a cancellation page to the customer portal](https://docs.stripe.com/customer-management/cancellation-page)
+
+
+Billing with other products
+Revenue recovery
+Automations
+Scripts
+Test your integration
+Tax
+[Overview](https://docs.stripe.com/tax)
+Use Stripe Tax
+````
 
 **scrapy+md**
-```
+````
 [Skip to content](#main-content)
 
-Backdate subscriptions
+Set up the customer portal with the API
 
-[Create account](https://dashboard.stripe.com/register/billing) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fbilling%2Fsubscriptions%2Fbackdating)
+[Create account](https://dashboard.stripe.com/register/billing) or [Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fcustomer-management%2Fintegrate-customer-portal)
 
 [The Stripe Docs logo](/)
 
@@ -5862,7 +5862,7 @@ Search
 
 `/`Ask AI
 
-[Create account](https://dashboard.stripe.com/register/billing)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fbilling%2Fsubscriptions%2Fbackdating)
+[Create account](https://dashboard.stripe.com/register/billing)[Sign in](https://dashboard.stripe.com/login?redirect=https%3A%2F%2Fdocs.stripe.com%2Fcustomer-management%2Fintegrate-customer-portal)
 
 [Get started](/get-started)
 
@@ -5886,14 +5886,14 @@ Billing
 
 Subscriptions
 
-[Overview](/subscriptions)
+Invoicing
 
-[How subscriptions work](/billing/subscriptions/overview)
-```
+Usage-based billing
+````
 
 **crawlee**
-```
-Backdate subscriptions | Stripe Documentation
+````
+Integrate the customer portal with the API | Stripe Documentation
 
 
 
@@ -5933,11 +5933,11 @@ box-shadow: var(--s--top-shadow), var(--s--keyline) 0 0 0 var(--s--keyline-width
 #​#​ .sn-1fnc4mz { --row-gap: normal; --column-gap: normal; gap: var(--row-gap) var(--column-gap); }
 #​#​ .sn-1c37ise { --padding-top: 0; --padding-right: 0; --padding-bottom: 0; --padding-left: 0; padding: var(--padding-top) var(--padding-right) var(--padding-bottom) var(--padding-left); }
 .\_\_sn-sheet-order { --order: '\_1rkm1cp,\_88mn99,\_5olop,\_16pds2j,\_1wna6e6,\_kskd3k,\_5vzub4,\_lzay40,\_1d9aqya,\_gyuk9p'; }#​#​#​#​#​ .sn-182o7r0 { font-family: var(--jybopzu-typeface-ui); color: var(--jybopzu-textColor-primary); fill: var(--jybopzu-iconColor-primary); -webkit-font-smoothing: antialiased; }#​#​#​#​#​#​#​ .tooltip-trigger-isolate {
-```
+````
 
 **colly+md**
-```
-Backdate subscriptions | Stripe Documentation
+````
+Integrate the customer portal with the API | Stripe Documentation
 
 
 
@@ -5977,11 +5977,11 @@ box-shadow: var(--s--top-shadow), var(--s--keyline) 0 0 0 var(--s--keyline-width
 #​#​ .sn-1fnc4mz { --row-gap: normal; --column-gap: normal; gap: var(--row-gap) var(--column-gap); }
 #​#​ .sn-1c37ise { --padding-top: 0; --padding-right: 0; --padding-bottom: 0; --padding-left: 0; padding: var(--padding-top) var(--padding-right) var(--padding-bottom) var(--padding-left); }
 .\_\_sn-sheet-order { --order: '\_1rkm1cp,\_88mn99,\_5olop,\_16pds2j,\_1wna6e6,\_kskd3k,\_5vzub4,\_lzay40,\_1d9aqya,\_gyuk9p'; }#​#​#​#​#​ .sn-182o7r0 { font-family: var(--jybopzu-typeface-ui); color: var(--jybopzu-textColor-primary); fill: var(--jybopzu-iconColor-primary); -webkit-font-smoothing: antialiased; }#​#​#​#​#​#​#​ .tooltip-trigger-isolate {
-```
+````
 
 **playwright**
-```
-Backdate subscriptions | Stripe Documentation
+````
+Integrate the customer portal with the API | Stripe Documentation
 
 
 
@@ -6021,7 +6021,7 @@ box-shadow: var(--s--top-shadow), var(--s--keyline) 0 0 0 var(--s--keyline-width
 #​#​ .sn-1fnc4mz { --row-gap: normal; --column-gap: normal; gap: var(--row-gap) var(--column-gap); }
 #​#​ .sn-1c37ise { --padding-top: 0; --padding-right: 0; --padding-bottom: 0; --padding-left: 0; padding: var(--padding-top) var(--padding-right) var(--padding-bottom) var(--padding-left); }
 .\_\_sn-sheet-order { --order: '\_1rkm1cp,\_88mn99,\_5olop,\_16pds2j,\_1wna6e6,\_kskd3k,\_5vzub4,\_lzay40,\_1d9aqya,\_gyuk9p'; }#​#​#​#​#​ .sn-182o7r0 { font-family: var(--jybopzu-typeface-ui); color: var(--jybopzu-textColor-primary); fill: var(--jybopzu-iconColor-primary); -webkit-font-smoothing: antialiased; }#​#​#​#​#​#​#​ .tooltip-trigger-isolate {
-```
+````
 
 **firecrawl** — no output for this URL
 
@@ -7635,7 +7635,7 @@ Nav boilerplate appears here before the real content starts.
 **markcrawl** — no output for this URL
 
 **crawl4ai**
-```
+````
 [ Skip to content ](https://github.blog/author/ruizjeimy/#start-of-content)
 [ ](https://github.com) / [ Blog](https://github.blog/)
   * [Changelog](https://github.blog/changelog/)
@@ -7676,10 +7676,10 @@ Stay current on what’s new (or new again).
 [Get started with GitHub documentation](https://docs.github.com/en/get-started)
 Learn how to start building, shipping, and maintaining software with GitHub.
 Learn more
-```
+````
 
 **crawl4ai-raw**
-```
+````
 [ Skip to content ](https://github.blog/author/ruizjeimy/#start-of-content)
 [ ](https://github.com) / [ Blog](https://github.blog/)
   * [Changelog](https://github.blog/changelog/)
@@ -7720,10 +7720,10 @@ Stay current on what’s new (or new again).
 [Get started with GitHub documentation](https://docs.github.com/en/get-started)
 Learn how to start building, shipping, and maintaining software with GitHub.
 Learn more
-```
+````
 
 **scrapy+md**
-```
+````
 # Jeimy Ruiz
 
 [@ruizjeimy](https://github.com/ruizjeimy)
@@ -7763,10 +7763,10 @@ May 29, 2025
 [Maintainers](https://github.blog/open-source/maintainers/)
 
 ### [From MCP to multi-agents: The top 10 new open source AI projects on GitHub right now and why they matter](https://github.blog/open-source/maintainers/from-mcp-to-multi-agents-the-top-10-open-source-ai-projects-on-github-right-now-and-why-they-matter/)
-```
+````
 
 **crawlee**
-```
+````
 Jeimy Ruiz, Author at The GitHub Blog
 
 
@@ -7806,10 +7806,10 @@ padding: 0 !important;
 
 :root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}.has-text-align-center{text-align:center}.has-text-align-left{text-align:left}.has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style\*=border-top-color]){border-top-style:solid}html :where([style\*=border-right-color]){border-right-style:solid}html :where([style\*=border-bottom-color]){border-bottom-style:solid}html :where([style\*=border-left-color]){border-left-style:solid}html :where([style\*=border-width]){border-style:solid}html :where([style\*=border-top-width]){border-top-style:solid}html :where([style\*=border-right-width]){border-right-style:solid}html :where([style\*=border-bottom-width]){border-bottom-style:solid}html :where([style\*=border-left-width]){border-left-style:solid}html :where(img[class\*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
 /\*# sourceURL=wp-block-library-inline-css \*/
-```
+````
 
 **colly+md**
-```
+````
 Jeimy Ruiz, Author at The GitHub Blog
 
 
@@ -7849,10 +7849,10 @@ padding: 0 !important;
 
 :root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}.has-text-align-center{text-align:center}.has-text-align-left{text-align:left}.has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style\*=border-top-color]){border-top-style:solid}html :where([style\*=border-right-color]){border-right-style:solid}html :where([style\*=border-bottom-color]){border-bottom-style:solid}html :where([style\*=border-left-color]){border-left-style:solid}html :where([style\*=border-width]){border-style:solid}html :where([style\*=border-top-width]){border-top-style:solid}html :where([style\*=border-right-width]){border-right-style:solid}html :where([style\*=border-bottom-width]){border-bottom-style:solid}html :where([style\*=border-left-width]){border-left-style:solid}html :where(img[class\*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
 /\*# sourceURL=wp-block-library-inline-css \*/
-```
+````
 
 **playwright**
-```
+````
 Jeimy Ruiz, Author at The GitHub Blog
 
 
@@ -7892,7 +7892,7 @@ padding: 0 !important;
 
 :root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}.has-text-align-center{text-align:center}.has-text-align-left{text-align:left}.has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style\*=border-top-color]){border-top-style:solid}html :where([style\*=border-right-color]){border-right-style:solid}html :where([style\*=border-bottom-color]){border-bottom-style:solid}html :where([style\*=border-left-color]){border-left-style:solid}html :where([style\*=border-width]){border-style:solid}html :where([style\*=border-top-width]){border-top-style:solid}html :where([style\*=border-right-width]){border-right-style:solid}html :where([style\*=border-bottom-width]){border-bottom-style:solid}html :where([style\*=border-left-width]){border-left-style:solid}html :where(img[class\*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
 /\*# sourceURL=wp-block-library-inline-css \*/
-```
+````
 
 **firecrawl** — no output for this URL
 
