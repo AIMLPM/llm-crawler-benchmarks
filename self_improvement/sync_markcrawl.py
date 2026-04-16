@@ -138,6 +138,9 @@ def parse_answer_quality(text: str) -> dict[str, float]:
     for row in _parse_table(text, "Overall"):
         tool = row.get("Tool", "").strip("*").strip()
         overall_str = row.get("Overall", "").strip("*").strip()
+        # Strip CI suffix like "±0.08"
+        if "±" in overall_str:
+            overall_str = overall_str.split("±")[0].strip()
         try:
             result[tool] = float(overall_str)
         except (ValueError, KeyError):

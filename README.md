@@ -25,30 +25,30 @@ see where the differences actually matter.
 
 | Dimension | Winner | Key metric | Runner-up |
 |-----------|--------|------------|-----------|
-| [Speed](reports/SPEED_COMPARISON.md) | **markcrawl** | 14.0 pages/sec | scrapy+md (9.3 p/s) |
-| [Extraction quality](reports/QUALITY_COMPARISON.md) | **markcrawl** | 99% content signal, 15 words preamble | scrapy+md (95%, 133 words) |
-| [Retrieval quality](reports/RETRIEVAL_COMPARISON.md) | playwright | 94% Hit@10, 0.799 MRR | crawlee (92%, 0.782) |
-| [LLM answer quality](reports/ANSWER_QUALITY.md) | scrapy+md | 4.41/5 overall score | playwright (4.38/5) |
+| [Speed](reports/SPEED_COMPARISON.md) | **markcrawl** | 12.1 pages/sec | scrapy+md (9.5 p/s) |
+| [Extraction quality](reports/QUALITY_COMPARISON.md) | **markcrawl** | 99% content signal, 14 words preamble | scrapy+md (93%, 208 words) |
+| [Retrieval quality](reports/RETRIEVAL_COMPARISON.md) | crawlee | 92% Hit@10, 0.733 MRR | playwright (92%, 0.727) |
+| [LLM answer quality](reports/ANSWER_QUALITY.md) | colly+md | 4.53/5 overall score | markcrawl (4.52/5) |
 | [Cost at scale](reports/COST_AT_SCALE.md) | **markcrawl** | $4,505/yr (100K pages, 1K q/day) | scrapy+md ($5,464/yr) |
 | [Pipeline timing](reports/PIPELINE_TIMING.md) | **markcrawl** | 476.5s end-to-end, $0.22 | scrapy+md (515.3s, $0.24) |
 
-## Leaderboard (Benchmark v1.0)
+## Leaderboard (Benchmark v2.0)
 
 All 7 tools, sorted by speed. 8 sites, 109 retrieval queries, scored on 5 dimensions.
 
 | Tool | Speed (p/s) | Content Signal | MRR | Answer (/5) | Cost (100K/yr) |
 |------|-------------|----------------|-----|-------------|----------------|
-| **markcrawl** | **14.0** | **99%** | **0.759** | **4.30** | **$4,505** |
-| scrapy+md | 9.3 | 95% | 0.757 | 4.41 | $5,464 |
-| colly+md | 6.6 | 68% | 0.759 | 4.29 | $7,213 |
-| playwright | 2.1 | 68% | 0.799 | 4.38 | $7,320 |
-| crawl4ai | 2.0 | 89% | 0.771 | 4.26 | $6,960 |
-| crawlee | 1.8 | 66% | 0.782 | 4.33 | $7,467 |
-| crawl4ai-raw | 1.4 | 89% | 0.767 | 4.31 | $6,961 |
+| **markcrawl** | **12.1** | **99%** | **0.698** | **4.52** | **$4,505** |
+| scrapy+md | 9.5 | 93% | 0.459 | 4.03 | $5,464 |
+| colly+md | 4.2 | 67% | 0.677 | 4.53 | $7,213 |
+| playwright | 2.2 | 64% | 0.727 | 4.42 | $7,320 |
+| crawlee | 1.7 | 63% | 0.733 | 4.52 | $7,467 |
+| crawl4ai-raw | 1.5 | 84% | 0.694 | 4.44 | $6,961 |
+| crawl4ai | 1.5 | 83% | 0.694 | 4.43 | $6,960 |
 
 > **Column definitions:** **Speed** = pages/sec (median of 3 runs). **Content Signal** = (total words - preamble) / total words (higher = cleaner). **MRR** = Mean Reciprocal Rank, best retrieval mode per tool. **Answer** = LLM answer quality scored 1-5 by gpt-4o-mini. **Cost** = annual RAG pipeline cost at 100K pages, 1K queries/day.
 
-**Bottom line:** markcrawl v0.2.0 (async httpx) is the fastest crawler at 14.0 pages/sec -- 51% faster than the runner-up scrapy+md. It also wins on pipeline timing ($0.22 end-to-end) and extraction quality (99% content signal). Answer quality is tight across all tools (4.26-4.41/5), with scrapy+md narrowly leading. Retrieval quality barely differs between tools -- switching retrieval mode (e.g., to reranked) gains more than switching crawlers.
+**Bottom line:** markcrawl v0.2.0 (async httpx) is the fastest crawler at 12.1 pages/sec -- 27% faster than the runner-up scrapy+md. It also wins on pipeline timing ($0.22 end-to-end) and extraction quality (99% content signal). Answer quality is tight across all tools (4.03-4.53/5), with colly+md narrowly leading. Retrieval quality barely differs between tools -- switching retrieval mode (e.g., to reranked) gains more than switching crawlers.
 
 ## Tools Compared
 
@@ -92,6 +92,16 @@ configurations and fairness decisions.
 | [MarkCrawl Self-Benchmark](reports/MARKCRAWL_RESULTS.md) | MarkCrawl standalone performance |
 | [Methodology](reports/METHODOLOGY.md) | How were these benchmarks run? |
 
+## Transparency
+
+This benchmark is maintained by the creators of
+[markcrawl](https://github.com/AIMLPM/markcrawl), one of the tools tested.
+We designed the [methodology](reports/METHODOLOGY.md) to be fair (identical
+seed URLs, randomized execution order, published scripts), but readers should
+be aware of this relationship. All code and data are published so results can
+be independently verified. If you rerun and get different results,
+[open an issue](https://github.com/AIMLPM/llm-crawler-benchmarks/issues).
+
 ## Limitations
 
 - **Single machine, single location.** All benchmarks run on one machine in one
@@ -110,9 +120,9 @@ configurations and fairness decisions.
   reviewers. LLM judges have known biases (verbosity preference, position
   effects). We mitigate with 4-dimension scoring but the scores are not
   ground truth.
-- **No authentication or JS-heavy SPA stress testing.** All test sites are
-  publicly accessible. Sites behind login walls or with heavy client-side
-  rendering may produce different results.
+- **No anti-bot, authentication, or JS-heavy SPA testing.** All test sites are
+  publicly accessible and crawler-friendly. Results do not apply to sites with
+  bot detection, rate limiting, or login walls.
 
 ## Including a tool
 
@@ -164,7 +174,7 @@ docker run --rm \
 
 ## Benchmark version
 
-**v1.0** -- 2026-04-14
+**v2.0** -- 2026-04-16
 
 When benchmark methodology changes (new sites, different scoring, updated
 tool versions), we increment the version. Results from different versions

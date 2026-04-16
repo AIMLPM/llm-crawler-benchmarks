@@ -1,24 +1,25 @@
 # Speed Comparison
-<!-- style: v2, 2026-04-13 -->
+<!-- style: v2, 2026-04-15 -->
 
-**markcrawl** is the fastest crawler at 14.0 pages/sec overall, followed by scrapy+md (9.3 p/s).
+**markcrawl** is the fastest crawler at 12.1 pages/sec overall, followed by scrapy+md (9.5 p/s).
 
-Generated: 2026-04-13 10:30:28 UTC
+Generated: 2026-04-16 03:00:38 UTC
 
 ## Methodology
 
-**Two-phase approach** for a fair comparison:
-
-1. **URL Discovery** — MarkCrawl crawls each site once to build a URL list
-2. **Benchmarking** — All tools fetch the **identical URLs** (no discovery, pure fetch+convert speed)
+**Per-tool discovery:** Each tool starts from the same seed URL and discovers
+its own pages through link-following. This tests real-world crawl behavior —
+discovery quality, link extraction, and content extraction are all measured.
+Page counts may vary between tools depending on each tool's link-following strategy.
 
 Settings:
+- **Seed URL:** Same for all tools per site
+- **Max pages:** Same limit for all tools per site
 - **Delay:** 0 (no politeness throttle)
 - **Concurrency:** 5
 - **Iterations:** 3 per tool per site (reporting median + std dev)
 - **Warm-up:** 1 throwaway run per site before timing
 - **Output:** Markdown files + JSONL index
-- **URL list:** Identical for all tools (discovered in Phase 1)
 
 See [METHODOLOGY.md](METHODOLOGY.md) for full methodology.
 
@@ -45,130 +46,132 @@ See [METHODOLOGY.md](METHODOLOGY.md) for full methodology.
 
 Max pages: 15
 
-| Tool | Pages (a) | Time (b) | Pages/sec [1] | Avg words [2] | Output KB [3] |
-|---|---|---|---|---|---|
-| **markcrawl** | 15 | 3.6 | 4.2 | 199 | 19 |
-| colly+md | 15 | 4.0 | 3.8 | 245 | 31 |
-| scrapy+md | 15 | 4.7 | 3.2 | 242 | 31 |
-| crawl4ai | 15 | 5.0 | 3.0 | 242 | 42 |
-| playwright | 15 | 5.1 | 3.0 | 245 | 31 |
-| crawlee | 15 | 6.8 | 2.2 | 245 | 31 |
-| crawl4ai-raw | 15 | 9.6 | 1.6 | 242 | 42 |
+| Tool | Pages (a) | Time (b) | Std dev | Pages/sec [1] | Avg words [2] | Output KB [3] | Peak MB [4] |
+|---|---|---|---|---|---|---|---|
+| scrapy+md | 15 | 3.5 | ±0.1 | 4.2 | 209 | 30 | 200 |
+| **markcrawl** | 15 | 3.9 | ±0.2 | 3.9 | 280 | 27 | 125 |
+| playwright | 15 | 4.4 | ±0.2 | 3.4 | 229 | 29 | 109 |
+| crawlee | 15 | 6.6 | ±0.1 | 2.3 | 215 | 27 | 200 |
+| colly+md | 15 | 6.7 | ±3.1 | 2.2 | 215 | 27 | 304 |
+| crawl4ai-raw | 15 | 7.3 | ±0.0 | 2.1 | 226 | 38 | 199 |
+| crawl4ai | 15 | 7.7 | ±0.3 | 1.9 | 226 | 38 | 181 |
 
 ### books-toscrape — E-commerce catalog (60 pages, pagination)
 
 Max pages: 60
 
-| Tool | Pages (a) | Time (b) | Pages/sec [1] | Avg words [2] | Output KB [3] |
-|---|---|---|---|---|---|
-| **markcrawl** | 60 | 4.2 | 14.3 | 339 | 155 |
-| scrapy+md | 60 | 4.9 | 12.3 | 387 | 251 |
-| colly+md | 60 | 6.5 | 9.2 | 395 | 254 |
-| crawl4ai | 60 | 11.4 | 5.3 | 493 | 482 |
-| crawlee | 60 | 16.6 | 3.6 | 395 | 254 |
-| crawl4ai-raw | 60 | 27.7 | 2.2 | 493 | 482 |
-| playwright | 60 | 35.1 | 1.8 | 395 | 254 |
+| Tool | Pages (a) | Time (b) | Std dev | Pages/sec [1] | Avg words [2] | Output KB [3] | Peak MB [4] |
+|---|---|---|---|---|---|---|---|
+| scrapy+md | 60 | 4.8 | ±0.2 | 12.5 | 473 | 216 | 110 |
+| **markcrawl** | 60 | 5.1 | ±0.2 | 11.7 | 389 | 186 | 324 |
+| playwright | 60 | 18.7 | ±2.2 | 3.2 | 384 | 270 | 320 |
+| crawlee | 60 | 19.2 | ±0.7 | 3.1 | 384 | 270 | 296 |
+| crawl4ai-raw | 60 | 21.8 | ±0.3 | 2.8 | 504 | 534 | 176 |
+| crawl4ai | 60 | 24.3 | ±0.1 | 2.5 | 504 | 534 | 313 |
+| colly+md | 60 | 30.0 | ±0.3 | 2.0 | 384 | 270 | 176 |
 
 ### fastapi-docs — API documentation (code blocks, headings, tutorials)
 
 Max pages: 500
 
-| Tool | Pages (a) | Time (b) | Pages/sec [1] | Avg words [2] | Output KB [3] |
-|---|---|---|---|---|---|
-| **markcrawl** | 153 | 11.4 | 13.4 | 2084 | 2952 |
-| colly+md | 153 | 27.1 | 5.6 | 3175 | 5437 |
-| scrapy+md | 153 | 29.6 | 5.2 | 2851 | 4677 |
-| playwright | 153 | 86.3 | 1.8 | 3160 | 6521 |
-| crawl4ai | 153 | 90.4 | 1.7 | 3519 | 6537 |
-| crawlee | 153 | 128.1 | 1.2 | 3154 | 6513 |
-| crawl4ai-raw | 153 | 139.8 | 1.1 | 3521 | 6538 |
+| Tool | Pages (a) | Time (b) | Std dev | Pages/sec [1] | Avg words [2] | Output KB [3] | Peak MB [4] |
+|---|---|---|---|---|---|---|---|
+| **markcrawl** | 500 | 35.7 | ±1.0 | 14.0 | 1967 | 10073 | 258 |
+| scrapy+md | 496 | 46.6 | ±0.9 | 10.6 | 2799 | 15277 | 269 |
+| colly+md | 500 | 94.5 | ±0.7 | 5.3 | 3218 | 19029 | 317 |
+| playwright | 500 | 200.5 | ±16.7 | 2.5 | 3253 | 22529 | 911 |
+| crawl4ai-raw | 500 | 334.6 | ±8.8 | 1.5 | 3630 | 22665 | 314 |
+| crawl4ai | 500 | 341.2 | ±18.9 | 1.5 | 3625 | 22650 | 353 |
+| crawlee | 502 | 367.7 | ±11.5 | 1.4 | 3241 | 22546 | 45 |
 
 ### python-docs — Python standard library docs
 
 Max pages: 500
 
-| Tool | Pages (a) | Time (b) | Pages/sec [1] | Avg words [2] | Output KB [3] |
-|---|---|---|---|---|---|
-| **markcrawl** | 500 | 22.1 | 22.7 | 3766 | 19103 |
-| colly+md | 500 | 43.5 | 11.5 | 4070 | 20718 |
-| scrapy+md | 328 | 37.6 | 8.7 | 4796 | 15751 |
-| crawlee | 500 | 74.4 | 6.7 | 4140 | 21108 |
-| playwright | 500 | 121.1 | 4.4 | 4140 | 21108 |
-| crawl4ai | 500 | 131.0 | 3.9 | 4180 | 26207 |
-| crawl4ai-raw | 500 | 187.6 | 2.7 | 4180 | 26207 |
+| Tool | Pages (a) | Time (b) | Std dev | Pages/sec [1] | Avg words [2] | Output KB [3] | Peak MB [4] |
+|---|---|---|---|---|---|---|---|
+| **markcrawl** | 500 | 37.3 | ±4.5 | 13.4 | 3713 | 18525 | 302 |
+| scrapy+md | 500 | 59.6 | ±9.2 | 8.2 | 3983 | 21017 | 105 |
+| colly+md | 500 | 130.0 | ±0.0 | 3.8 | 5453 | 24839 | 912 |
+| playwright | 500 | 130.0 | ±11.6 | 3.8 | 3064 | 15460 | 338 |
+| crawlee | 500 | 130.3 | ±1.5 | 3.8 | 3064 | 15463 | 42 |
+| crawl4ai | 500 | 192.0 | ±15.6 | 2.6 | 3058 | 18362 | 267 |
+| crawl4ai-raw | 500 | 228.1 | ±29.4 | 2.2 | 3058 | 18362 | 277 |
 
 ### react-dev — React docs (SPA, JS-rendered, interactive examples)
 
 Max pages: 500
 
-| Tool | Pages (a) | Time (b) | Pages/sec [1] | Avg words [2] | Output KB [3] |
-|---|---|---|---|---|---|
-| **markcrawl** | 221 | 8.4 | 26.3 | 1559 | 2711 |
-| scrapy+md | 221 | 22.9 | 9.6 | 1601 | 2914 |
-| colly+md | 221 | 32.3 | 6.9 | 4292 | 11570 |
-| playwright | 221 | 59.7 | 3.7 | 4292 | 11570 |
-| crawlee | 221 | 76.8 | 2.9 | 4370 | 11751 |
-| crawl4ai | 221 | 109.7 | 2.0 | 2277 | 5678 |
-| crawl4ai-raw | 221 | 123.1 | 1.8 | 2279 | 5685 |
+| Tool | Pages (a) | Time (b) | Std dev | Pages/sec [1] | Avg words [2] | Output KB [3] | Peak MB [4] |
+|---|---|---|---|---|---|---|---|
+| **markcrawl** | 221 | 11.0 | ±0.1 | 20.1 | 1587 | 2769 | 191 |
+| scrapy+md | 217 | 15.4 | ±1.9 | 14.1 | 1623 | 2885 | 213 |
+| colly+md | 292 | 24.1 | ±2.9 | 12.1 | 5535 | 18880 | 311 |
+| playwright | 221 | 44.1 | ±2.7 | 5.0 | 4330 | 11657 | 652 |
+| crawlee | 217 | 72.4 | ±2.1 | 3.0 | 4432 | 11667 | 31 |
+| crawl4ai | 500 | 221.4 | ±7.2 | 2.3 | 1866 | 10911 | 304 |
+| crawl4ai-raw | 500 | 224.7 | ±12.1 | 2.2 | 1866 | 10911 | 520 |
 
 ### wikipedia-python — Wikipedia (tables, infoboxes, citations, deep linking)
 
 Max pages: 50
 
-| Tool | Pages (a) | Time (b) | Pages/sec [1] | Avg words [2] | Output KB [3] |
-|---|---|---|---|---|---|
-| **markcrawl** | 50 | 6.7 | 7.5 | 3417 | 1848 |
-| scrapy+md | 50 | 8.2 | 6.3 | 4925 | 3052 |
-| colly+md | 50 | 9.0 | 5.6 | 5446 | 3635 |
-| playwright | 42 | 12.2 | 3.5 | 5249 | 3079 |
-| crawlee | 50 | 17.0 | 3.0 | 10493 | 13532 |
-| crawl4ai-raw | 50 | 29.5 | 1.7 | 5106 | 3664 |
-| crawl4ai | 50 | 41.7 | 1.2 | 5106 | 3664 |
+| Tool | Pages (a) | Time (b) | Std dev | Pages/sec [1] | Avg words [2] | Output KB [3] | Peak MB [4] |
+|---|---|---|---|---|---|---|---|
+| **markcrawl** | 50 | 6.9 | ±0.5 | 7.3 | 3491 | 1771 | 242 |
+| scrapy+md | 50 | 8.5 | ±2.8 | 5.9 | 3764 | 2425 | 279 |
+| playwright | 50 | 34.2 | ±27.3 | 1.5 | 6645 | 4534 | 506 |
+| crawl4ai | 50 | 43.0 | ±3.6 | 1.2 | 6644 | 4708 | 233 |
+| crawl4ai-raw | 50 | 44.4 | ±7.1 | 1.1 | 6641 | 4704 | 311 |
+| crawlee | 50 | 47.8 | ±9.8 | 1.0 | 12020 | 13469 | 176 |
+| colly+md | — | — | — | — | — | error: heartbeat stall: 0 pages after 120s |
 
 ### stripe-docs — Stripe API docs (tabbed content, code samples, sidebars)
 
 Max pages: 500
 
-| Tool | Pages (a) | Time (b) | Pages/sec [1] | Avg words [2] | Output KB [3] |
-|---|---|---|---|---|---|
-| scrapy+md | 257 | 24.2 | 10.6 | 1360 | 2908 |
-| **markcrawl** | 257 | 35.7 | 7.2 | 1165 | 2100 |
-| colly+md | 254 | 58.0 | 4.4 | 16950 | 114124 |
-| crawl4ai | 257 | 268.5 | 1.0 | 1372 | 3605 |
-| playwright | 257 | 333.2 | 0.8 | 18073 | 122018 |
-| crawl4ai-raw | 257 | 423.1 | 0.6 | 1369 | 3598 |
-| crawlee | 257 | 413.2 | 0.6 | 18095 | 122070 |
+| Tool | Pages (a) | Time (b) | Std dev | Pages/sec [1] | Avg words [2] | Output KB [3] | Peak MB [4] |
+|---|---|---|---|---|---|---|---|
+| scrapy+md | 498 | 49.7 | ±3.9 | 10.0 | 3741 | 20967 | 269 |
+| **markcrawl** | 500 | 63.2 | ±3.3 | 7.9 | 767 | 2808 | 206 |
+| colly+md | 498 | 127.2 | ±1.7 | 3.9 | 21170 | 294038 | 600 |
+| playwright | 500 | 449.2 | ±12.4 | 1.1 | 20274 | 266655 | 724 |
+| crawlee | 500 | 468.4 | ±2.8 | 1.1 | 20292 | 264386 | 133 |
+| crawl4ai-raw | 500 | 628.0 | ±201.2 | 0.8 | 2038 | 9857 | 684 |
+| crawl4ai | 500 | 708.0 | ±9.4 | 0.7 | 1514 | 7418 | 648 |
 
 ### blog-engineering — GitHub Engineering Blog (articles, images, technical content)
 
 Max pages: 200
 
-| Tool | Pages (a) | Time (b) | Pages/sec [1] | Avg words [2] | Output KB [3] |
-|---|---|---|---|---|---|
-| scrapy+md | 200 | 6.7 | 30.1 | 659 | 1075 |
-| **markcrawl** | 200 | 11.7 | 17.5 | 667 | 1064 |
-| playwright | 200 | 40.2 | 5.0 | 3584 | 14500 |
-| colly+md | 124 | 28.9 | 4.4 | 3048 | 7229 |
-| crawl4ai | 200 | 58.9 | 3.4 | 2301 | 5266 |
-| crawlee | 200 | 73.4 | 2.7 | 3576 | 14420 |
-| crawl4ai-raw | 200 | 87.0 | 2.3 | 2301 | 5266 |
+| Tool | Pages (a) | Time (b) | Std dev | Pages/sec [1] | Avg words [2] | Output KB [3] | Peak MB [4] |
+|---|---|---|---|---|---|---|---|
+| **markcrawl** | 200 | 6.0 | ±23.4 | 33.5 | 703 | 1139 | 145 |
+| scrapy+md | 195 | 25.0 | ±3.7 | 7.7 | 1051 | 1709 | 211 |
+| playwright | 200 | 40.7 | ±14.2 | 4.9 | 3375 | 13779 | 651 |
+| crawlee | 200 | 59.6 | ±11.9 | 3.4 | 3369 | 13724 | 105 |
+| crawl4ai | 200 | 65.1 | ±0.6 | 3.1 | 2148 | 4864 | 270 |
+| crawl4ai-raw | 200 | 65.9 | ±0.7 | 3.0 | 2148 | 4864 | 269 |
+| colly+md | 200 | 74.0 | ±9.6 | 2.7 | 3674 | 12873 | 262 |
 
-> **Column definitions:** **Pages (a)** = total pages fetched from the site (identical URL list for all tools).
+> **Column definitions:** **Pages (a)** = pages discovered and fetched by this tool (varies per tool).
 > **Time (b)** = wall-clock seconds to fetch and convert all pages (median of 3 iterations).
-> **[1] Pages/sec** = median throughput across 3 iterations. Approximately a÷b; small differences arise because each column is an independent median.
+> **[1] Pages/sec** = median throughput across iterations.
+> Approximately a÷b; small differences arise because each column is an independent median.
 > **[2] Avg words** = mean words per page. **[3] Output KB** = total Markdown output size across all pages.
+> **Std dev** = standard deviation of Time across iterations. **[4] Peak MB** = peak resident memory (RSS) during crawl.
 
 ## Overall summary
 
 | Tool | Total pages (a) | Total time (b) | Avg pages/sec (a÷b) | Notes |
 |---|---|---|---|---|
-| **markcrawl** | 1456 | 103.9 | 14.0 | |
-| scrapy+md | 1284 | 138.8 | 9.3 | *(missing 172 pages)* |
-| colly+md | 1376 | 209.3 | 6.6 | *(missing 80 pages)* |
-| playwright | 1448 | 692.8 | 2.1 | *(missing 8 pages)* |
-| crawl4ai | 1456 | 716.4 | 2.0 | |
-| crawlee | 1456 | 806.2 | 1.8 | |
-| crawl4ai-raw | 1456 | 1027.5 | 1.4 | |
+| **markcrawl** | 2046 | 169.0 | 12.1 | *(missing 279 pages)* |
+| scrapy+md | 2031 | 213.1 | 9.5 | *(missing 294 pages)* |
+| colly+md | 2065 | 486.6 | 4.2 | *(7/8 sites)* *(missing 260 pages)* |
+| playwright | 2046 | 921.8 | 2.2 | *(missing 279 pages)* |
+| crawlee | 2044 | 1172.0 | 1.7 | *(missing 281 pages)* |
+| crawl4ai-raw | 2325 | 1554.6 | 1.5 |  |
+| crawl4ai | 2325 | 1602.7 | 1.5 |  |
 
 > **Column definitions:** **Total pages (a)** = sum of pages fetched across all sites.
 > **Total time (b)** = sum of median wall-clock times across all sites. **Avg pages/sec (a÷b)** = overall throughput.
@@ -182,7 +185,7 @@ Max pages: 200
 
 HTTP-only tools (markcrawl, scrapy+md, colly+md) are consistently 2-7x faster than browser-based tools (crawl4ai, crawlee, playwright). The speed gap comes from skipping browser startup and JavaScript execution entirely.
 
-markcrawl is fastest overall, but loses on stripe-docs (scrapy+md) and blog-engineering (scrapy+md). Site-specific results vary with server response times and content complexity.
+markcrawl is fastest overall, but loses on quotes-toscrape (scrapy+md), books-toscrape (scrapy+md), stripe-docs (scrapy+md). Site-specific results vary with server response times and content complexity.
 
 Higher word counts from browser-based tools (crawlee, playwright) do not indicate better extraction quality — they often reflect extra navigation chrome and repeated boilerplate. See [QUALITY_COMPARISON.md](QUALITY_COMPARISON.md) for content signal analysis.
 
