@@ -102,7 +102,10 @@ def _bold(text: str) -> str:
 
 
 def _bold_if_mc(text: str, tool: str) -> str:
-    return _bold(text) if tool == "markcrawl" else text
+    # Markcrawl is no longer bolded in tables to avoid visual bias.
+    # Kept as a no-op wrapper so callers don't need to change.
+    del tool
+    return text
 
 
 def _winner(data: dict, higher_is_better: bool = True):

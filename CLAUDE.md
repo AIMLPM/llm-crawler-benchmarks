@@ -106,8 +106,10 @@ others can skip it. The summary must serve all three.
 - **Use percentages in "vs markcrawl" columns**, not multipliers.
 - **Tables must be sorted** — by the primary metric, descending (best first).
   markcrawl should be first only if it ranks first.
-- **Bold markcrawl's row** in summary tables for scannability, but only with `**`,
-  not by putting it in a special position if it didn't earn it.
+- **Do NOT bold markcrawl's row** in summary tables. Bolding the authoring
+  tool adds visual bias — let the sort order and data speak. The linter
+  enforces this and will fail if a `**markcrawl**` row appears in a
+  comparative report.
 - **Round consistently.** Percentages to 1 decimal. Dollar amounts: no decimals
   above $10, two decimals below $1. Scores to 2 decimals.
 - **No emojis** in reports unless the user explicitly requests them.
@@ -217,8 +219,9 @@ Reports should link to each other where findings connect:
   Winners are dynamically computed from report data.
 - The Leaderboard table shows all tools sorted by speed with 5 key metrics
   (speed, content signal, MRR, answer quality, annual cost).
-- Bold markcrawl's row in the leaderboard. Bold the winner name in Key
-  Findings only if the winner is markcrawl.
+- Do not bold markcrawl's row in the leaderboard. Do not bold the winner
+  name in Key Findings based on tool identity — ranking and data speak for
+  themselves (same anti-bias rule as comparative report tables).
 - The "Bottom line" narrative is generated from data. It should combine
   multiple markcrawl wins into one sentence (e.g., "It also wins on X and Y").
 - The Limitations section must remain honest — list real caveats, don't

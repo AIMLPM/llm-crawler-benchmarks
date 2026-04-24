@@ -7,7 +7,7 @@ Checks each benchmark .md file for structural compliance:
 - Metric context section before first table
 - Summary table with all tools
 - Cross-references to related reports
-- Formatting rules (sorted tables, consistent units, bold markcrawl row)
+- Formatting rules (sorted tables, consistent units, no bolded markcrawl row)
 
 Usage:
     python lint_reports.py              # lint all reports
@@ -137,13 +137,16 @@ def lint_file(filepath: Path) -> list[str]:
             if tool not in text_lower:
                 warnings.append(f"{name}: tool '{tool}' not found in report — all 7 tools should appear")
 
-    # --- 6. Bold markcrawl row in summary tables ---
+    # --- 6. No bolded markcrawl row in summary tables (avoid visual bias) ---
     if name in COMPARATIVE_REPORTS:
-        # Look for table rows containing markcrawl — at least one should be bolded
         mc_rows = [line for line in lines if line.startswith("|") and "markcrawl" in line.lower()]
-        has_bold_mc = any("**markcrawl**" in row or "**markcrawl" in row for row in mc_rows)
-        if mc_rows and not has_bold_mc:
-            warnings.append(f"{name}: markcrawl row in tables should be bolded with **")
+        for row in mc_rows:
+            if "**markcrawl**" in row:
+                warnings.append(
+                    f"{name}: markcrawl row in tables must not be bolded — "
+                    "bolding the authoring tool adds visual bias"
+                )
+                break
 
     # --- 7. No emojis (except in code blocks or as data markers) ---
     emoji_pattern = re.compile(

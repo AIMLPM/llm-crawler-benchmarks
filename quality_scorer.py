@@ -410,7 +410,7 @@ def generate_quality_report(
         "# Extraction Quality Comparison",
         f"<!-- style: v2, {today} -->",
         "",
-        "**markcrawl** produces the cleanest Markdown for RAG: lowest preamble and "
+        "markcrawl produces the cleanest Markdown for RAG: lowest preamble and "
         "highest content signal across all sites.",
         "",
         "## Methodology",
@@ -511,7 +511,7 @@ def generate_quality_report(
                 continue
             preamble_flag = " ⚠" if s["avg_preamble"] > 50 else ""
             repeat_flag = " ⚠" if s["avg_repeat"] > 0.20 else ""
-            tool_label = f"**{tool}**" if tool == "markcrawl" else tool
+            tool_label = tool
             lines.append(
                 f"| {tool_label} | {s['signal_ratio']:.0%} | "
                 f"{s['avg_preamble']:.0f}{preamble_flag} | "
@@ -610,7 +610,7 @@ def generate_quality_report(
             preamble_flag = " ⚠" if avg_preamble > 50 else ""
             repeat_flag = " ⚠" if repeat_rate > 0.20 else ""
 
-            tool_label = f"**{tool}**" if tool == "markcrawl" else tool
+            tool_label = tool
             lines.append(
                 f"| {tool_label} | {avg_words:.0f} | {avg_preamble:.0f}{preamble_flag} | "
                 f"{repeat_rate:.0%}{repeat_flag} | {junk_per_page:.1f} | {avg_headings:.1f} | "
