@@ -1,0 +1,294 @@
+# Canonical site pool for llm-crawler-benchmarks.
+#
+# Structure: see sites/pool.py. Adding a site:
+#   1. Pick the right category (must be in VALID_CATEGORIES).
+#   2. Verify it's crawlable (no auth wall, reasonable robots.txt, stable).
+#   3. Set has_queries: true ONLY if TEST_QUERIES in benchmark_retrieval.py
+#      has an entry with the same `name`. Retrieval/answer-quality benches
+#      filter on this flag.
+#
+# Version bumps: when swapping sites in/out, increment `version` (e.g.
+# v1.0 -> v1.1) so run manifests capture which pool produced their numbers.
+#
+# Health check: a weekly CI job (TODO) should fetch each URL and flag
+# non-200s or content-hash drift exceeding 30% — dead sites shouldn't
+# silently lower everyone's scores.
+
+version: "v1.1"
+released: "2026-04-18"
+
+sites:
+  # ==========================================================================
+  # Original 8 sites -- preserved verbatim so cached runs (run_20260416_030039)
+  # still replay against the same names. Do not rename.
+  # ==========================================================================
+  - name: quotes-toscrape
+    url: http://quotes.toscrape.com
+    category: sandbox
+    difficulty: [static, paginated]
+    max_pages: 15
+    render_js: false
+    description: "Paginated quotes (simple HTML, link-following)"
+    has_queries: true
+
+  - name: books-toscrape
+    url: http://books.toscrape.com
+    category: sandbox
+    difficulty: [static, paginated]
+    max_pages: 60
+    render_js: false
+    description: "E-commerce catalog (60 pages, pagination)"
+    has_queries: true
+
+  - name: fastapi-docs
+    url: https://fastapi.tiangolo.com
+    category: api_docs
+    difficulty: [static]
+    max_pages: 500
+    render_js: false
+    description: "API documentation (code blocks, headings, tutorials)"
+    has_queries: true
+
+  - name: python-docs
+    url: https://docs.python.org/3/library/
+    category: reference
+    difficulty: [static]
+    max_pages: 500
+    render_js: false
+    description: "Python standard library docs"
+    has_queries: true
+
+  - name: react-dev
+    url: https://react.dev/learn
+    category: framework_docs
+    difficulty: [dynamic_js]
+    max_pages: 500
+    render_js: true
+    description: "React docs (SPA, JS-rendered, interactive examples)"
+    has_queries: true
+
+  - name: wikipedia-python
+    url: https://en.wikipedia.org/wiki/Python_(programming_language)
+    category: wiki
+    difficulty: [static]
+    max_pages: 50
+    render_js: false
+    description: "Wikipedia (tables, infoboxes, citations, deep linking)"
+    has_queries: true
+
+  - name: stripe-docs
+    url: https://docs.stripe.com/payments
+    category: api_docs
+    difficulty: [dynamic_js]
+    max_pages: 500
+    render_js: false
+    description: "Stripe API docs (tabbed content, code samples, sidebars)"
+    has_queries: true
+
+  - name: blog-engineering
+    url: https://github.blog/engineering/
+    category: blog
+    difficulty: [static, paginated]
+    max_pages: 200
+    render_js: false
+    description: "GitHub Engineering Blog (articles, images, technical content)"
+    has_queries: true
+
+  # ==========================================================================
+  # Pool expansion -- v1.0 additions. No retrieval queries yet, so these are
+  # speed + extraction-quality only. Add queries in benchmark_retrieval.py
+  # and flip has_queries: true as they come online.
+  # ==========================================================================
+
+  # --- API docs (dev tools) ---
+  - name: django-docs
+    url: https://docs.djangoproject.com/en/stable/
+    category: api_docs
+    difficulty: [static, paginated]
+    max_pages: 300
+    render_js: false
+    description: "Django framework docs -- long-form, deep linking"
+
+  - name: flask-docs
+    url: https://flask.palletsprojects.com/en/stable/
+    category: api_docs
+    difficulty: [static]
+    max_pages: 150
+    render_js: false
+    description: "Flask docs -- concise, code-heavy"
+
+  - name: sqlalchemy-docs
+    url: https://docs.sqlalchemy.org/en/20/
+    category: api_docs
+    difficulty: [static]
+    max_pages: 300
+    render_js: false
+    description: "SQLAlchemy ORM docs -- code samples, class references"
+
+  - name: requests-docs
+    url: https://requests.readthedocs.io/en/latest/
+    category: api_docs
+    difficulty: [static]
+    max_pages: 50
+    render_js: false
+    description: "Requests library docs (ReadTheDocs layout)"
+
+  # --- Framework docs (JS ecosystem) ---
+  - name: vuejs-docs
+    url: https://vuejs.org/guide/introduction.html
+    category: framework_docs
+    difficulty: [dynamic_js]
+    max_pages: 300
+    render_js: true
+    description: "Vue.js guide -- SPA, interactive code examples"
+
+  - name: svelte-docs
+    url: https://svelte.dev/docs
+    category: framework_docs
+    difficulty: [dynamic_js]
+    max_pages: 200
+    render_js: true
+    description: "Svelte docs -- interactive REPL, tutorials"
+
+  - name: nextjs-docs
+    url: https://nextjs.org/docs
+    category: framework_docs
+    difficulty: [dynamic_js, paginated]
+    max_pages: 300
+    render_js: true
+    description: "Next.js docs -- tabbed content, versioned paths"
+
+  # --- Reference / wiki ---
+  - name: mdn-html
+    url: https://developer.mozilla.org/en-US/docs/Web/HTML
+    category: reference
+    difficulty: [static]
+    max_pages: 200
+    render_js: false
+    description: "MDN HTML reference -- element/attribute pages"
+
+  - name: wikipedia-rust
+    url: https://en.wikipedia.org/wiki/Rust_(programming_language)
+    category: wiki
+    difficulty: [static]
+    max_pages: 50
+    render_js: false
+    description: "Wikipedia Rust article -- tables, infoboxes"
+
+  - name: arxiv-cs-ai
+    url: https://arxiv.org/list/cs.AI/recent
+    category: reference
+    difficulty: [static, paginated]
+    max_pages: 100
+    render_js: false
+    description: "arXiv recent AI papers listing -- abstracts, metadata"
+
+  # --- Blogs / engineering content ---
+  - name: cloudflare-blog
+    url: https://blog.cloudflare.com/
+    category: blog
+    difficulty: [static, paginated]
+    max_pages: 100
+    render_js: false
+    description: "Cloudflare engineering blog -- long-form posts"
+
+  - name: netflix-tech-blog
+    url: https://netflixtechblog.com/
+    category: blog
+    difficulty: [dynamic_js, paginated]
+    max_pages: 100
+    render_js: true
+    description: "Netflix tech blog (Medium-hosted, JS-rendered)"
+
+  - name: stackoverflow-blog
+    url: https://stackoverflow.blog/engineering/
+    category: blog
+    difficulty: [static, paginated]
+    max_pages: 100
+    render_js: false
+    description: "Stack Overflow engineering blog"
+
+  # --- Tutorials ---
+  - name: real-python
+    url: https://realpython.com/tutorials/all/
+    category: tutorial
+    difficulty: [static, paginated]
+    max_pages: 150
+    render_js: false
+    description: "Real Python tutorials -- code-heavy long-form"
+
+  - name: digitalocean-tutorials
+    url: https://www.digitalocean.com/community/tutorials
+    category: tutorial
+    difficulty: [dynamic_js, paginated]
+    max_pages: 200
+    render_js: true
+    description: "DigitalOcean community tutorials (infrastructure/devops)"
+
+  # --- Ecommerce (real, not sandbox) ---
+  - name: hackernews
+    url: https://news.ycombinator.com/
+    category: news
+    difficulty: [static, paginated]
+    max_pages: 100
+    render_js: false
+    description: "Hacker News front page + pagination (minimal HTML)"
+
+  # --- SaaS marketing / product pages ---
+  - name: vercel-marketing
+    url: https://vercel.com/docs
+    category: saas_marketing
+    difficulty: [dynamic_js]
+    max_pages: 200
+    render_js: true
+    description: "Vercel product docs -- marketing-adjacent, interactive"
+
+  - name: auth0-docs
+    url: https://auth0.com/docs
+    category: api_docs
+    difficulty: [dynamic_js]
+    max_pages: 300
+    render_js: true
+    description: "Auth0 identity docs -- code tabs, language switchers"
+
+  # ==========================================================================
+  # v1.1 additions -- 4 new sites (autoresearch expansion 4 -> 12).
+  # All have has_queries: true; queries added to TEST_QUERIES in
+  # benchmark_retrieval.py on the same commit.
+  # ==========================================================================
+
+  - name: gen2fund
+    url: https://gen2fund.com/
+    category: saas_marketing
+    difficulty: [static]
+    max_pages: 50
+    render_js: false
+    description: "Gen2 Fund -- venture fund marketing site (small static)"
+    has_queries: true
+
+  - name: brex
+    url: https://www.brex.com/
+    category: saas_marketing
+    difficulty: [dynamic_js]
+    max_pages: 150
+    render_js: false
+    description: "Brex -- NA fintech neobank marketing + product pages"
+    has_queries: true
+
+  - name: supabase-docs
+    url: https://supabase.com/docs
+    category: api_docs
+    difficulty: [dynamic_js]
+    max_pages: 300
+    render_js: false
+    description: "Supabase platform docs -- OSS backend, modern SPA"
+    has_queries: true
+
+  - name: tailwind-docs
+    url: https://tailwindcss.com/docs
+    category: framework_docs
+    difficulty: [static]
+    max_pages: 200
+    render_js: false
+    description: "Tailwind CSS utility-first framework docs"
+    has_queries: true
