@@ -123,7 +123,7 @@ To force fully sequential execution: `--sequential`
 
 | Tool | Custom code written | What crawl4ai/scrapy/etc. provides natively |
 |---|---|---|
-| **markcrawl** | Direct `CrawlEngine` API calls with per-URL fetch + process loop | CLI is out-of-box, but benchmark uses the Python API for URL-list mode |
+| markcrawl | Direct `CrawlEngine` API calls with per-URL fetch + process loop | CLI is out-of-box, but benchmark uses the Python API for URL-list mode |
 | **crawl4ai** | `arun_many()` batch dispatch, custom file I/O (`.md` + `.jsonl`) | `AsyncWebCrawler`, `BrowserConfig`, `CrawlerRunConfig`, built-in markdown conversion. Also has `BFSDeepCrawlStrategy` for link discovery (unused) |
 | **crawl4ai-raw** | Sequential `arun()` calls, same file I/O glue | Same as crawl4ai but without `arun_many()` batching — the simplest possible usage |
 | **scrapy+md** | Full custom `Spider` class with `markdownify` in `parse()`, subprocess isolation | Scrapy provides the crawler framework; markdown conversion is custom |
@@ -367,6 +367,11 @@ For each site, show the same page's Markdown output from all 4 tools. Let the re
 | Scrapy | `pip install scrapy markdownify` | Xs | Scrapy framework | Write spider class |
 
 ## Reproducibility
+
+Every run writes a `manifest.json` capturing the exact sites, seed, pool
+version, tool versions, and repo git SHA — so any run can be replayed
+bit-for-bit. See [REPRODUCIBILITY.md](REPRODUCIBILITY.md) for the manifest
+format and replay one-liners.
 
 ### Prerequisites
 
