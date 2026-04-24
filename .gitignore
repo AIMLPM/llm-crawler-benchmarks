@@ -32,6 +32,8 @@ runs/
 embed_cache/
 retrieval_checkpoints/
 answer_quality_checkpoints/
+.pipeline_checkpoints/
+hyde_cache/
 storage/
 .url_cache.json
 .benchmark_checkpoint.json
