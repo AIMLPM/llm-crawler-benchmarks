@@ -13,12 +13,10 @@ def test_load_pool():
     p = P.load_pool()
     assert p.version.startswith("v"), p.version
     assert len(p.sites) >= 8, f"expected >= 8 sites, got {len(p.sites)}"
-    # Original 8 must be present.
-    for name in ["quotes-toscrape", "books-toscrape", "fastapi-docs",
-                 "python-docs", "react-dev", "wikipedia-python",
-                 "stripe-docs", "blog-engineering"]:
-        assert p.by_name(name) is not None, f"original site missing: {name}"
-    # All categories valid.
+    # Continuity anchors (carried across pool swaps).
+    for name in ["react-dev", "stripe-docs"]:
+        assert p.by_name(name) is not None, f"anchor site missing: {name}"
+    # All categories + difficulties valid.
     for s in p.sites:
         assert s.category in P.VALID_CATEGORIES
         for d in s.difficulty:
@@ -33,23 +31,37 @@ def test_sample_deterministic():
 
 
 def test_sample_different_seeds_differ():
+    """Different seeds must produce different samples on at least some
+    category with enough members to offer variety. Robust to pool reshapes:
+    we require that ANY pair of seeds, across a handful of trials, differs."""
     p = P.load_pool()
-    a = P.sample(p, seed=1, per_category=2)
-    b = P.sample(p, seed=2, per_category=2)
-    assert [s.name for s in a] != [s.name for s in b], "different seeds produced same sample"
+    # Find the largest category — that's where seed variance is observable.
+    sizes = {}
+    for s in p.sites:
+        sizes[s.category] = sizes.get(s.category, 0) + 1
+    largest = max(sizes.values())
+    assert largest >= 3, f"pool has no category with >=3 sites; got sizes {sizes}"
+    # Pick per_category so the largest category can choose a proper subset.
+    per_cat = max(1, largest - 1)
+    samples = [tuple(s.name for s in P.sample(p, seed=i, per_category=per_cat))
+               for i in (1, 2, 17, 999)]
+    assert len(set(samples)) >= 2, f"all 4 seeds produced the same sample: {samples[0]}"
 
 
 def test_sample_requires_queries():
     p = P.load_pool()
-    s = P.sample(p, seed=1, per_category=10, requires_queries=True)
+    # Sample generously so every query-bearing site is pulled.
+    s = P.sample(p, seed=1, per_category=50, requires_queries=True)
     assert all(x.has_queries for x in s), "requires_queries leaked a no-query site"
-    assert len(s) >= 8, "should include all 8 original sites"
+    expected = [x for x in p.sites if x.has_queries]
+    assert len(s) == len(expected), f"expected all {len(expected)} query sites, got {len(s)}"
 
 
 def test_sample_only_filter():
     p = P.load_pool()
-    s = P.sample(p, seed=0, per_category=1, only=["fastapi-docs", "python-docs"])
-    assert {x.name for x in s} == {"fastapi-docs", "python-docs"}
+    anchors = ["react-dev", "stripe-docs"]
+    s = P.sample(p, seed=0, per_category=1, only=anchors)
+    assert {x.name for x in s} == set(anchors)
 
 
 def test_manifest_roundtrip():
@@ -78,15 +90,15 @@ def test_manifest_roundtrip():
 def test_sites_for_run_legacy():
     """A run dir without manifest.json should be discoverable from disk layout."""
     p = P.load_pool()
+    anchors = ["react-dev", "stripe-docs"]
     with tempfile.TemporaryDirectory() as tmp:
         run_dir = Path(tmp) / "run_legacy"
         # Simulate: runs/<id>/<tool>/<site>/pages.jsonl
-        (run_dir / "markcrawl" / "fastapi-docs").mkdir(parents=True)
-        (run_dir / "markcrawl" / "fastapi-docs" / "pages.jsonl").write_text("{}\n")
-        (run_dir / "markcrawl" / "python-docs").mkdir(parents=True)
-        (run_dir / "markcrawl" / "python-docs" / "pages.jsonl").write_text("{}\n")
+        for name in anchors:
+            (run_dir / "markcrawl" / name).mkdir(parents=True)
+            (run_dir / "markcrawl" / name / "pages.jsonl").write_text("{}\n")
         sites = P.sites_for_run(run_dir, p)
-        assert {s.name for s in sites} == {"fastapi-docs", "python-docs"}
+        assert {s.name for s in sites} == set(anchors)
 
 
 def test_pool_hash_stable():
