@@ -44,9 +44,16 @@ func main() {
 
 	var pageCount int64
 
+	// Browser-like User-Agent. Default colly UA ("colly - ...") is blocked
+	// by Cloudflare/Akamai/etc. WAFs on most modern sites. Use a recent
+	// Chrome on macOS string so we look like a normal browser.
+	const browserUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) " +
+		"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+
 	c := colly.NewCollector(
 		colly.MaxDepth(3),
 		colly.Async(true),
+		colly.UserAgent(browserUA),
 	)
 
 	// Per-request timeout and concurrency limits
@@ -59,6 +66,22 @@ func main() {
 
 	// Respect robots.txt
 	c.AllowURLRevisit = false
+
+	// Set browser-like Accept headers on every request. Some WAFs check
+	// UA + Accept consistency together; matching what a real Chrome sends
+	// reduces the chance of getting flagged as a bot.
+	c.OnRequest(func(r *colly.Request) {
+		r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
+		r.Headers.Set("Accept-Language", "en-US,en;q=0.9")
+		r.Headers.Set("Accept-Encoding", "gzip, deflate, br")
+		r.Headers.Set("Sec-Ch-Ua", `"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"`)
+		r.Headers.Set("Sec-Ch-Ua-Mobile", "?0")
+		r.Headers.Set("Sec-Ch-Ua-Platform", `"macOS"`)
+		r.Headers.Set("Sec-Fetch-Dest", "document")
+		r.Headers.Set("Sec-Fetch-Mode", "navigate")
+		r.Headers.Set("Sec-Fetch-Site", "none")
+		r.Headers.Set("Upgrade-Insecure-Requests", "1")
+	})
 
 	parsedBase, _ := url.Parse(*baseURL)
 	baseDomain := parsedBase.Hostname()
