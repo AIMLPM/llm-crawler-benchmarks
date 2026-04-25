@@ -172,9 +172,13 @@ def _embed_with_retry(client, texts: list, max_retries: int = 4) -> list:
 # Core logic
 # ---------------------------------------------------------------------------
 
+_PER_CHUNK_CHAR_CAP = 8000  # ~2k tokens; protects against pathological un-chunked pages
+
+
 def _generate_answer(client, question: str, chunks: List[str]) -> str:
     """Generate an answer from retrieved chunks using the LLM."""
-    context = "\n\n---\n\n".join(chunks[:TOP_K_FOR_ANSWER])
+    capped = [c[:_PER_CHUNK_CHAR_CAP] for c in chunks[:TOP_K_FOR_ANSWER]]
+    context = "\n\n---\n\n".join(capped)
     prompt = ANSWER_PROMPT.format(context=context, question=question)
 
     for attempt in range(3):
@@ -188,7 +192,11 @@ def _generate_answer(client, question: str, chunks: List[str]) -> str:
             )
             return response.choices[0].message.content.strip()
         except Exception as exc:
-            if "400" in str(exc) or "BadRequest" in type(exc).__name__:
+            exc_str = str(exc)
+            if "context_length_exceeded" in exc_str:
+                logger.warning(f"    Skipping query: context_length_exceeded after cap (chunks={len(capped)})")
+                return "[skipped: context length exceeded]"
+            if "400" in exc_str or "BadRequest" in type(exc).__name__:
                 raise
             if attempt < 2:
                 time.sleep(2 ** attempt * 2)
