@@ -273,6 +273,28 @@ python self_improvement/check_cross_report_consistency.py
 
 See `self_improvement/09_safeguards.md` for the full process.
 
+## CI: run all checks locally before push
+
+GitHub Actions runs install + ruff + pytest + invariants on every push.
+To catch regressions before they land (and before the failure-email
+flood), run the same checks locally:
+
+```bash
+scripts/ci_local.sh         # mirrors .github/workflows/ci.yml
+scripts/ci_local.sh --fix   # apply ruff autofix where possible
+```
+
+To wire it into every push automatically:
+```bash
+scripts/install_pre_push_hook.sh
+```
+That installs `.git/hooks/pre-push` to block pushes when CI would fail.
+Bypass once with `git push --no-verify` if you really need to.
+
+If CI starts failing on something `ci_local.sh` doesn't catch, update
+the script — it's the source of truth for "what CI runs" and the
+workflow file should mirror it.
+
 ## Git commits
 
 - Do NOT add `Co-Authored-By` lines to commit messages.
