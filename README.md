@@ -48,7 +48,7 @@ All 7 tools, sorted by speed. 8 sites, 109 retrieval queries, scored on 5 dimens
 
 > **Column definitions:** **Speed** = pages/sec (median of 3 runs). **Content Signal** = (total words - preamble) / total words (higher = cleaner). **MRR** = Mean Reciprocal Rank, best retrieval mode per tool. **Answer** = LLM answer quality scored 1-5 by gpt-4o-mini. **Cost** = annual RAG pipeline cost at 100K pages, 1K queries/day.
 
-**Bottom line:** markcrawl v0.2.0 (async httpx) is the fastest crawler at 6.0 pages/sec -- 13% faster than the runner-up scrapy+md. It also wins on pipeline timing ($0.31 end-to-end) and extraction quality (100% content signal). Answer quality is tight across all tools (3.88-4.33/5), with colly+md narrowly leading. Retrieval quality barely differs between tools -- switching retrieval mode (e.g., to reranked) gains more than switching crawlers.
+**Bottom line:** markcrawl v0.5.0 (async httpx) is the fastest crawler at 6.0 pages/sec -- 13% faster than the runner-up scrapy+md. It also wins on pipeline timing ($0.31 end-to-end) and extraction quality (100% content signal). Answer quality is tight across all tools (3.88-4.33/5), with colly+md narrowly leading. Retrieval quality barely differs between tools -- switching retrieval mode (e.g., to reranked) gains more than switching crawlers.
 
 ## Tools Compared
 
@@ -174,7 +174,7 @@ docker run --rm \
 
 ## Benchmark version
 
-**v2.0** -- 2026-04-25
+**v2.0** -- 2026-04-30
 
 When benchmark methodology changes (new sites, different scoring, updated
 tool versions), we increment the version. Results from different versions
