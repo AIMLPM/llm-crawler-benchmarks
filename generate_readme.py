@@ -87,6 +87,38 @@ def _parse_pipeline(text: str) -> dict[str, dict]:
     return result
 
 
+def _parse_tool_versions(text: str) -> dict[str, str]:
+    """Parse the 'Tool versions in this run' table → {tool: version}."""
+    result = {}
+    for row in _parse_table(text, "Version"):
+        tool = row.get("Tool", "").strip("*").strip()
+        version = row.get("Version", "").strip("*").strip()
+        if tool and version and version != "—":
+            result[tool] = version
+    return result
+
+
+def _resolve_markcrawl_version(pipeline_text: str) -> str | None:
+    """Resolve the markcrawl version actually used for the current reports.
+
+    Prefers the version stamped into PIPELINE_TIMING.md by the benchmark run
+    (authoritative for what produced the numbers). Falls back to the locally
+    installed package version when the report has no stamp.
+    """
+    versions = _parse_tool_versions(pipeline_text)
+    v = versions.get("markcrawl")
+    if v and not v.lower().startswith(("go binary", "—", "skipped")):
+        return v
+    try:
+        from importlib.metadata import PackageNotFoundError, version
+        try:
+            return version("markcrawl")
+        except PackageNotFoundError:
+            return None
+    except ImportError:
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -274,8 +306,10 @@ def generate_readme() -> str:
     # Speed claim
     if sw == "markcrawl" and srv:
         pct = (sv - srv) / srv * 100
+        mc_version = _resolve_markcrawl_version(pipeline_text)
+        version_label = f" v{mc_version}" if mc_version else ""
         first = (
-            f"markcrawl v0.2.0 (async httpx) is the fastest crawler at "
+            f"markcrawl{version_label} (async httpx) is the fastest crawler at "
             f"{sv:.1f} pages/sec -- {pct:.0f}% faster than the runner-up {sr}"
         )
     else:
