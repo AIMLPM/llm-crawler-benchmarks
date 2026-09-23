@@ -687,7 +687,15 @@ def main():
     parser.add_argument("--dry-run", action="store_true",
                         help="Run model-invariant assertions + write models_manifest.json, then exit. "
                              "No API spend. Used by tests + as a pre-flight gate before topping up credits.")
+    parser.add_argument("--allow-stale-markcrawl", action="store_true",
+                        help="Proceed even if the installed markcrawl is older than PyPI's latest "
+                             "(deliberate old-version runs only).")
     args = parser.parse_args()
+
+    # Chunks every tool's output with markcrawl's chunker (see benchmark_retrieval.py).
+    if not (args.report_only or args.dry_run):
+        from tools.markcrawl_freshness import enforce as _enforce_markcrawl_fresh
+        _enforce_markcrawl_fresh(args.allow_stale_markcrawl)
 
     runs_dir = BENCH_DIR / "runs"
     run_dir = runs_dir / args.run if args.run else find_latest_run(runs_dir)
