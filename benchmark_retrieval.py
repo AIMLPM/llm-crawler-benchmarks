@@ -2387,7 +2387,16 @@ def main():
                         help="Clear checkpoints and embedding cache — start from scratch")
     parser.add_argument("--report-only", action="store_true",
                         help="Regenerate report from checkpoints only — no API calls")
+    parser.add_argument("--allow-stale-markcrawl", action="store_true",
+                        help="Proceed even if the installed markcrawl is older than PyPI's latest "
+                             "(deliberate old-version runs only).")
     args = parser.parse_args()
+
+    # Every tool's output is chunked with markcrawl's chunker, so a stale
+    # install skews all tools' scores, not just markcrawl's.
+    if not args.report_only:
+        from tools.markcrawl_freshness import enforce as _enforce_markcrawl_fresh
+        _enforce_markcrawl_fresh(args.allow_stale_markcrawl)
 
     # If --no-rerank, remove reranked from modes
     global RETRIEVAL_MODES

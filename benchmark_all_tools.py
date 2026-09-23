@@ -1221,6 +1221,9 @@ def main():
                         help="When sampling, restrict to sites with has_queries=true "
                              "(speed benches can still crawl non-query sites; this flag keeps "
                              "parity with retrieval/answer-quality runs).")
+    parser.add_argument("--allow-stale-markcrawl", action="store_true",
+                        help="Proceed even if the installed markcrawl is older than PyPI's latest "
+                             "(deliberate old-version runs only).")
     args = parser.parse_args()
 
     # --run: regenerate report from saved data (no crawling)
@@ -1289,6 +1292,10 @@ def main():
             logger.error(f"Unknown tool(s): {', '.join(unknown)}")
             logger.error(f"Available: {', '.join(TOOLS.keys())}")
             sys.exit(1)
+
+    if tool_filter is None or "markcrawl" in tool_filter:
+        from tools.markcrawl_freshness import enforce as _enforce_markcrawl_fresh
+        _enforce_markcrawl_fresh(args.allow_stale_markcrawl)
 
     # Check available tools
     available = []
