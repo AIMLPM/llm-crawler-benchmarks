@@ -7,7 +7,7 @@ license = "MIT"
 requires-python = ">=3.10"
 
 dependencies = [
-    "markcrawl>=0.10.5",
+    "markcrawl>=0.11.1",
     "scrapy",
     "crawl4ai==0.8.6",
     "crawlee[playwright]",
